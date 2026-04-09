@@ -3636,13 +3636,13 @@ setTimeout(function(){
   var sbRaise = document.getElementById('bsb-raise-input');
   if(sbCash && savedBgt.cash) sbCash.value = savedBgt.cash;
   if(sbRaise && savedBgt.raise != null) sbRaise.value = savedBgt.raise;
-  // One-time cleanup: reset all auto-populated amounts back to $0
-  // Only keep committee-approved contributions (Dawson Holle + Karen Rohr)
+  // Cleanup: reset ALL amounts to $0 except committee-approved candidates
+  // Only Dawson Holle ($500) and Karen Rohr ($500) are approved
   var _tracker = loadTracker();
   var _cleaned = false;
   var _approvedKeys = {'person_holle_31':true, 'person_rohr_31':true};
   Object.keys(_tracker).forEach(function(k){
-    if(!_approvedKeys[k] && _tracker[k].amt > 0 && _tracker[k].status === 'none'){
+    if(!_approvedKeys[k] && _tracker[k].amt > 0){
       _tracker[k].amt = 0;
       _cleaned = true;
     }
