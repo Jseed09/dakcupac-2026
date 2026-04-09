@@ -1673,6 +1673,7 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
   </div>
   <div style="display:flex;align-items:center;gap:10px">
     <button onclick="openGACModal()" class="header-badge" style="cursor:pointer;color:#90EE90;border:1px solid rgba(144,238,144,0.4);background:rgba(255,255,255,0.15);font-family:inherit;transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,.25)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">Balance: <strong style="font-size:14px">$34,029</strong></button>
+    <button onclick="toggleTierBar()" class="header-badge" style="cursor:pointer;border:1px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.15);font-family:inherit;">🎯 Filter Recs</button>
     <div class="header-badge">⚑ Filing Deadline Apr 6</div>
   </div>
 </header>
@@ -1689,6 +1690,21 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
 </nav>
 
 <!-- ── BUDGET SIDEBAR (pull tab + collapsible) ── -->
+<!-- Global Recommendation Tier Filters -->
+<div id="tier-filter-bar" style="display:none;position:fixed;top:128px;left:50%;transform:translateX(-50%);z-index:185;background:var(--white);border:1px solid var(--border);border-radius:0 0 12px 12px;padding:6px 12px;box-shadow:var(--shadow-md);display:flex;gap:4px;flex-wrap:wrap;">
+  <span style="font-size:10px;font-weight:700;color:var(--text-muted);margin-right:4px;align-self:center;">FILTER:</span>
+  <button onclick="toggleTierFilter('all')" class="tier-btn active" id="tbtn-all" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid var(--border);background:var(--teal);color:#fff;cursor:pointer;">All</button>
+  <button onclick="toggleTierFilter('PROTECT')" class="tier-btn" id="tbtn-PROTECT" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid #15803D;background:#fff;color:#15803D;cursor:pointer;">🛡️ Protect</button>
+  <button onclick="toggleTierFilter('MAINTAIN')" class="tier-btn" id="tbtn-MAINTAIN" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid #15803D;background:#fff;color:#15803D;cursor:pointer;">✅ Maintain</button>
+  <button onclick="toggleTierFilter('BUILD')" class="tier-btn" id="tbtn-BUILD" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid #0D7377;background:#fff;color:#0D7377;cursor:pointer;">🤝 Build</button>
+  <button onclick="toggleTierFilter('EVALUATE')" class="tier-btn" id="tbtn-EVALUATE" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid #1D4ED8;background:#fff;color:#1D4ED8;cursor:pointer;">🔍 Evaluate</button>
+  <button onclick="toggleTierFilter('HEDGE')" class="tier-btn" id="tbtn-HEDGE" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid #7C3AED;background:#fff;color:#7C3AED;cursor:pointer;">🔀 Hedge</button>
+  <button onclick="toggleTierFilter('HOLD')" class="tier-btn" id="tbtn-HOLD" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid #B45309;background:#fff;color:#B45309;cursor:pointer;">⚠️ Hold</button>
+  <button onclick="toggleTierFilter('NOT RECOMMENDED')" class="tier-btn" id="tbtn-NOTREC" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid #B91C1C;background:#fff;color:#B91C1C;cursor:pointer;">🚫 Not Rec</button>
+  <button onclick="toggleTierFilter('ALIGNED')" class="tier-btn" id="tbtn-ALIGNED" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid #6B7280;background:#fff;color:#6B7280;cursor:pointer;">👍 Aligned</button>
+  <button onclick="toggleTierFilter('OUTREACH')" class="tier-btn" id="tbtn-OUTREACH" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid #6B7280;background:#fff;color:#6B7280;cursor:pointer;">📋 Outreach</button>
+  <button onclick="toggleTierFilter('hide-all')" class="tier-btn" id="tbtn-hideall" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid var(--ink);background:#fff;color:var(--ink);cursor:pointer;">✕ Hide All Recs</button>
+</div>
 <div class="budget-sidebar-tab" id="budget-tab" onclick="toggleBudgetSidebar()">💰</div>
 <aside class="budget-sidebar" id="budget-sidebar">
   <div>
@@ -2724,8 +2740,8 @@ function getSB2266Vote(name, chamber){
   // Step 1: exact full-name match (fastest, most specific)
   const full = name.toLowerCase().replace(/[^a-z]/g,'');
   if(SB2266_LOOKUP[full]) return SB2266_LOOKUP[full];
-  // Step 2: last-name fallback — search ALL_VOTES with chamber AND first-name check
-  // Prevents Shawn Kessel from inheriting Greg Kessel's vote, etc.
+  // Step 2: last-name fallback — REQUIRES first name match
+  // No exceptions. Dennis Johnson's vote cannot transfer to Corey Johnson, period.
   const parts = name.trim().split(/\s+/);
   const last = parts[parts.length-1].toLowerCase();
   const first = parts[0].toLowerCase();
@@ -2733,16 +2749,14 @@ function getSB2266Vote(name, chamber){
     const vParts = v.name.trim().split(/\s+/);
     const vLast = vParts[vParts.length-1].toLowerCase();
     const vFirst = vParts[0].toLowerCase();
-    // Must match last name AND (same first name OR same chamber)
-    return vLast === last && (vFirst === first || (chamber && v.chamber === chamber));
+    // MUST match BOTH first AND last name — no exceptions
+    return vLast === last && vFirst === first;
   });
   if(!matches.length) return null;
-  // Prefer exact first+last match
-  const exactMatch = matches.find(v => v.name.trim().split(/\s+/)[0].toLowerCase() === first);
-  if(exactMatch) return exactMatch.vote;
+  // If chamber specified, prefer that chamber's match
   if(chamber){
     const chamberMatch = matches.find(v => v.chamber === chamber);
-    return chamberMatch ? chamberMatch.vote : null;
+    if(chamberMatch) return chamberMatch.vote;
   }
   return matches[0].vote;
 }
@@ -3351,8 +3365,10 @@ function getCupacRec(name, dist, chamber, party, isIncumbent) {
   if(_recCache[key]) return _recCache[key];
 
   var ch = (chamber==='Senate'||chamber==='S') ? 'Senate' : 'House';
-  // SB 2266 vote — check BOTH chambers
-  var vote = getSB2266Vote(name, ch) || getSB2266Vote(name, ch==='Senate'?'House':'Senate');
+  // SB 2266 vote — check own chamber first, then other chamber
+  // Cross-chamber is needed for House→Senate transfers (e.g. Jayme Davis voted YEA as House, now running Senate)
+  // But getSB2266Vote now requires exact first+last name match, so no cross-person leakage
+  var vote = getSB2266Vote(name, ch) || getSB2266Vote(name, null);
   var votedYea = vote==='YEA';
   var votedNay = vote==='NAY';
   var noVote = !vote || vote==='—';
@@ -3636,13 +3652,14 @@ setTimeout(function(){
   var sbRaise = document.getElementById('bsb-raise-input');
   if(sbCash && savedBgt.cash) sbCash.value = savedBgt.cash;
   if(sbRaise && savedBgt.raise != null) sbRaise.value = savedBgt.raise;
-  // Cleanup: reset ALL amounts to $0 except committee-approved candidates
+  // Cleanup: reset ALL tracker amounts to $0 except committee-approved candidates
   // Only Dawson Holle ($500) and Karen Rohr ($500) are approved
   var _tracker = loadTracker();
   var _cleaned = false;
   var _approvedKeys = {'person_holle_31':true, 'person_rohr_31':true};
   Object.keys(_tracker).forEach(function(k){
-    if(!_approvedKeys[k] && _tracker[k].amt > 0){
+    var amt = parseInt(_tracker[k].amt) || 0;
+    if(!_approvedKeys[k] && amt > 0){
       _tracker[k].amt = 0;
       _cleaned = true;
     }
@@ -4013,6 +4030,39 @@ function generateNDExcel() {
   });
 }
 
+// Global tier filter — show/hide recommendation blocks by tier
+var _activeTierFilter = 'all';
+function toggleTierFilter(tier) {
+  _activeTierFilter = tier;
+  // Update button styles
+  document.querySelectorAll('.tier-btn').forEach(function(b){ b.style.background='#fff'; b.style.fontWeight='400'; });
+  var activeBtn = document.getElementById('tbtn-'+(tier==='NOT RECOMMENDED'?'NOTREC':tier==='hide-all'?'hideall':tier));
+  if(activeBtn){ activeBtn.style.background=activeBtn.style.color; activeBtn.style.color='#fff'; activeBtn.style.fontWeight='700'; }
+
+  // Show/hide all recommendation blocks based on tier
+  document.querySelectorAll('[id^="rec_"]').forEach(function(el){
+    if(tier === 'all') { el.style.display = ''; }
+    else if(tier === 'hide-all') { el.style.display = 'none'; }
+    else {
+      // Check if this rec block contains the tier text
+      var tierText = el.querySelector('div')?.textContent || '';
+      if(tierText.indexOf(tier) >= 0) { el.style.display = ''; }
+      else { el.style.display = 'none'; }
+    }
+  });
+  // Also hide/show the profileCard recs (they don't have IDs)
+  document.querySelectorAll('.profile-card [style*="border:2px solid"]').forEach(function(el){
+    if(tier === 'all') { el.parentElement.style.display = ''; }
+    else if(tier === 'hide-all') { el.parentElement.style.display = 'none'; }
+  });
+}
+
+// Show/hide the tier filter bar
+function toggleTierBar() {
+  var bar = document.getElementById('tier-filter-bar');
+  bar.style.display = bar.style.display === 'none' ? 'flex' : 'none';
+}
+
 function toggleBudgetSidebar() {
   var sidebar = document.getElementById('budget-sidebar');
   var tab = document.getElementById('budget-tab');
@@ -4208,7 +4258,10 @@ function personCard(cfg){
 
   // ── CUPAC RECOMMENDATION (unified engine) ──
   var recBlock = '';
-  if(parseInt(dist) && parseInt(dist)%2===1) {
+  // Only show recommendations for candidates who are actually on the 2026 ballot
+  // Must be in CANDIDATES array AND on an odd district
+  var _isOnBallot = parseInt(dist) && parseInt(dist)%2===1 && CANDIDATES.some(function(c){return c.name===name && parseInt(c.dist)===parseInt(dist);});
+  if(_isOnBallot) {
     // Use unified recommendation engine (cached)
     var _rec = getCupacRec(name, parseInt(dist), chamber, party, cfg.incumbent);
 
