@@ -3636,8 +3636,20 @@ setTimeout(function(){
   var sbRaise = document.getElementById('bsb-raise-input');
   if(sbCash && savedBgt.cash) sbCash.value = savedBgt.cash;
   if(sbRaise && savedBgt.raise != null) sbRaise.value = savedBgt.raise;
-  // Pre-seed confirmed contributions (Dawson Holle + Karen Rohr — committee approved)
+  // One-time cleanup: reset all auto-populated amounts back to $0
+  // Only keep committee-approved contributions (Dawson Holle + Karen Rohr)
   var _tracker = loadTracker();
+  var _cleaned = false;
+  var _approvedKeys = {'person_holle_31':true, 'person_rohr_31':true};
+  Object.keys(_tracker).forEach(function(k){
+    if(!_approvedKeys[k] && _tracker[k].amt > 0 && _tracker[k].status === 'none'){
+      _tracker[k].amt = 0;
+      _cleaned = true;
+    }
+  });
+  if(_cleaned) saveTracker(_tracker);
+
+  // Pre-seed confirmed contributions (Dawson Holle + Karen Rohr — committee approved)
   var _preSeeded = false;
   var _confirmed = [
     {key:'person_holle_31', name:'Dawson Holle', amt:500, status:'contributed'},
@@ -4200,16 +4212,8 @@ function personCard(cfg){
     // Use unified recommendation engine (cached)
     var _rec = getCupacRec(name, parseInt(dist), chamber, party, cfg.incumbent);
 
-    // Auto-populate tracker if no decision made yet
-    if(_rec.amt > 0 && saved.status === 'none' && !saved.amt) {
-      var _trkData = loadTracker();
-      if(!_trkData[ukey]) _trkData[ukey] = {status:'none',notes:'',amt:0};
-      if(!_trkData[ukey].amt) {
-        _trkData[ukey].amt = _rec.amt;
-        saveTracker(_trkData);
-        saved.amt = _rec.amt;
-      }
-    }
+    // Recommendations are display-only — do NOT auto-fill tracker
+    // Only Dawson Holle and Karen Rohr are pre-seeded (committee approved)
 
     // Build the recommendation block
     var _recBg = _rec.amt > 0 ? 'rgba('+(_rec.color==='#15803D'?'21,128,61':_rec.color==='#0D7377'?'13,115,119':_rec.color==='#1D4ED8'?'29,78,216':'107,114,128')+',0.06)' : (_rec.color==='#B91C1C'||_rec.color==='#991B1B'?'#FEF2F2':'var(--surface)');
