@@ -2780,7 +2780,7 @@ const CANDIDATES = [
   {ch:'Senate',dist:31,name:'Kelly Spilman',party:'D',incumbent:false,email:'kellysspilman@gmail.com',phone:'(701) 426-5791',web:'',news:'Running as Democratic candidate in Senate Dist 31. Very limited campaign coverage. (Dakota News Network, 2026)',employer:'Mandan resident'},
   {ch:'Senate',dist:33,name:'Keith Boehm',party:'R',incumbent:true,email:'mheob10@hotmail.com',phone:'(701) 425-1520',web:'',news:'Announced reelection Nov 22, 2025. Priorities: fossil fuels, property taxes, agriculture. First elected 2022 defeating incumbent in primary. (boehmfornd.com, Nov 2025)', ibl:'IBL Vice Chair'},
   {ch:'Senate',dist:33,name:'Signe Snortland',party:'D',incumbent:false,email:'ssnortland1@gmail.com',phone:'(701) 426-9536',web:'',news:'Archaeologist, former ND chief archaeologist. Running alongside Kruckenberg and Banks. Daughter of former Supt. of Public Instruction. (Bismarck Mandan Leaders, 2026)',employer:'Archaeologist; fmr. chief archaeologist State of North Dakota'},
-  {ch:'Senate',dist:35,name:'Sean Cleary',party:'R',incumbent:true,email:'seandcleary13@gmail.com',phone:'(701) 426-4618',web:'www.clearyfornd.com',news:'Running for reelection. First elected 2022 defeating incumbent Democrat Tracy Potter. Economist at University of Mary. Focuses on Legacy Fund transparency and health care affordability. (Ballotpedia, 2026)'},
+  {ch:'Senate',dist:35,name:'Sean Cleary',party:'R',incumbent:true,email:'seandcleary13@gmail.com',phone:'(701) 426-4618',web:'www.clearyfornd.com',familyBankingTie:true,familyBankingDetail:'Spouse is a registered lobbyist for the banking industry',news:'⚠ BANKING CONNECTION: Spouse is a registered lobbyist for the banking industry. Running for reelection. First elected 2022 defeating incumbent Democrat Tracy Potter. Economist at University of Mary. Voted NAY on SB 2266. (Ballotpedia, 2026)'},
   {ch:'Senate',dist:35,name:'Dale Pittman',party:'D',incumbent:false,email:'jdpittman@gmail.com',phone:'(701) 516-0004',web:'',news:'No recent news found. (—, 2026)',employer:'Bismarck resident'},
   {ch:'Senate',dist:37,name:'Dean Rummel',party:'R',incumbent:true,email:'drummel@ndsupernet.com',phone:'(701) 290-0593',web:'deanrummel.com',news:'Seeking reelection; received District 37 GOP endorsement. Discussed Theodore Roosevelt Presidential Library infrastructure challenges. (Dickinson Press, Feb 2026)'},
   {ch:'Senate',dist:39,name:'Greg Kessel',party:'R',incumbent:true,email:'gregory.kessel@gmail.com',phone:'(701) 260-0609',web:'',news:'Incumbent eligible for reelection. Serves on Energy and Natural Resources (VP) and Industry and Business committees. From Belfield. No formal reelection announcement found. (Ballotpedia, 2026)'},
@@ -3323,7 +3323,7 @@ function profileCard(l){
       var rec = getCupacRec(l.name, l.distNum, l.chamber, l.party, true);
       if(!rec.tier) return '';
       var bg = rec.amt>0 ? 'rgba('+(rec.color==='#15803D'?'21,128,61':rec.color==='#0D7377'?'13,115,119':'107,114,128')+',0.06)' : (rec.color==='#B91C1C'||rec.color==='#991B1B'?'#FEF2F2':'var(--surface)');
-      return '<div style="padding:8px 14px;border-bottom:1px solid var(--border)"><div style="padding:6px 8px;background:'+bg+';border:2px solid '+rec.color+';border-radius:8px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px"><span style="font-size:10px;font-weight:700;color:'+rec.color+'">'+rec.icon+' '+rec.tier+'</span>'+(rec.amt?'<span style="font-size:14px;font-weight:700;color:'+rec.color+'">$'+rec.amt+'</span>':'<span style="font-size:10px;color:'+rec.color+'">$0</span>')+'</div><div style="font-size:10px;font-weight:600;color:var(--text)">'+rec.action+'</div><div style="font-size:9px;color:var(--text-dim)">'+rec.reasons.join(' · ')+'</div></div></div>';
+      return '<div style="padding:8px 14px;border-bottom:1px solid var(--border)"><div style="padding:6px 8px;background:'+bg+';border:2px solid '+rec.color+';border-radius:8px;position:relative"><button onclick="this.parentElement.parentElement.style.display=\'none\'" style="position:absolute;top:2px;right:4px;background:none;border:none;cursor:pointer;font-size:13px;color:var(--text-muted);padding:2px 4px;" title="Dismiss recommendation">✕</button><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;padding-right:18px"><span style="font-size:10px;font-weight:700;color:'+rec.color+'">'+rec.icon+' '+rec.tier+'</span>'+(rec.amt?'<span style="font-size:14px;font-weight:700;color:'+rec.color+'">$'+rec.amt+'</span>':'<span style="font-size:10px;color:'+rec.color+'">$0</span>')+'</div><div style="font-size:10px;font-weight:600;color:var(--text)">'+rec.action+'</div><div style="font-size:9px;color:var(--text-dim)">'+rec.reasons.join(' · ')+'</div></div></div>';
     })()}
 
     <!-- News snippet -->
@@ -3449,13 +3449,26 @@ function getCupacRec(name, dist, chamber, party, isIncumbent) {
     reasons.push('Prior CUPAC recipient ($'+cupacTotal+')');
 
   } else if(votedYea && !hasCupac) {
-    tier='BUILD'; icon='🤝'; color='#0D7377';
-    amt = inPrimary ? 400 : 300;
-    timing = inPrimary ? 'Phase 1 — contribute before June 9 primary' : 'Phase 2 — introduce relationship at general (Oct)';
-    action = inPrimary ? 'Supported FOM without prior CUPAC support — opportunity to establish relationship during primary'
-           : 'Supported FOM independently' + (_winReason ? ' — '+_winReason : '') + '. First contribution introduces CUPAC for 70th Assembly';
-    reasons.push('Supported FOM (SB 2266 YEA vote) without prior CUPAC relationship');
-    reasons.push('First CUPAC contribution establishes goodwill');
+    // BUILD only if: (a) they have a realistic chance of winning (party matches district lean or incumbent)
+    // AND (b) the vote is verified as THEIRS (not inherited from a name match)
+    var _partyMatchesLean = (party==='R' && lean.t > lean.d) || (party==='D' && lean.d > lean.t);
+    var _canWin = isIncumbent || _partyMatchesLean || competitive;
+    if(_canWin) {
+      tier='BUILD'; icon='🤝'; color='#0D7377';
+      amt = inPrimary ? 400 : 300;
+      timing = inPrimary ? 'Phase 1 — contribute before June 9 primary' : 'Phase 2 — introduce relationship at general (Oct)';
+      action = inPrimary ? 'Supported FOM without prior CUPAC support — opportunity to establish relationship during primary'
+             : 'Supported FOM independently' + (_winReason ? ' — '+_winReason : '') + '. First contribution introduces CUPAC for 70th Assembly';
+      reasons.push('Supported FOM (SB 2266 YEA vote) without prior CUPAC relationship');
+      reasons.push('First CUPAC contribution establishes goodwill');
+    } else {
+      // They voted YEA but can't win — acknowledge alignment but don't recommend funding
+      tier='ALIGNED'; icon='👍'; color='#6B7280'; amt=0;
+      timing = 'No contribution recommended — district not competitive for this candidate';
+      action = 'Supported FOM but in an unwinnable district for their party. Acknowledge alignment, no funding recommended.';
+      reasons.push('Supported FOM (SB 2266 YEA vote)');
+      reasons.push('District lean does not favor their party — investment unlikely to produce a seated ally');
+    }
 
   } else if(votedNay && bankerTotal >= 800) {
     tier='NOT RECOMMENDED'; icon='🚫'; color='#B91C1C'; amt=0;
@@ -3484,13 +3497,13 @@ function getCupacRec(name, dist, chamber, party, isIncumbent) {
     // CHECK: does their opponent have a known FOM vote? If so, adjust recommendation
     var ctx = isIncumbent ? 'Incumbent' : cand&&cand.formerHouse ? 'Former House member running for Senate' : cand&&cand.formerSenate ? 'Former Senator running for House' : 'Returning legislator';
     if(_oppHasAlly) {
-      // Their primary opponent is a proven FOM supporter — prioritize the ally
+      // Their primary opponent is a proven FOM supporter — prioritize the ally but maintain relationship
       tier='EVALUATE'; icon='🔍'; color='#1D4ED8';
-      amt = hasCupac ? 200 : 0;
-      timing = 'Phase 1 — prioritize FOM-aligned opponent in this primary';
-      action = ctx + ' with no FOM vote on record. Primary opponent has a proven FOM voting record — recommend prioritizing the known supporter. Consider a courtesy contribution if prior CUPAC relationship exists, but primary investment should go to the aligned candidate.';
+      amt = hasCupac ? 300 : 0;
+      timing = 'Phase 1 — maintain relationship, prioritize FOM-aligned opponent';
+      action = ctx + ' with no FOM vote on record. Primary opponent has a proven FOM voting record. Maintain existing CUPAC relationship with a courtesy contribution, but prioritize the FOM-aligned candidate.';
       reasons.push('No SB 2266 vote — primary opponent is a confirmed FOM supporter');
-      reasons.push('Recommendation: prioritize the FOM-aligned candidate in this race');
+      if(hasCupac) reasons.push('Prior CUPAC recipient ($'+cupacTotal+') — maintain the relationship');
     } else {
       tier='EVALUATE'; icon='🔍'; color='#1D4ED8';
       amt = hasCupac ? 300 : 200;
@@ -4200,8 +4213,10 @@ function personCard(cfg){
 
     // Build the recommendation block
     var _recBg = _rec.amt > 0 ? 'rgba('+(_rec.color==='#15803D'?'21,128,61':_rec.color==='#0D7377'?'13,115,119':_rec.color==='#1D4ED8'?'29,78,216':'107,114,128')+',0.06)' : (_rec.color==='#B91C1C'||_rec.color==='#991B1B'?'#FEF2F2':'var(--surface)');
-    recBlock = '<div style="padding:8px 10px;background:'+_recBg+';border:2px solid '+_rec.color+';border-radius:10px;margin-top:6px;">'
-      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">'
+    var _recId = 'rec_'+name.replace(/[^a-zA-Z0-9]/g,'')+'_'+dist;
+    recBlock = '<div id="'+_recId+'" style="padding:8px 10px;background:'+_recBg+';border:2px solid '+_rec.color+';border-radius:10px;margin-top:6px;position:relative;">'
+      +'<button onclick="this.parentElement.style.display=\'none\'" style="position:absolute;top:4px;right:6px;background:none;border:none;cursor:pointer;font-size:14px;color:var(--text-muted);line-height:1;padding:2px 4px;" title="Dismiss recommendation">✕</button>'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;padding-right:20px;">'
         +'<div style="font-size:11px;font-weight:700;color:'+_rec.color+';letter-spacing:.04em;">'+_rec.icon+' '+_rec.tier+'</div>'
         +(_rec.amt > 0 ? '<div style="font-size:16px;font-weight:700;color:'+_rec.color+';">$'+_rec.amt+'</div>' : '<div style="font-size:11px;font-weight:700;color:'+_rec.color+';">$0 recommended</div>')
       +'</div>'
