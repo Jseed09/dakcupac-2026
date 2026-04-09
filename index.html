@@ -2716,23 +2716,30 @@ ALL_VOTES.forEach(r=>{
   // Full name key (primary — most specific, avoids last-name collisions)
   const fullKey = r.name.toLowerCase().replace(/[^a-z]/g,'');
   SB2266_LOOKUP[fullKey] = r.vote;
-  // Last name key (secondary fallback — only if slot not already taken)
-  const lastName = r.name.trim().split(/\s+/).pop().toLowerCase().replace(/[^a-z]/g,'');
-  if(!SB2266_LOOKUP[lastName]) SB2266_LOOKUP[lastName] = r.vote;
+  // No last-name keys in lookup — prevents cross-person attribution
+  // (e.g. Shawn Kessel inheriting Greg Kessel's vote)
 });
 function getSB2266Vote(name, chamber){
   if(!name) return null;
   // Step 1: exact full-name match (fastest, most specific)
   const full = name.toLowerCase().replace(/[^a-z]/g,'');
   if(SB2266_LOOKUP[full]) return SB2266_LOOKUP[full];
-  // Step 2: last-name fallback — search ALL_VOTES with chamber filter
-  // This prevents Jon Lee (House, new) from inheriting Judy Lee (Senate NAY)
-  const last = name.trim().split(/\s+/).pop().toLowerCase();
+  // Step 2: last-name fallback — search ALL_VOTES with chamber AND first-name check
+  // Prevents Shawn Kessel from inheriting Greg Kessel's vote, etc.
+  const parts = name.trim().split(/\s+/);
+  const last = parts[parts.length-1].toLowerCase();
+  const first = parts[0].toLowerCase();
   const matches = ALL_VOTES.filter(v=>{
-    const vLast = v.name.trim().split(/\s+/).pop().toLowerCase();
-    return vLast === last;
+    const vParts = v.name.trim().split(/\s+/);
+    const vLast = vParts[vParts.length-1].toLowerCase();
+    const vFirst = vParts[0].toLowerCase();
+    // Must match last name AND (same first name OR same chamber)
+    return vLast === last && (vFirst === first || (chamber && v.chamber === chamber));
   });
   if(!matches.length) return null;
+  // Prefer exact first+last match
+  const exactMatch = matches.find(v => v.name.trim().split(/\s+/)[0].toLowerCase() === first);
+  if(exactMatch) return exactMatch.vote;
   if(chamber){
     const chamberMatch = matches.find(v => v.chamber === chamber);
     return chamberMatch ? chamberMatch.vote : null;
@@ -2807,7 +2814,7 @@ const CANDIDATES = [
   {ch:'House',dist:7,name:'Tiffany Williams-Rice',party:'D',incumbent:false,email:'tiffany.williamsrice@gmail.com',phone:'(520) 456-5479',web:'',news:'Bismarck 5th-grade teacher. Focused on childcare affordability, education, and advocacy for underserved students. (InForum, 2026)',employer:'5th-grade teacher, Bismarck Public Schools; UND/Colorado State/U of Washington'},
   {ch:'House',dist:9,name:'Duane Poitra',party:'D',incumbent:false,email:'dpoitra67@gmail.com',phone:'(701) 550-1588',web:'',employer:'Belcourt resident'},
   {ch:'House',dist:11,name:'Anastassiya (Stass) Andrianova',party:'D',incumbent:false,email:'aandrianova@gmail.com',phone:'(917) 202-3835',web:''},
-  {ch:'House',dist:11,name:'Liz Conmy',party:'D',incumbent:false,email:'quamconmy@gmail.com',phone:'(701) 793-6409',web:'',news:'Incumbent announced reelection Jan 15, 2026. Serves on Energy and Education committees. Named to ND Human Trafficking Commission. Opposed private school voucher bill on constitutional grounds. (InForum, Jan 2026)'},
+  {ch:'House',dist:11,name:'Liz Conmy',party:'D',incumbent:true,email:'quamconmy@gmail.com',phone:'(701) 793-6409',web:'',news:'Incumbent announced reelection Jan 15, 2026. Serves on Energy and Education committees. Named to ND Human Trafficking Commission. Opposed private school voucher bill on constitutional grounds. (InForum, Jan 2026)'},
   {ch:'House',dist:13,name:'Russell Bubach',party:'R',incumbent:false,email:'rlbubach@msn.com',phone:'(701) 212-2890',web:'voted13wf.com',news:'ENDORSED by NDGOP D13 for House. 35+ years USDA Farm Service Agency. D13 Republican Party chairman. Running with Duckworth — says incumbents not lining up with Republican platform. (ND Monitor Apr 6 2026; InForum Jan 2026)',employer:'35+ yrs USDA Farm Service Agency; NDGOP D13 Chair'},
   {ch:'House',dist:13,name:'Everett Duckworth',party:'R',incumbent:false,email:'lee83everett@outlook.com',phone:'(701) 969-0867',web:'voted13wf.com',news:'ENDORSED by NDGOP D13 for House. Retired civil engineer. Running with Bubach on accountability platform against incumbents Jonas and Schauer. (ND Monitor Apr 6 2026; InForum Jan 2026)',employer:'Retired civil engineer'},
   {ch:'House',dist:13,name:'Maggi Gadaire',party:'D',incumbent:false,email:'Gadairemaggi@gmail.com',phone:'(701) 371-0605',web:'',news:'Semi-retired nurse. First-time candidate. Attended her first Dem-NPL state convention March 7 — strongest Dem turnout in 8 years. (North Dakota Monitor, Mar 2026)',employer:'Semi-retired nurse'},
@@ -2820,7 +2827,7 @@ const CANDIDATES = [
   {ch:'House',dist:15,name:'Corry Kenner',party:'R',incumbent:false,email:'corry.g.kenner@gmail.com',phone:'(701) 351-3301',web:'',news:'No recent news found. Not confirmed on SOS filing list as of research date.'},
   {ch:'House',dist:17,name:'Don Aandal',party:'D',incumbent:false,email:'daandal@yahoo.com',phone:'(218) 689-5874',web:'',news:'Endorsed by Dist 17 Dem-NPL. Running alongside Senate candidate Katie Benton. (Grand Forks Herald, 2026)',employer:'Grand Forks resident'},
   {ch:'House',dist:17,name:'Reed Johnson',party:'R',incumbent:false,email:'reed@reedfornd.com',phone:'(701) 590-0066',web:'reedfornd.com',news:'West Point grad, Army tank commander, law student. Announced Feb 5, 2026. Positioning as "reasonable right" opposing far-right populists. Focuses on economic growth and property tax relief. (Grand Forks Herald, Feb 2026)',employer:'Fmr. legal counsel in Gov. Armstrong office; West Point grad; Army officer; law student'},
-  {ch:'House',dist:17,name:'Mark Sanford',party:'R',incumbent:false,email:'msanford@gra.midco.net',phone:'(701) 772-4236',web:''},
+  {ch:'House',dist:17,name:'Mark Sanford',party:'R',incumbent:true,email:'msanford@gra.midco.net',phone:'(701) 772-4236',web:''},
   {ch:'House',dist:19,name:'Karen A Anderson',party:'R',incumbent:true,email:'kareand@polarcomm.com',phone:'(701) 520-0559',web:'',news:'Incumbent (elected 2022). Serves on Human Services and Transportation; Walsh County Commissioner. No specific 2026 reelection announcement found. (Ballotpedia, 2026)', ibl:'IBL Member'},
   {ch:'House',dist:19,name:'Jolene L Hermanson',party:'D',incumbent:false,email:'jolenehermanson@gmail.com',phone:'(701) 739-0878',web:'',news:'No recent news found. District 19 Dem-NPL endorsements went to Jeff Hermanson (Senate) per Grand Forks Herald. (—, 2026)',employer:'Grafton resident'},
   {ch:'House',dist:19,name:'David Monson',party:'R',incumbent:true,email:'davmon8@gmail.com',phone:'(701) 496-3394',web:'',news:'Long-serving incumbent 22+ years on Appropriations. Chairs Government Operations Division. Voted for 2026 term limits ballot amendment. (Ballotpedia, 2026)'},
@@ -2830,7 +2837,7 @@ const CANDIDATES = [
   {ch:'House',dist:23,name:'Mark Casler',party:'D',incumbent:false,email:'markcaslerfornd@gmail.com',phone:'(701) 770-6351',web:'',news:'Previously lost Nov 2024 special election for Dist 23 to Nehring. Williston native, Dem-NPL Executive Committee member. Likely running again 2026. (Ballotpedia, 2026)',facebook:'https://www.facebook.com/markcaslerfornd',linkedin:'https://www.linkedin.com/in/mark-casler-a99625101/',employer:'Construction/farm equipment; NDSU grad (Political Science)'},
   {ch:'House',dist:23,name:'Corey Johnson',party:'R',incumbent:false,email:'cajohnsonfornd@gmail.com',phone:'(701) 570-4018',web:'johnsonfornd.com',news:'⚠ Former District 23 GOP chair. Lost party endorsement to Sharlet Mohr after Sons of Liberty flooded convention. Will challenge Mohr in June primary. (North Dakota Monitor, Jan 2026)',facebook:'https://www.facebook.com/johnsonfornd/',employer:'Interim Fire Chief, City of Williston; District 23 GOP Chair'},
   {ch:'House',dist:23,name:'Sharlet Mohr',party:'R',incumbent:false,email:'sharletmohr@yahoo.com',phone:'(701) 570-9163',web:'',news:'⚠ Won NDGOP Dist 23 endorsement amid controversy — Rob Port called her a "sham candidate" (previously ran in 2024 U.S. House primary to dilute votes for Julie Fedorchak). Sons of Liberty flooded convention. (InForum, Jan 2026)',employer:'Moms for Liberty activist; ran for U.S. House 2024 (R primary, 1%)'},
-  {ch:'House',dist:23,name:'Dennis Nehring',party:'R',incumbent:false,email:'dennisnehring2@gmail.com',phone:'(701) 809-0869',web:'',news:'Incumbent; appointed May 2024, won Nov 2024 special election over Mark Casler. Army veteran and rancher. (Ballotpedia, 2026)',employer:'Retired rancher & oil field worker; fmr. Williams County School Board; appointed House D23 May 2024'},
+  {ch:'House',dist:23,name:'Dennis Nehring',party:'R',incumbent:true,email:'dennisnehring2@gmail.com',phone:'(701) 809-0869',web:'',news:'Incumbent; appointed May 2024, won Nov 2024 special election over Mark Casler. Army veteran and rancher. (Ballotpedia, 2026)',employer:'Retired rancher & oil field worker; fmr. Williams County School Board; appointed House D23 May 2024'},
   {ch:'House',dist:23,name:'Michael A Steele',party:'D',incumbent:false,email:'michaelsteelefornd@gmail.com',phone:'(701) 500-2360',web:'',news:'Previously ran for U.S. Senate (D) 2022. Fargo small business owner, Army veteran, cancer survivor. No specific 2026 House Dist 23 news found. (Ballotpedia, 2022)',facebook:'https://www.facebook.com/steele2022/',linkedin:'https://www.linkedin.com/in/michael-steele-65416a145/',employer:'Art and antiques vendor; ran for U.S. Senate 2022 (D primary)'},
   {ch:'House',dist:25,name:'Matt Evans',party:'R',incumbent:false,email:'d25@mattevans.org',phone:'(701) 205-2844',web:'evans4nd.com',news:'⚠ CONTROVERSY: Involved in 2022 Young Republicans Telegram scandal involving hateful messages targeting racial minorities and LGBTQ individuals. Also applied religious litmus test selecting Schreiber-Beck replacement. (InForum/Rob Port, 2026)',employer:'District 25 Republican Party chairman'},
   {ch:'House',dist:25,name:'Terry Goerger',party:'R',incumbent:false,email:'tgrgr@rrt.net',phone:'(701) 640-0777',web:'',news:'⚠ Initially appointed June 2025 to replace the late Rep. Schreiber-Beck but appointment was rejected by ND Secretary of State — district party was not properly organized per NDGOP rules. No 2026 filing confirmed. (InForum, June 2025)',employer:'Retired farmer (Goerger Seed Farm/Company); Richland County Commissioner'},
@@ -2891,7 +2898,7 @@ const CANDIDATES = [
   {ch:'House',  dist:41, name:'Stacy Heidenreich',    party:'D', incumbent:false, email:'stacyheidenreich@yahoo.com',  phone:'(701) 866-7494', news:'Filed for House Dist. 41. Democratic-NPL candidate. (SoS filing, Apr 2026)'},
   {ch:'House',  dist:42, name:'Ethan Harsell',        party:'R', incumbent:false, email:'ethan1gk@harsell.org',        phone:'(701) 620-7697', web:'ethanharsell.com', news:'Filed for House Dist. 42. Republican candidate — three-way R primary with McNally and Osowski. (SoS filing, Apr 2026)',priorRace:true},
   {ch:'Senate', dist:9,  name:'Jayme Davis',          party:'D', incumbent:false, email:'jayme.m.davis@gmail.com',     phone:'(701) 202-8700', news:'Running for Senate Dist. 9 — D primary against Richard Marcellais. Former House Dist. 9 member. (SoS filing, Apr 2026)', runningForSenate:true,formerHouse:true,incumbent:false,formerLegislator:true,legHistory:'House Rep D9 in 69th Assembly (2025). Voted YEA on SB 2266. Now running Senate D9.',ndlegisUrl:'https://ndlegis.gov/biography/jayme-davis',news:'CONTESTED D PRIMARY: Gathered signatures to challenge Dem-NPL endorsed incumbent Sen. Marcellais. Both Turtle Mountain Band of Chippewa members. Davis calls 2026 a change election — says strong voices needed for Native communities. Voted YEA on SB 2266 as House Rep. (ND Monitor Apr 6 2026; KFGO Apr 7 2026)'},
-  {ch:'Senate', dist:11, name:"Christine O'Riley",    party:'R', incumbent:false, email:'christine4nd@gmail.com',      phone:'(701) 721-8854', news:'Filed for Senate Dist. 11 challenging incumbent Tim Mathern (D). R primary vs. Mathern in odd district. (SoS filing, Apr 2026)'},
+
 ];
 const POOLS = [
   {id:'leadership', label:'Leadership Relationships', icon:'⭐', color:'var(--teal-dark)', desc:'Senate/House leaders — regardless of ballot status.', default:5000},
@@ -3616,6 +3623,21 @@ setTimeout(function(){
   var sbRaise = document.getElementById('bsb-raise-input');
   if(sbCash && savedBgt.cash) sbCash.value = savedBgt.cash;
   if(sbRaise && savedBgt.raise != null) sbRaise.value = savedBgt.raise;
+  // Pre-seed confirmed contributions (Dawson Holle + Karen Rohr — committee approved)
+  var _tracker = loadTracker();
+  var _preSeeded = false;
+  var _confirmed = [
+    {key:'person_holle_31', name:'Dawson Holle', amt:500, status:'contributed'},
+    {key:'person_rohr_31', name:'Karen Rohr', amt:500, status:'contributed'}
+  ];
+  _confirmed.forEach(function(c){
+    if(!_tracker[c.key] || (!_tracker[c.key].amt && _tracker[c.key].status==='none')){
+      _tracker[c.key] = {status:c.status, amt:c.amt, notes:'Committee approved — Phase 1 contested primary'};
+      _preSeeded = true;
+    }
+  });
+  if(_preSeeded) saveTracker(_tracker);
+
   // Broadcast to all components
   broadcastBudget(savedBgt);
   if(typeof updateBudgetSidebar==='function') updateBudgetSidebar();
@@ -5842,7 +5864,7 @@ var RACE_HISTORY = {
 ]},
 
 // ── NON-INCUMBENTS WITH PRIOR RACE RECORDS ──
-'Sharlet Mohr': {bio:'No prior legislative service. Ran 2024 U.S. House R primary. NDGOP D23 endorsed for House 2026.',races:[
+'Sharlet Mohr': {bio:'No prior legislative service. Ran in 2024 U.S. House At-large Republican Primary (finished 4th). NDGOP D23 endorsed for House 2026. Moms for Liberty activist.',races:[
   {y:2024,title:'U.S. House At-large — Republican Primary',type:'primary',
    cands:[{n:'Julie Fedorchak (R)',pct:null,v:null,w:true},{n:'Rick Becker (R)',pct:null,v:null,w:false},{n:'Cara Mund (R)',pct:null,v:null,w:false},{n:'Sharlet Mohr (R)',pct:null,v:null,w:false}],
    note:'Mohr received ~1% of primary vote; Fedorchak won'},
