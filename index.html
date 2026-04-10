@@ -4416,7 +4416,7 @@ function personCard(cfg){
   return '<div class="'+cardClass+'" '+clickHandler+'>'
     +'<div class="pcard-hdr">'
       +'<div>'
-        +'<div class="pcard-name" onclick="openPersonCard(\''+safeName+'\','+(parseInt(dist)||0)+')">'+name+iblBadge+pins+'</div>'
+        +'<div class="pcard-name" onclick="openPersonCard(\''+safeName+'\','+(parseInt(dist)||0)+')">'+name+(_pcStatusLabel?' <span style="font-size:11px;font-weight:600;opacity:.85;color:#991B1B">('+_pcStatusLabel+')</span>':'')+iblBadge+pins+'</div>'
         +'<div class="pcard-meta">'+meta.join(' · ')+'</div>'
       +'</div>'
       +'<div class="pcard-badges">'+pb+' '+ballot+'</div>'
