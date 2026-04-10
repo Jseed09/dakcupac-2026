@@ -1501,23 +1501,28 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
 .pcard.pcard-yea{border-left:4px solid var(--green-border)}
 .pcard.pcard-nay{border-left:4px solid var(--red-border)}
 .pcard.pcard-notrunning{opacity:0.6;border-left:4px solid #B91C1C;background:#FEF2F2}
-.pcard.pcard-notrunning .pcard-hdr{background:rgba(185,28,28,0.08)}
+.pcard.pcard-notrunning .pcard-hdr{background:#8B1A1A}
 .pcard.pcard-priority{border-color:var(--gold-border);border-width:2px}
-.pcard-hdr{padding:10px 14px 8px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
-.pcard-name{font-family:var(--font-display);font-size:15px;font-weight:700;color:var(--teal);cursor:pointer;line-height:1.2;text-decoration:underline}
-.pcard-name:hover{color:var(--teal-dark)}
-.pcard-meta{font-size:11px;color:var(--text-muted);margin-top:2px}
-.pcard-badges{display:flex;flex-wrap:wrap;gap:4px;flex-shrink:0}
-.pcard-body{padding:10px 14px;display:flex;flex-direction:column;gap:8px;flex:1}
+.pcard-hdr{padding:12px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;background:var(--teal-dark)}
+.pcard-name{font-family:var(--font-display);font-size:16px;font-weight:700;color:#fff;cursor:pointer;line-height:1.2;text-decoration:none}
+.pcard-name:hover{opacity:.85}
+.pcard-meta{font-size:12px;color:rgba(255,255,255,0.75);margin-top:2px}
+.pcard-badges{display:flex;flex-wrap:wrap;gap:4px;margin-top:3px}
+.pcard-body{padding:0;display:flex;flex-direction:column;flex:1}
+.pcard-datagrid{display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid var(--border)}
+.pcard-datagrid>div{padding:10px 14px}
+.pcard-datagrid>div:not(:last-child){border-right:1px solid var(--border)}
+.pcard-gridlabel{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);margin-bottom:4px}
+.pcard-section{padding:10px 14px;border-bottom:1px solid var(--border)}
 .pcard-row{display:flex;align-items:center;justify-content:space-between;font-size:12px;gap:8px}
 .pcard-label{color:var(--text-muted);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
-.pcard-bars{display:flex;gap:3px;align-items:flex-end;height:32px}
+.pcard-bars{display:flex;gap:4px;align-items:flex-end;height:42px}
 .pcard-bar-wrap{display:flex;flex-direction:column;align-items:center;gap:1px;flex:1}
 .pcard-bar{width:100%;border-radius:2px 2px 0 0;background:#e8e8e8;min-height:3px}
 .pcard-bar.filled{background:var(--teal);cursor:pointer}
 .pcard-bar.filled:hover{opacity:.8}
 .pcard-barlabel{font-size:7px;color:var(--text-muted)}
-.pcard-footer{padding:8px 14px;background:var(--cream);border-top:1px solid var(--border);display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.pcard-footer{padding:10px 14px;background:var(--cream);border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between;font-size:12px}
 .pcard-tracker{display:flex;flex-direction:column;gap:6px;padding:8px 14px;border-top:1px solid var(--border);background:var(--cream-deep)}
 
 </style>
@@ -4413,29 +4418,81 @@ function personCard(cfg){
 
   var openBtn='<button class="btn" style="font-size:11px;padding:3px 10px;background:var(--teal);color:#fff;border-color:var(--teal)" onclick="openPersonCard(\''+safeName+'\','+( parseInt(dist)||0)+')">▸ Full card</button>';
 
+  // Party pill for header
+  var partyBg = party==='R' ? '#DAEAF5' : party==='D' ? '#F5DAD8' : '#e8e8e8';
+  var partyClr = party==='R' ? '#0D3B66' : party==='D' ? '#5C1010' : '#666';
+  var partyPill = party ? '<span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;background:'+partyBg+';color:'+partyClr+';flex-shrink:0">'+party+'</span>' : '';
+
+  // Ballot badge for data grid
+  var ballotGridBadge = cfg.onBallot
+    ? incBadge+'<span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;background:rgba(46,139,87,0.12);color:var(--green-text);border:1px solid var(--green-border)">✓ Dist. '+(parseInt(dist)||'')+'</span>'
+    : _isNotRunningCard
+    ? '<span style="font-size:11px;color:var(--text-muted);font-style:italic">'+(_pcStatusLabel||'Not on 2026 ballot')+'</span>'
+    : '<span style="font-size:11px;color:var(--text-muted)">—</span>';
+
+  // Coverage lookup
+  var _covMembers = COMMITTEE_MEMBERS.filter(function(m){return m.districts.includes(parseInt(dist));}).map(function(m){return m.name;});
+  var _covTxt = _covMembers.length ? _covMembers.join(', ') : '<span style="color:#aaa;font-style:italic">None assigned</span>';
+
   return '<div class="'+cardClass+'" '+clickHandler+'>'
     +'<div class="pcard-hdr">'
       +'<div>'
-        +'<div class="pcard-name" onclick="openPersonCard(\''+safeName+'\','+(parseInt(dist)||0)+')">'+name+(_pcStatusLabel?' <span style="font-size:11px;font-weight:600;opacity:.85;color:#991B1B">('+_pcStatusLabel+')</span>':'')+iblBadge+pins+'</div>'
-        +'<div class="pcard-meta">'+meta.join(' · ')+'</div>'
+        +'<div class="pcard-name" onclick="openPersonCard(\''+safeName+'\','+(parseInt(dist)||0)+')" title="Open full profile">'
+          +name+(_pcStatusLabel?' <span style="font-size:11px;font-weight:600;opacity:.85">('+_pcStatusLabel+')</span>':'')
+          +iblBadge+pins+' <span style="font-size:12px;opacity:.6">▸</span>'
+        +'</div>'
+        +'<div class="pcard-badges">'+ballot+'</div>'
+        +'<div class="pcard-meta">'+meta.join(' · ')+(cfg.role?' · '+cfg.role:'')+'</div>'
       +'</div>'
-      +'<div class="pcard-badges">'+pb+' '+ballot+'</div>'
+      +partyPill
     +'</div>'
+
     +'<div class="pcard-body">'
-      +'<div class="pcard-row" style="cursor:pointer" onclick="showPanel(\'sb2266\',document.querySelectorAll(\'.nav-tab\')[1])" title="Go to Vote Record tab"><span class="pcard-label">SB 2266 ↗</span>'+vb+'</div>'
-      +bankingAlert
-      +(cupacTotal
-        ?'<div class="pcard-row" style="cursor:pointer" onclick="showPanel(\'history\',document.querySelectorAll(\'.nav-tab\')[2])" title="Go to History tab"><span class="pcard-label">CUPAC total ↗</span><strong style="font-size:13px;color:var(--teal-dark)">'+cupacTotal+'</strong></div>'
-          +'<div class="pcard-bars">'+bars+'</div>'
-        :'<div style="font-size:11px;color:var(--text-muted);font-style:italic">No prior CUPAC giving</div>')
-      +bankerRow
-      +'<div class="pcard-row" style="cursor:pointer" onclick="showPanel(\'candidates\',document.querySelectorAll(\'.nav-tab\')[3])" title="Go to Candidates & Funding tab"><span class="pcard-label">Decision ↗</span><span style="display:flex;align-items:center;font-size:12px">'+dot+''+dotLabels[saved.status]+(saved.amt?(' · <strong style="color:var(--teal-dark)">$'+saved.amt+'</strong>'):'')+'</span></div>'
-      +recBlock
-      +newsSnippet
+
+      +'<div class="pcard-datagrid">'
+        +'<div>'
+          +'<div class="pcard-gridlabel">SB 2266</div>'
+          +vb
+        +'</div>'
+        +'<div>'
+          +'<div class="pcard-gridlabel">2026 Ballot</div>'
+          +ballotGridBadge
+        +'</div>'
+        +'<div>'
+          +'<div class="pcard-gridlabel">Decision</div>'
+          +'<div style="display:flex;align-items:center;font-size:12px;color:var(--text)">'+dot+''+dotLabels[saved.status]+(saved.amt?(' <strong style="margin-left:4px;color:var(--teal-dark)">$'+saved.amt+'</strong>'):'')+'</div>'
+        +'</div>'
+      +'</div>'
+
+      +'<div class="pcard-section">'
+        +'<div class="pcard-gridlabel">CUPAC History — '+(cupacTotal?'<strong style="color:var(--teal-dark)">'+cupacTotal+'</strong>':'<span style="color:var(--text-muted)">$0</span>')+'</div>'
+        +(hist.reduce(function(s,v){return s+v;},0)>0
+          ?'<div class="pcard-bars">'+bars+'</div>'
+          :'<div style="font-size:11px;color:var(--text-muted);font-style:italic;margin-top:4px">No prior CUPAC giving</div>')
+      +'</div>'
+
+      +(bankingAlert?'<div class="pcard-section">'+bankingAlert+'</div>':'')
+      +(bankerRow?'<div class="pcard-section">'+bankerRow+'</div>':'')
+
+      +(recBlock?'<div class="pcard-section">'+recBlock+'</div>':'')
+
+      +(newsSnippet?'<div class="pcard-section">'+newsSnippet+'</div>':'')
+
     +'</div>'
+
     +tracker
-    +_empRow+_profLinksRow
-    +'<div class="pcard-footer">'+openBtn+(h?'<a href="https://cf.sos.nd.gov/search/showcommittee.aspx?cid=281" target="_blank" style="font-size:11px;color:var(--teal)">SoS records ↗</a>':'')+'</div>'
+
+    +'<div class="pcard-footer">'
+      +'<div style="color:var(--text-muted)">Coverage: <span style="color:var(--text)">'+_covTxt+'</span></div>'
+      +'<div style="display:flex;gap:8px;align-items:center">'
+        +_profLinksRow
+        +openBtn
+        +(h?'<a href="https://cf.sos.nd.gov/search/showcommittee.aspx?cid=281" target="_blank" style="font-size:11px;color:var(--teal)">SoS ↗</a>':'')
+      +'</div>'
+    +'</div>'
+
+    +_empRow
+
     +'</div>';
 }
 
