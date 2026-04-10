@@ -1500,6 +1500,8 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
 .pcard:hover{box-shadow:0 4px 16px var(--shadow)}
 .pcard.pcard-yea{border-left:4px solid var(--green-border)}
 .pcard.pcard-nay{border-left:4px solid var(--red-border)}
+.pcard.pcard-notrunning{opacity:0.6;border-left:4px solid #B91C1C;background:#FEF2F2}
+.pcard.pcard-notrunning .pcard-hdr{background:rgba(185,28,28,0.08)}
 .pcard.pcard-priority{border-color:var(--gold-border);border-width:2px}
 .pcard-hdr{padding:10px 14px 8px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
 .pcard-name{font-family:var(--font-display);font-size:15px;font-weight:700;color:var(--teal);cursor:pointer;line-height:1.2;text-decoration:underline}
@@ -1693,17 +1695,17 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
 <!-- Global Recommendation Tier Filters -->
 <div id="tier-filter-bar" style="display:none;position:fixed;top:128px;left:50%;transform:translateX(-50%);z-index:185;background:var(--white);border:1px solid var(--border);border-radius:0 0 12px 12px;padding:6px 12px;box-shadow:var(--shadow-md);display:flex;gap:4px;flex-wrap:wrap;">
   <span style="font-size:10px;font-weight:700;color:var(--text-muted);margin-right:4px;align-self:center;">FILTER:</span>
-  <button onclick="toggleTierFilter('all')" class="tier-btn active" id="tbtn-all" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid var(--border);background:var(--teal);color:#fff;cursor:pointer;">All</button>
-  <button onclick="toggleTierFilter('PROTECT')" class="tier-btn" id="tbtn-PROTECT" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid #15803D;background:#fff;color:#15803D;cursor:pointer;">🛡️ Protect</button>
-  <button onclick="toggleTierFilter('MAINTAIN')" class="tier-btn" id="tbtn-MAINTAIN" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid #15803D;background:#fff;color:#15803D;cursor:pointer;">✅ Maintain</button>
-  <button onclick="toggleTierFilter('BUILD')" class="tier-btn" id="tbtn-BUILD" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid #0D7377;background:#fff;color:#0D7377;cursor:pointer;">🤝 Build</button>
-  <button onclick="toggleTierFilter('EVALUATE')" class="tier-btn" id="tbtn-EVALUATE" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid #1D4ED8;background:#fff;color:#1D4ED8;cursor:pointer;">🔍 Evaluate</button>
-  <button onclick="toggleTierFilter('HEDGE')" class="tier-btn" id="tbtn-HEDGE" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid #7C3AED;background:#fff;color:#7C3AED;cursor:pointer;">🔀 Hedge</button>
-  <button onclick="toggleTierFilter('HOLD')" class="tier-btn" id="tbtn-HOLD" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid #B45309;background:#fff;color:#B45309;cursor:pointer;">⚠️ Hold</button>
-  <button onclick="toggleTierFilter('NOT RECOMMENDED')" class="tier-btn" id="tbtn-NOTREC" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid #B91C1C;background:#fff;color:#B91C1C;cursor:pointer;">🚫 Not Rec</button>
-  <button onclick="toggleTierFilter('ALIGNED')" class="tier-btn" id="tbtn-ALIGNED" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid #6B7280;background:#fff;color:#6B7280;cursor:pointer;">👍 Aligned</button>
-  <button onclick="toggleTierFilter('OUTREACH')" class="tier-btn" id="tbtn-OUTREACH" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid #6B7280;background:#fff;color:#6B7280;cursor:pointer;">📋 Outreach</button>
-  <button onclick="toggleTierFilter('hide-all')" class="tier-btn" id="tbtn-hideall" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid var(--ink);background:#fff;color:var(--ink);cursor:pointer;">✕ Hide All Recs</button>
+  <button onclick="toggleTierFilter('all')" class="tier-btn" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid var(--teal);background:var(--teal);color:#fff;cursor:pointer;">Show All</button>
+  <button onclick="toggleTierFilter('PROTECT')" class="tier-btn" data-tier="PROTECT" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid #15803D;background:#fff;color:#15803D;cursor:pointer;">🛡️ Protect</button>
+  <button onclick="toggleTierFilter('MAINTAIN')" class="tier-btn" data-tier="MAINTAIN" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid #15803D;background:#fff;color:#15803D;cursor:pointer;">✅ Maintain</button>
+  <button onclick="toggleTierFilter('BUILD')" class="tier-btn" data-tier="BUILD" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid #0D7377;background:#fff;color:#0D7377;cursor:pointer;">🤝 Build</button>
+  <button onclick="toggleTierFilter('EVALUATE')" class="tier-btn" data-tier="EVALUATE" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid #1D4ED8;background:#fff;color:#1D4ED8;cursor:pointer;">🔍 Evaluate</button>
+  <button onclick="toggleTierFilter('HEDGE')" class="tier-btn" data-tier="HEDGE" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid #7C3AED;background:#fff;color:#7C3AED;cursor:pointer;">🔀 Hedge</button>
+  <button onclick="toggleTierFilter('HOLD')" class="tier-btn" data-tier="HOLD" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid #B45309;background:#fff;color:#B45309;cursor:pointer;">⚠️ Hold</button>
+  <button onclick="toggleTierFilter('NOT RECOMMENDED')" class="tier-btn" data-tier="NOT RECOMMENDED" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid #B91C1C;background:#fff;color:#B91C1C;cursor:pointer;">🚫 Not Rec</button>
+  <button onclick="toggleTierFilter('ALIGNED')" class="tier-btn" data-tier="ALIGNED" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid #6B7280;background:#fff;color:#6B7280;cursor:pointer;">👍 Aligned</button>
+  <button onclick="toggleTierFilter('OUTREACH')" class="tier-btn" data-tier="OUTREACH" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid #6B7280;background:#fff;color:#6B7280;cursor:pointer;">📋 Outreach</button>
+  <button onclick="toggleTierFilter('hide-all')" class="tier-btn" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid var(--ink);background:#fff;color:var(--ink);cursor:pointer;">✕ Hide All</button>
 </div>
 <div class="budget-sidebar-tab" id="budget-tab" onclick="toggleBudgetSidebar()">💰</div>
 <aside class="budget-sidebar" id="budget-sidebar">
@@ -3167,6 +3169,8 @@ function showPanel(id, el){
   }
   if(id==='winprob') setTimeout(renderWPTable, 50);
   if(id==='strategy') setTimeout(function(){ if(typeof initStrategyRoom==='function') initStrategyRoom(); }, 100);
+  // Apply tier filter state to newly rendered tab
+  setTimeout(function(){ if(typeof applyTierFilter==='function') applyTierFilter(); }, 200);
 }
 
 // ════ HELPERS ════
@@ -3227,7 +3231,23 @@ function buildProfiles(){
 }
 
 function profileCard(l){
-  const isRetired = l.notRunning;
+  // Determine 2026 status with clear reason
+  const _inCands = CANDIDATES.some(function(c){return c.name===l.name;});
+  const _isEvenDist = l.distNum && l.distNum % 2 === 0;
+  const isRetired = l.notRunning || (!_inCands && l.ballot!=='yes');
+  // Build status label
+  var _statusLabel = '';
+  if(l.notRunning) {
+    _statusLabel = 'Not Running';
+    if(l.role && l.role.indexOf('NOT RUNNING')>=0) _statusLabel = 'Not Running — Retired';
+    if(l.name==='Josh Boschee') _statusLabel = 'Running for Fargo Mayor';
+  } else if(_isEvenDist) {
+    _statusLabel = 'Even District — Term Ends 2028';
+  } else if(!_inCands && l.ballot==='no') {
+    _statusLabel = 'Not on 2026 Ballot';
+  } else if(!_inCands) {
+    _statusLabel = 'Did Not File for 2026';
+  }
   const coverage  = COMMITTEE_MEMBERS.filter(m=>m.districts.includes(l.distNum)).map(m=>m.name);
   const saved     = getSaved(l.name, l.distNum||0);
   const ukey      = personKey(l.name, l.distNum||0);
@@ -3301,7 +3321,7 @@ function profileCard(l){
     <div style="background:${accentColor};padding:12px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
       <div>
         <div style="font-family:var(--font-display);font-size:16px;font-weight:700;color:var(--white);cursor:pointer;line-height:1.2" onclick="openPersonCard('${l.name.replace(/'/g,"\\'")}',${l.distNum||0})" title="Open full profile">
-          ${l.name}${l.priority?' ⭐':''} ${isRetired?'<span style="font-size:11px;opacity:.7">(Not Running)</span>':''} <span style="font-size:12px;opacity:.6">▸</span>
+          ${l.name}${l.priority?' ⭐':''} ${_statusLabel?'<span style="font-size:11px;opacity:.85">('+_statusLabel+')</span>':''} <span style="font-size:12px;opacity:.6">▸</span>
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:3px">${_badges}</div>
         <div style="font-size:12px;color:rgba(255,255,255,0.75);margin-top:2px">${l.role}</div>
@@ -3334,10 +3354,12 @@ function profileCard(l){
     <!-- CUPAC Recommendation (unified engine) -->
     ${(function(){
       if(!l.distNum || l.distNum%2!==1) return '';
+      if(l.notRunning) return ''; // Not running = no recommendation
+      if(l.ballot==='no') return ''; // Even district, not on 2026 ballot
       var rec = getCupacRec(l.name, l.distNum, l.chamber, l.party, true);
       if(!rec.tier) return '';
       var bg = rec.amt>0 ? 'rgba('+(rec.color==='#15803D'?'21,128,61':rec.color==='#0D7377'?'13,115,119':'107,114,128')+',0.06)' : (rec.color==='#B91C1C'||rec.color==='#991B1B'?'#FEF2F2':'var(--surface)');
-      return '<div style="padding:8px 14px;border-bottom:1px solid var(--border)"><div style="padding:6px 8px;background:'+bg+';border:2px solid '+rec.color+';border-radius:8px;position:relative"><button onclick="this.parentElement.parentElement.style.display=\'none\'" style="position:absolute;top:2px;right:4px;background:none;border:none;cursor:pointer;font-size:13px;color:var(--text-muted);padding:2px 4px;" title="Dismiss recommendation">✕</button><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;padding-right:18px"><span style="font-size:10px;font-weight:700;color:'+rec.color+'">'+rec.icon+' '+rec.tier+'</span>'+(rec.amt?'<span style="font-size:14px;font-weight:700;color:'+rec.color+'">$'+rec.amt+'</span>':'<span style="font-size:10px;color:'+rec.color+'">$0</span>')+'</div><div style="font-size:10px;font-weight:600;color:var(--text)">'+rec.action+'</div><div style="font-size:9px;color:var(--text-dim)">'+rec.reasons.join(' · ')+'</div></div></div>';
+      return '<div class="rec-block" data-tier="'+rec.tier+'" style="padding:8px 14px;border-bottom:1px solid var(--border)"><div style="padding:6px 8px;background:'+bg+';border:2px solid '+rec.color+';border-radius:8px;position:relative"><button onclick="this.parentElement.parentElement.style.display=\'none\'" style="position:absolute;top:2px;right:4px;background:none;border:none;cursor:pointer;font-size:13px;color:var(--text-muted);padding:2px 4px;" title="Dismiss recommendation">✕</button><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;padding-right:18px"><span style="font-size:10px;font-weight:700;color:'+rec.color+'">'+rec.icon+' '+rec.tier+'</span>'+(rec.amt?'<span style="font-size:14px;font-weight:700;color:'+rec.color+'">$'+rec.amt+'</span>':'<span style="font-size:10px;color:'+rec.color+'">$0</span>')+'</div><div style="font-size:10px;font-weight:600;color:var(--text)">'+rec.action+'</div><div style="font-size:9px;color:var(--text-dim)">'+rec.reasons.join(' · ')+'</div></div></div>';
     })()}
 
     <!-- News snippet -->
@@ -4030,30 +4052,61 @@ function generateNDExcel() {
   });
 }
 
-// Global tier filter — show/hide recommendation blocks by tier
-var _activeTierFilter = 'all';
-function toggleTierFilter(tier) {
-  _activeTierFilter = tier;
-  // Update button styles
-  document.querySelectorAll('.tier-btn').forEach(function(b){ b.style.background='#fff'; b.style.fontWeight='400'; });
-  var activeBtn = document.getElementById('tbtn-'+(tier==='NOT RECOMMENDED'?'NOTREC':tier==='hide-all'?'hideall':tier));
-  if(activeBtn){ activeBtn.style.background=activeBtn.style.color; activeBtn.style.color='#fff'; activeBtn.style.fontWeight='700'; }
+// Global tier filter — Hide All first, then click tiers to show them
+var _allTiers = ['PROTECT','MAINTAIN','BUILD','EVALUATE','HEDGE','HOLD','NOT RECOMMENDED','ALIGNED','OUTREACH'];
+var _visibleTiers = {}; // empty = show all
+var _filterActive = false; // false = show all, true = only show selected
 
-  // Show/hide all recommendation blocks based on tier
-  document.querySelectorAll('[id^="rec_"]').forEach(function(el){
-    if(tier === 'all') { el.style.display = ''; }
-    else if(tier === 'hide-all') { el.style.display = 'none'; }
-    else {
-      // Check if this rec block contains the tier text
-      var tierText = el.querySelector('div')?.textContent || '';
-      if(tierText.indexOf(tier) >= 0) { el.style.display = ''; }
-      else { el.style.display = 'none'; }
+function toggleTierFilter(tier) {
+  if(tier === 'all') {
+    // Reset — show everything
+    _filterActive = false;
+    _visibleTiers = {};
+  } else if(tier === 'hide-all') {
+    // Hide all — now user clicks individual tiers to bring them back
+    _filterActive = true;
+    _visibleTiers = {};
+  } else {
+    // Toggle this tier on/off
+    _filterActive = true;
+    if(_visibleTiers[tier]) { delete _visibleTiers[tier]; }
+    else { _visibleTiers[tier] = true; }
+  }
+
+  // Update button styles
+  document.querySelectorAll('.tier-btn').forEach(function(b){
+    var btnTier = b.getAttribute('data-tier');
+    if(!btnTier) return;
+    if(!_filterActive) {
+      // All showing — buttons look normal
+      b.style.opacity = '1';
+      b.style.background = '#fff';
+      b.style.fontWeight = '400';
+    } else if(_visibleTiers[btnTier]) {
+      // This tier is ON — highlight it
+      b.style.opacity = '1';
+      b.style.background = b.style.borderColor || '#0D7377';
+      b.style.color = '#fff';
+      b.style.fontWeight = '700';
+    } else {
+      // This tier is OFF — dim it
+      b.style.opacity = '0.4';
+      b.style.background = '#fff';
+      b.style.color = b.getAttribute('data-color') || '#666';
+      b.style.fontWeight = '400';
     }
   });
-  // Also hide/show the profileCard recs (they don't have IDs)
-  document.querySelectorAll('.profile-card [style*="border:2px solid"]').forEach(function(el){
-    if(tier === 'all') { el.parentElement.style.display = ''; }
-    else if(tier === 'hide-all') { el.parentElement.style.display = 'none'; }
+
+  // Show/hide ALL recommendation blocks across entire dashboard
+  applyTierFilter();
+}
+// Apply current filter state to all rec-blocks — call after any render
+function applyTierFilter(){
+  document.querySelectorAll('.rec-block').forEach(function(el){
+    if(!_filterActive) { el.style.display = ''; return; }
+    var tier = el.getAttribute('data-tier') || '';
+    if(Object.keys(_visibleTiers).length === 0) { el.style.display = 'none'; return; }
+    el.style.display = _visibleTiers[tier] ? '' : 'none';
   });
 }
 
@@ -4125,10 +4178,19 @@ function personCard(cfg){
     : '';
 
   // Ballot badge
+  // Build ballot badge with specific reason
+  var _pcStatusLabel = '';
+  if(_isNotRunningCard) {
+    if(_isEvenDist) _pcStatusLabel = 'Even District — Not Up Until 2028';
+    else if(_ldr && _ldr.notRunning) _pcStatusLabel = 'Not Running — Retired';
+    else if(name==='Josh Boschee') _pcStatusLabel = 'Running for Fargo Mayor';
+    else if(name==='Michelle Strinden') _pcStatusLabel = 'Lt. Governor — Not on Ballot';
+    else _pcStatusLabel = 'Did Not File for 2026';
+  }
   var ballot = cfg.onBallot
     ? incBadge + '<span style="font-size:10px;font-weight:600;padding:1px 6px;border-radius:8px;background:var(--green-bg);color:var(--green-text);border:1px solid var(--green-border)">2026</span>'
-    : cfg.notRunning
-    ? '<span style="font-size:10px;padding:1px 6px;border-radius:8px;background:var(--red-bg);color:var(--red-text)">Not Running</span>'
+    : _isNotRunningCard
+    ? '<span style="font-size:10px;font-weight:600;padding:1px 6px;border-radius:8px;background:#FEE2E2;color:#991B1B;border:1px solid #FCA5A5">'+(_pcStatusLabel||'Not on 2026 Ballot')+'</span>'
     : '';
 
   // Spark bars
@@ -4258,9 +4320,12 @@ function personCard(cfg){
 
   // ── CUPAC RECOMMENDATION (unified engine) ──
   var recBlock = '';
-  // Only show recommendations for candidates who are actually on the 2026 ballot
-  // Must be in CANDIDATES array AND on an odd district
-  var _isOnBallot = parseInt(dist) && parseInt(dist)%2===1 && CANDIDATES.some(function(c){return c.name===name && parseInt(c.dist)===parseInt(dist);});
+  // Only show recommendations for candidates who are actually running in 2026
+  // Must be in CANDIDATES array AND on an odd district AND not marked as not running
+  var _candMatch2 = CANDIDATES.find(function(c){return c.name===name && parseInt(c.dist)===parseInt(dist);});
+  var _ldrMatch = LEADERS.find(function(l){return l.name===name;});
+  var _isNotRunning = (_ldrMatch && (_ldrMatch.notRunning || _ldrMatch.ballot==='no'));
+  var _isOnBallot = parseInt(dist) && parseInt(dist)%2===1 && _candMatch2 && !_isNotRunning;
   if(_isOnBallot) {
     // Use unified recommendation engine (cached)
     var _rec = getCupacRec(name, parseInt(dist), chamber, party, cfg.incumbent);
@@ -4271,7 +4336,7 @@ function personCard(cfg){
     // Build the recommendation block
     var _recBg = _rec.amt > 0 ? 'rgba('+(_rec.color==='#15803D'?'21,128,61':_rec.color==='#0D7377'?'13,115,119':_rec.color==='#1D4ED8'?'29,78,216':'107,114,128')+',0.06)' : (_rec.color==='#B91C1C'||_rec.color==='#991B1B'?'#FEF2F2':'var(--surface)');
     var _recId = 'rec_'+name.replace(/[^a-zA-Z0-9]/g,'')+'_'+dist;
-    recBlock = '<div id="'+_recId+'" style="padding:8px 10px;background:'+_recBg+';border:2px solid '+_rec.color+';border-radius:10px;margin-top:6px;position:relative;">'
+    recBlock = '<div id="'+_recId+'" class="rec-block" data-tier="'+_rec.tier+'" style="padding:8px 10px;background:'+_recBg+';border:2px solid '+_rec.color+';border-radius:10px;margin-top:6px;position:relative;">'
       +'<button onclick="this.parentElement.style.display=\'none\'" style="position:absolute;top:4px;right:6px;background:none;border:none;cursor:pointer;font-size:14px;color:var(--text-muted);line-height:1;padding:2px 4px;" title="Dismiss recommendation">✕</button>'
       +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;padding-right:20px;">'
         +'<div style="font-size:11px;font-weight:700;color:'+_rec.color+';letter-spacing:.04em;">'+_rec.icon+' '+_rec.tier+'</div>'
@@ -4283,7 +4348,23 @@ function personCard(cfg){
   }
 
   // card class
-  var cardClass='pcard'+(vote==='YEA'?' pcard-yea':vote==='NAY'?' pcard-nay':'')+' '+(cfg.priority?'pcard-priority':'');
+  // Check if this person is not running — apply red styling across all tabs
+  // Check if NOT RUNNING — covers ALL cases across ALL tabs
+  var _isNotRunningCard = cfg.notRunning;
+  var _distNum = parseInt(dist) || 0;
+  var _isEvenDist = _distNum > 0 && _distNum % 2 === 0;
+  // Leader flags
+  if(!_isNotRunningCard && _ldr && (_ldr.notRunning || _ldr.ballot==='no' || (typeof _ldr.ballot==='string' && _ldr.ballot.indexOf('Not')>=0))) _isNotRunningCard = true;
+  // Even district = not on 2026 ballot
+  if(!_isNotRunningCard && _isEvenDist) _isNotRunningCard = true;
+  // Odd district but not in CANDIDATES = didn't file
+  if(!_isNotRunningCard && _distNum > 0 && _distNum % 2 === 1) {
+    var _inCandidates = CANDIDATES.some(function(c){return c.name===name && parseInt(c.dist)===parseInt(dist);});
+    if(!_inCandidates && !cfg.onBallot) _isNotRunningCard = true;
+  }
+  var cardClass='pcard'
+    +(_isNotRunningCard?' pcard-notrunning':vote==='YEA'?' pcard-yea':vote==='NAY'?' pcard-nay':'')
+    +' '+(cfg.priority?'pcard-priority':'');
   var clickHandler=cfg.onSelect?'onclick="'+cfg.onSelect+'"':'';
 
   // Tracker
