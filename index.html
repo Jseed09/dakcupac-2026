@@ -2433,6 +2433,17 @@ function loadBudget(){  try{return JSON.parse(localStorage.getItem(CAND_BUDGET_K
 // Note: this saveBudget saves candidate-level allocations (different from the PAC-wide saveBudget above)
 function saveCandBudget(d){ try{localStorage.setItem(CAND_BUDGET_KEY,JSON.stringify(d))}catch(e){} }
 
+// District lean badge — reusable across all tabs
+function distLeanBadge(dist){
+  var d = parseInt(dist);
+  if(!d || isNaN(d)) return '';
+  var lean = ND_PARTISAN_LEAN[d] || {t:68,d:30};
+  var margin = lean.d - lean.t;
+  var label = Math.abs(margin)<3 ? 'Even' : margin>0 ? 'D+'+Math.round(margin) : 'R+'+Math.round(-margin);
+  var clr = margin>5 ? '#93C5FD' : margin<-5 ? '#FCA5A5' : '#FDE68A';
+  return '<span style="font-size:11px;font-weight:700;padding:1px 7px;border-radius:8px;background:rgba(0,0,0,0.25);color:'+clr+';margin-left:8px;">Lean: <span style="color:'+clr+'">'+label+'</span></span>';
+}
+
 function personKey(name, dist){
   const last = name.trim().split(/\s+/).pop().toLowerCase().replace(/[^a-z]/g,'');
   return 'person_' + last + '_' + (dist||0);
@@ -4696,7 +4707,7 @@ function renderVoteTable(){
     var coverStr=covering.length?covering.join(', '):'';
     if(dist&&dist!=='—'){
       voteHtml+='<div style="grid-column:1/-1;margin-top:16px;margin-bottom:4px;padding:8px 14px;background:var(--teal-dark);color:#fff;border-radius:6px;display:flex;align-items:center;justify-content:space-between;">'
-        +'<span style="font-family:var(--font-display);font-size:15px;font-weight:700;">District '+dist+onBallotBadge+'</span>'
+        +'<span style="font-family:var(--font-display);font-size:15px;font-weight:700;">District '+dist+onBallotBadge+distLeanBadge(dist)+'</span>'
         +(coverStr?'<span style="font-size:11px;color:rgba(255,255,255,0.65);">📍 '+coverStr+'</span>':'')
         +'</div>';
     }
@@ -4787,7 +4798,7 @@ function expandSbRow(lname, dist){
   panelRow.innerHTML=`<td colspan="5" style="padding:0;border-left:4px solid var(--teal)">
     <div style="background:var(--cream-deep);padding:14px 18px;border-bottom:2px solid var(--teal-mid)">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-        <span style="font-family:var(--font-display);font-size:15px;font-weight:700;color:var(--teal-dark)">📍 District ${dist} — 2026 Candidates</span>
+        <span style="font-family:var(--font-display);font-size:15px;font-weight:700;color:var(--teal-dark)">📍 District ${dist} — 2026 Candidates ${(function(){var l=ND_PARTISAN_LEAN[dist]||{t:68,d:30};var m=l.d-l.t;var lb=Math.abs(m)<3?'Even':m>0?'D+'+Math.round(m):'R+'+Math.round(-m);var c=m>5?'#1D4ED8':m<-5?'#DC2626':'#B45309';return '<span style="font-size:11px;font-weight:700;color:'+c+'">· Lean: '+lb+'</span>';})()}</span>
         <button onclick="expandSbRow('${lname}',${dist})" style="background:none;border:1px solid var(--border);padding:3px 10px;border-radius:4px;cursor:pointer;font-size:12px;color:var(--text-muted)">✕ Close</button>
       </div>
       ${distCands.length===0?`<p style="color:var(--text-muted);font-style:italic">No candidates filed as of March 27, 2026.</p>`:chamberTbl(distCands.filter(c=>c.ch==='Senate'),'🏛 Senate')+chamberTbl(distCands.filter(c=>c.ch==='House'),'🏠 House')}
@@ -4899,7 +4910,7 @@ function renderCandidates(list){
     const covering = COMMITTEE_MEMBERS.filter(m=>m.districts.includes(parseInt(dist))).map(m=>m.name);
     const coverStr = covering.length ? covering.join(', ') : '';
     html += '<div style="grid-column:1/-1;margin-top:16px;margin-bottom:4px;padding:8px 14px;background:var(--teal-dark);color:#fff;border-radius:6px;display:flex;align-items:center;justify-content:space-between;">'
-      +'<span style="font-family:var(--font-display);font-size:15px;font-weight:700;">District '+dist+onBallot+'</span>'
+      +'<span style="font-family:var(--font-display);font-size:15px;font-weight:700;">District '+dist+onBallot+distLeanBadge(dist)+'</span>'
       +(coverStr?'<span style="font-size:11px;color:rgba(255,255,255,0.65);">📍 '+coverStr+'</span>':'')
       +'</div>';
     // Sub-group by chamber: Senate first, then House
@@ -8512,7 +8523,7 @@ function renderWPTable() {
       var distColor = distLean>5 ? '#1D4ED8' : distLean<-5 ? '#DC2626' : '#B45309';
       var distCands = filtered.filter(function(x){return x.c.dist===c.dist;}).length;
       html += '<div style="grid-column:1/-1;background:var(--ink);color:var(--white);padding:10px 16px;border-radius:10px;margin-top:8px;font-weight:700;font-size:14px;">'
-        +'District '+c.dist+' <span style="font-weight:400;font-size:12px;margin-left:8px;color:rgba(255,255,255,0.7);">'+distCands+' candidate'+(distCands>1?'s':'')+' · Lean: <span style="color:'+distColor+';font-weight:700;">'+distLabel+'</span></span>'
+        +'District '+c.dist+distLeanBadge(c.dist)+' <span style="font-weight:400;font-size:12px;margin-left:8px;color:rgba(255,255,255,0.7);">'+distCands+' candidate'+(distCands>1?'s':'')+'</span>'
         +(r.hasPrimary ? ' <span style="font-size:10px;background:#FEF3C7;color:#92400E;border-radius:4px;padding:1px 6px;margin-left:6px;">⚔ Contested Primary</span>' : '')
         +'</div>';
     }
