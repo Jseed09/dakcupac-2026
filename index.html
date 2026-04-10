@@ -4706,8 +4706,10 @@ function renderVoteTable(){
     var covering=COMMITTEE_MEMBERS.filter(function(m){return m.districts.includes(parseInt(dist));}).map(function(m){return m.name;});
     var coverStr=covering.length?covering.join(', '):'';
     if(dist&&dist!=='—'){
+      var _totalCands = CANDIDATES.filter(function(c){return parseInt(c.dist)===parseInt(dist);}).length;
+      var _candCountBadge = _totalCands ? '<span style="font-size:11px;font-weight:400;margin-left:8px;color:rgba(255,255,255,0.7);">'+_totalCands+' candidate'+(_totalCands>1?'s':'')+' filed</span>' : '';
       voteHtml+='<div style="grid-column:1/-1;margin-top:16px;margin-bottom:4px;padding:8px 14px;background:var(--teal-dark);color:#fff;border-radius:6px;display:flex;align-items:center;justify-content:space-between;">'
-        +'<span style="font-family:var(--font-display);font-size:15px;font-weight:700;">District '+dist+onBallotBadge+distLeanBadge(dist)+'</span>'
+        +'<span style="font-family:var(--font-display);font-size:15px;font-weight:700;">District '+dist+onBallotBadge+distLeanBadge(dist)+_candCountBadge+'</span>'
         +(coverStr?'<span style="font-size:11px;color:rgba(255,255,255,0.65);">📍 '+coverStr+'</span>':'')
         +'</div>';
     }
@@ -4909,8 +4911,10 @@ function renderCandidates(list){
     const onBallot = isOdd ? '<span style="font-size:11px;font-weight:600;padding:1px 7px;border-radius:8px;background:var(--green-bg);color:var(--green-text);border:1px solid var(--green-border);margin-left:6px;">★ 2026 Ballot</span>' : '';
     const covering = COMMITTEE_MEMBERS.filter(m=>m.districts.includes(parseInt(dist))).map(m=>m.name);
     const coverStr = covering.length ? covering.join(', ') : '';
+    const _totalCandsD = CANDIDATES.filter(function(c){return parseInt(c.dist)===parseInt(dist);}).length;
+    const _candCountD = _totalCandsD ? '<span style="font-size:11px;font-weight:400;margin-left:8px;color:rgba(255,255,255,0.7);">'+_totalCandsD+' candidate'+(_totalCandsD>1?'s':'')+' filed</span>' : '';
     html += '<div style="grid-column:1/-1;margin-top:16px;margin-bottom:4px;padding:8px 14px;background:var(--teal-dark);color:#fff;border-radius:6px;display:flex;align-items:center;justify-content:space-between;">'
-      +'<span style="font-family:var(--font-display);font-size:15px;font-weight:700;">District '+dist+onBallot+distLeanBadge(dist)+'</span>'
+      +'<span style="font-family:var(--font-display);font-size:15px;font-weight:700;">District '+dist+onBallot+distLeanBadge(dist)+_candCountD+'</span>'
       +(coverStr?'<span style="font-size:11px;color:rgba(255,255,255,0.65);">📍 '+coverStr+'</span>':'')
       +'</div>';
     // Sub-group by chamber: Senate first, then House
@@ -8522,8 +8526,9 @@ function renderWPTable() {
       var distLabel = Math.abs(distLean)<2 ? 'Even' : distLean>0 ? 'D+'+Math.round(distLean) : 'R+'+Math.round(-distLean);
       var distColor = distLean>5 ? '#1D4ED8' : distLean<-5 ? '#DC2626' : '#B45309';
       var distCands = filtered.filter(function(x){return x.c.dist===c.dist;}).length;
+      var _totalCandsS = CANDIDATES.filter(function(x){return parseInt(x.dist)===parseInt(c.dist);}).length;
       html += '<div style="grid-column:1/-1;background:var(--ink);color:var(--white);padding:10px 16px;border-radius:10px;margin-top:8px;font-weight:700;font-size:14px;">'
-        +'District '+c.dist+distLeanBadge(c.dist)+' <span style="font-weight:400;font-size:12px;margin-left:8px;color:rgba(255,255,255,0.7);">'+distCands+' candidate'+(distCands>1?'s':'')+'</span>'
+        +'District '+c.dist+distLeanBadge(c.dist)+' <span style="font-weight:400;font-size:12px;margin-left:8px;color:rgba(255,255,255,0.7);">'+_totalCandsS+' candidate'+(_totalCandsS>1?'s':'')+' filed</span>'
         +(r.hasPrimary ? ' <span style="font-size:10px;background:#FEF3C7;color:#92400E;border-radius:4px;padding:1px 6px;margin-left:6px;">⚔ Contested Primary</span>' : '')
         +'</div>';
     }
