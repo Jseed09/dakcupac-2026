@@ -2455,7 +2455,7 @@ function loadBudget(){  try{return JSON.parse(localStorage.getItem(CAND_BUDGET_K
 // Note: this saveBudget saves candidate-level allocations (different from the PAC-wide saveBudget above)
 function saveCandBudget(d){ try{localStorage.setItem(CAND_BUDGET_KEY,JSON.stringify(d))}catch(e){} }
 
-// District lean badge — reusable across all tabs
+// District lean + banker gap badge — reusable across all tabs
 function distLeanBadge(dist){
   var d = parseInt(dist);
   if(!d || isNaN(d)) return '';
@@ -2463,7 +2463,17 @@ function distLeanBadge(dist){
   var margin = lean.d - lean.t;
   var label = Math.abs(margin)<3 ? 'Even' : margin>0 ? 'D+'+Math.round(margin) : 'R+'+Math.round(-margin);
   var clr = margin>5 ? '#93C5FD' : margin<-5 ? '#FCA5A5' : '#FDE68A';
-  return '<span style="font-size:11px;font-weight:700;padding:1px 7px;border-radius:8px;background:rgba(0,0,0,0.25);color:'+clr+';margin-left:8px;">Lean: <span style="color:'+clr+'">'+label+'</span></span>';
+  var badge = '<span style="font-size:11px;font-weight:700;padding:1px 7px;border-radius:8px;background:rgba(0,0,0,0.25);color:'+clr+';margin-left:8px;">Lean: '+label+'</span>';
+  // Banker gap from FIGHT_DATA
+  var cuTot=0, bkTot=0;
+  FIGHT_DATA.forEach(function(f){ if(parseInt(f.d)===d){ cuTot+=(f.cu||0); bkTot+=(f.nd||0)+(f.ic||0); }});
+  if(cuTot>0 || bkTot>0){
+    var gap = bkTot - cuTot;
+    var gClr = gap>0 ? '#FCA5A5' : gap<0 ? '#86EFAC' : '#FDE68A';
+    var gLbl = gap>0 ? 'BK +$'+gap.toLocaleString() : gap<0 ? 'CU +$'+Math.abs(gap).toLocaleString() : 'Tied';
+    badge += ' <span style="font-size:10px;font-weight:700;padding:1px 7px;border-radius:8px;background:rgba(0,0,0,0.25);color:'+gClr+';margin-left:4px;">💰 CU $'+cuTot.toLocaleString()+' vs BK $'+bkTot.toLocaleString()+' · '+gLbl+'</span>';
+  }
+  return badge;
 }
 
 function personKey(name, dist){
