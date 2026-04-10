@@ -2305,6 +2305,14 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
     </div>
   </div>
 
+  <!-- ── BANKER GAP ANALYSIS ── -->
+  <div style="margin-bottom:32px;">
+    <div class="section-title">District Banker Gap Analysis — Where Are We Being Outspent?</div>
+    <div class="subtitle" style="margin-bottom:12px;">Historical 2016–2024 PAC spending by district. Identifies where banker PACs outspend CUPAC — focus resources where the margin matters.</div>
+    <div class="card-row" id="banker-gap-stats" style="margin-bottom:16px;"></div>
+    <div id="banker-gap-table" style="background:var(--white);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:var(--shadow-sm);"></div>
+  </div>
+
   <!-- ── STRATEGY RECOMMENDER ── -->
   <div style="margin-bottom:32px;">
     <div class="section-title" id="strat-alloc-title">Recommended Allocation</div>
@@ -2352,6 +2360,20 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
       <button onclick="printAgenda()" style="padding:8px 16px;border-radius:8px;background:var(--ink);color:#fff;border:1px solid var(--ink);cursor:pointer;font-weight:600;font-size:13px;">🖨 Print</button>
     </div>
     <div id="agenda-output" style="display:none;background:var(--white);border:1px solid var(--border);border-radius:14px;padding:32px;box-shadow:var(--shadow-md);"></div>
+  </div>
+
+  <!-- ── COMMITTEE PREP PACKETS ── -->
+  <div style="margin-bottom:32px;">
+    <div class="section-title">Committee Member Prep Packets</div>
+    <div class="subtitle" style="margin-bottom:12px;">Generate a per-member briefing with all their assigned districts, candidates, recommendations, and talking points. Print-ready for committee meetings.</div>
+    <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
+      <select id="prep-member-select" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--white);flex:1;max-width:350px;">
+        <option value="">Select a committee member...</option>
+      </select>
+      <button onclick="generatePrepPacket()" style="padding:8px 16px;border-radius:8px;background:var(--teal);color:#fff;border:1px solid var(--teal);cursor:pointer;font-weight:600;font-size:13px;">Generate Packet</button>
+      <button onclick="printPrepPacket()" style="padding:8px 16px;border-radius:8px;background:var(--ink);color:#fff;border:1px solid var(--ink);cursor:pointer;font-weight:600;font-size:13px;">🖨 Print</button>
+    </div>
+    <div id="prep-output" style="display:none;background:var(--white);border:1px solid var(--border);border-radius:14px;padding:32px;box-shadow:var(--shadow-md);max-width:900px;"></div>
   </div>
 </div>
 
@@ -8610,9 +8632,11 @@ function initStrategyRoom() {
   }
   updateStrategyTotals();
   renderPhasePlan();
+  renderBankerGap();
   renderStrategy();
   renderMatchups();
   populateOnePagerSelect();
+  populatePrepSelect();
 }
 
 // ── PHASE 1 vs PHASE 2 BUDGET PLANNER ──
@@ -9184,6 +9208,254 @@ function printAgenda() {
   if(!content) return;
   var w = window.open('','','width=800,height=700');
   w.document.write('<html><head><title>CUPAC Committee Meeting Agenda</title><style>body{font-family:sans-serif;padding:24px;font-size:12px;max-width:800px;margin:0 auto}*{box-sizing:border-box}h2,h3{margin:0 0 8px 0}</style></head><body>'+content+'</body></html>');
+  w.document.close();
+  w.print();
+}
+
+// ══════════════════════════════════════════════════
+// ── 6. DISTRICT BANKER GAP ANALYSIS ──
+// ══════════════════════════════════════════════════
+function renderBankerGap(){
+  // Aggregate FIGHT_DATA by district (odd only)
+  var byDist = {};
+  FIGHT_DATA.forEach(function(f){
+    var d = parseInt(f.d);
+    if(!d || d%2!==1) return; // odd districts only (2026 ballot)
+    if(!byDist[d]) byDist[d] = {dist:d, cu:0, banker:0, legs:[]};
+    byDist[d].cu += (f.cu||0);
+    byDist[d].banker += (f.nd||0)+(f.ic||0);
+    byDist[d].legs.push({name:f.n, cu:f.cu||0, banker:(f.nd||0)+(f.ic||0), vote:f.v});
+  });
+
+  var districts = Object.values(byDist);
+  districts.forEach(function(d){ d.gap = d.banker - d.cu; });
+  districts.sort(function(a,b){ return b.gap - a.gap; }); // biggest banker advantage first
+
+  var totalCu = districts.reduce(function(s,d){return s+d.cu;},0);
+  var totalBanker = districts.reduce(function(s,d){return s+d.banker;},0);
+  var bankerLeadCount = districts.filter(function(d){return d.gap>0;}).length;
+  var cupacLeadCount = districts.filter(function(d){return d.gap<0;}).length;
+  var maxGap = Math.max.apply(null, districts.map(function(d){return Math.abs(d.gap);})) || 1;
+
+  // Stat cards
+  document.getElementById('banker-gap-stats').innerHTML =
+    '<div class="stat-card" style="border-left:4px solid var(--teal)"><div class="label">Total CUPAC Spent</div><div class="value" style="color:var(--teal)">$'+totalCu.toLocaleString()+'</div><div class="sub">Across '+districts.length+' districts (2016–2024)</div></div>'
+    +'<div class="stat-card" style="border-left:4px solid var(--red-border)"><div class="label">Total Banker Spent</div><div class="value" style="color:var(--red-text)">$'+totalBanker.toLocaleString()+'</div><div class="sub">ND Bankers + Indep. Community</div></div>'
+    +'<div class="stat-card" style="border-left:4px solid #DC2626"><div class="label">Bankers Lead</div><div class="value" style="color:#DC2626">'+bankerLeadCount+'</div><div class="sub">Districts where bankers outspend us</div></div>'
+    +'<div class="stat-card" style="border-left:4px solid #15803D"><div class="label">CUPAC Leads</div><div class="value" style="color:#15803D">'+cupacLeadCount+'</div><div class="sub">Districts where we lead</div></div>';
+
+  // Table
+  var html = '<table style="width:100%;border-collapse:collapse;font-size:13px;">'
+    +'<thead><tr style="background:var(--teal-dark);color:#fff;">'
+    +'<th style="padding:10px 14px;text-align:left;font-size:11px;">District</th>'
+    +'<th style="padding:10px 14px;text-align:left;font-size:11px;">Lean</th>'
+    +'<th style="padding:10px 14px;text-align:right;font-size:11px;">CUPAC $</th>'
+    +'<th style="padding:10px 14px;text-align:right;font-size:11px;">Banker $</th>'
+    +'<th style="padding:10px 14px;text-align:right;font-size:11px;">Gap</th>'
+    +'<th style="padding:10px 14px;text-align:left;font-size:11px;">Gap Visual</th>'
+    +'<th style="padding:10px 14px;text-align:left;font-size:11px;">Key Candidates</th>'
+    +'</tr></thead><tbody>';
+
+  districts.forEach(function(d, i){
+    var lean = ND_PARTISAN_LEAN[d.dist] || {t:68,d:30};
+    var margin = lean.d - lean.t;
+    var leanLabel = Math.abs(margin)<3 ? 'Even' : margin>0 ? 'D+'+Math.round(margin) : 'R+'+Math.round(-margin);
+    var leanClr = margin>5 ? '#1D4ED8' : margin<-5 ? '#DC2626' : '#B45309';
+    var gapClr = d.gap>0 ? '#DC2626' : d.gap<0 ? '#15803D' : '#6B7280';
+    var gapLabel = d.gap>0 ? '-$'+d.gap.toLocaleString() : d.gap<0 ? '+$'+Math.abs(d.gap).toLocaleString() : 'Tied';
+    var barPct = Math.max(4, Math.round(Math.abs(d.gap)/maxGap*100));
+    var barClr = d.gap>0 ? '#FCA5A5' : '#86EFAC';
+    var bg = i%2===0 ? 'var(--white)' : 'var(--surface)';
+
+    // Top 2 candidates by banker spending in this district
+    var topLegs = d.legs.slice().sort(function(a,b){return b.banker-a.banker;}).slice(0,2);
+    var legHtml = topLegs.map(function(l){
+      var vClr = l.vote==='YEA'?'var(--green-text)':l.vote==='NAY'?'var(--red-text)':'var(--text-muted)';
+      return '<span style="font-size:11px;"><span style="color:'+vClr+';font-weight:700;">'+l.vote+'</span> '+l.name+'</span>';
+    }).join(', ');
+
+    html += '<tr style="background:'+bg+';cursor:pointer;" onclick="showPanel(\'candidates\',document.querySelectorAll(\'.nav-tab\')[3])">'
+      +'<td style="padding:8px 14px;font-weight:700;">Dist. '+d.dist+'</td>'
+      +'<td style="padding:8px 14px;"><span style="color:'+leanClr+';font-weight:700;font-size:12px;">'+leanLabel+'</span></td>'
+      +'<td style="padding:8px 14px;text-align:right;color:var(--teal-dark);font-weight:600;">$'+d.cu.toLocaleString()+'</td>'
+      +'<td style="padding:8px 14px;text-align:right;color:var(--red-text);font-weight:600;">$'+d.banker.toLocaleString()+'</td>'
+      +'<td style="padding:8px 14px;text-align:right;font-weight:700;color:'+gapClr+';">'+gapLabel+'</td>'
+      +'<td style="padding:8px 14px;"><div style="width:'+barPct+'%;height:14px;border-radius:3px;background:'+barClr+';min-width:4px;"></div></td>'
+      +'<td style="padding:8px 14px;">'+legHtml+'</td>'
+      +'</tr>';
+  });
+
+  html += '</tbody></table>';
+  document.getElementById('banker-gap-table').innerHTML = html;
+}
+
+
+// ══════════════════════════════════════════════════
+// ── 7. COMMITTEE PREP PACKETS ──
+// ══════════════════════════════════════════════════
+function populatePrepSelect(){
+  var sel = document.getElementById('prep-member-select');
+  if(!sel) return;
+  sel.innerHTML = '<option value="">Select a committee member...</option>';
+  COMMITTEE_MEMBERS.forEach(function(m){
+    if(!m.districts || !m.districts.length) return;
+    sel.innerHTML += '<option value="'+m.name+'">'+m.name+' ('+m.title+') — '+m.districts.length+' district'+(m.districts.length>1?'s':'')+'</option>';
+  });
+}
+
+function generatePrepPacket(){
+  var sel = document.getElementById('prep-member-select');
+  var memberName = sel.value;
+  if(!memberName) return;
+  var member = COMMITTEE_MEMBERS.find(function(m){return m.name===memberName;});
+  if(!member) return;
+
+  var out = document.getElementById('prep-output');
+  out.style.display = 'block';
+
+  var today = new Date();
+  var primary = new Date('2026-06-09');
+  var daysToPrimary = Math.ceil((primary - today) / (1000*60*60*24));
+  var totalRecommended = 0;
+
+  var html = '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;padding-bottom:16px;border-bottom:3px solid var(--teal);">'
+    +'<div><h2 style="font-family:var(--font-display);font-size:22px;color:var(--ink);margin-bottom:4px;">Committee Prep Packet — '+member.name+'</h2>'
+    +'<div style="font-size:13px;color:var(--text-muted);">'+member.title+' · '+member.cu+'</div>'
+    +'<div style="font-size:12px;color:var(--text-dim);margin-top:2px;">Generated '+today.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})+' · '+daysToPrimary+' days to primary</div></div>'
+    +'<div style="text-align:right;font-size:11px;color:var(--text-dim);">DakCUPAC · Confidential<br>Not for Public Distribution</div></div>';
+
+  // Summary strip
+  var totalCands = 0;
+  var contestedCount = 0;
+  member.districts.forEach(function(d){
+    var cands = CANDIDATES.filter(function(c){return parseInt(c.dist)===d;});
+    totalCands += cands.length;
+    // Check contested
+    var ck={};
+    cands.forEach(function(c){if(d%2===1){var k=c.ch+'_'+c.party;ck[k]=(ck[k]||0)+1;}});
+    Object.keys(ck).forEach(function(k){var ch=k.split('_')[0];if(ck[k]>=(ch==='Senate'?2:3)) contestedCount++;});
+  });
+
+  html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;">'
+    +'<div style="text-align:center;padding:12px;background:var(--teal-light);border:1px solid var(--teal-mid);border-radius:10px;"><div style="font-size:24px;font-weight:700;color:var(--teal);">'+member.districts.length+'</div><div style="font-size:10px;font-weight:700;color:var(--teal);text-transform:uppercase;">Districts</div></div>'
+    +'<div style="text-align:center;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:10px;"><div style="font-size:24px;font-weight:700;color:var(--ink);">'+totalCands+'</div><div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;">Candidates</div></div>'
+    +'<div style="text-align:center;padding:12px;background:var(--gold-light);border:1px solid var(--gold-border);border-radius:10px;"><div style="font-size:24px;font-weight:700;color:var(--gold);">'+contestedCount+'</div><div style="font-size:10px;font-weight:700;color:var(--gold);text-transform:uppercase;">Contested Primaries</div></div>'
+    +'<div style="text-align:center;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:10px;" id="prep-total-rec"><div style="font-size:24px;font-weight:700;color:var(--teal);">—</div><div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;">Recommended Spend</div></div>'
+  +'</div>';
+
+  // Each district
+  var sortedDists = member.districts.slice().sort(function(a,b){return a-b;});
+  sortedDists.forEach(function(d){
+    var lean = ND_PARTISAN_LEAN[d] || {t:68,d:30};
+    var margin = lean.d - lean.t;
+    var leanLabel = Math.abs(margin)<3 ? 'Even' : margin>0 ? 'D+'+Math.round(margin) : 'R+'+Math.round(-margin);
+    var leanClr = margin>5 ? '#1D4ED8' : margin<-5 ? '#DC2626' : '#B45309';
+    var cands = CANDIDATES.filter(function(c){return parseInt(c.dist)===d;});
+    var dd = ND_DIST_DATA ? ND_DIST_DATA[d] : null;
+    var isOdd = d%2===1;
+
+    // Contested check
+    var ck={};
+    cands.forEach(function(c){if(isOdd){var k=c.ch+'_'+c.party;ck[k]=(ck[k]||0)+1;}});
+    var isContested = false;
+    Object.keys(ck).forEach(function(k){var ch=k.split('_')[0];if(ck[k]>=(ch==='Senate'?2:3)) isContested=true;});
+
+    // Fight data for this district
+    var distFight = FIGHT_DATA.filter(function(f){return parseInt(f.d)===d;});
+    var distCu = distFight.reduce(function(s,f){return s+(f.cu||0);},0);
+    var distBanker = distFight.reduce(function(s,f){return s+(f.nd||0)+(f.ic||0);},0);
+
+    html += '<div style="margin-bottom:24px;border:1px solid var(--border);border-radius:12px;overflow:hidden;'+(isContested?'border-left:4px solid var(--gold);':'')+'">';
+
+    // District header
+    html += '<div style="background:var(--teal-dark);color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;">'
+      +'<div><span style="font-family:var(--font-display);font-size:16px;font-weight:700;">District '+d+'</span>'
+      +'<span style="font-size:11px;font-weight:700;margin-left:10px;color:'+leanClr+';background:rgba(0,0,0,0.25);padding:1px 7px;border-radius:8px;">Lean: '+leanLabel+'</span>'
+      +(isContested?' <span style="font-size:10px;background:#FEF3C7;color:#92400E;border-radius:4px;padding:1px 6px;margin-left:6px;">⚔ Contested Primary</span>':'')
+      +(isOdd?' <span style="font-size:10px;background:rgba(21,128,61,0.2);color:#86EFAC;border-radius:4px;padding:1px 6px;margin-left:4px;">★ 2026 Ballot</span>':'<span style="font-size:10px;color:rgba(255,255,255,0.5);margin-left:6px;">Even — Not Up Until 2028</span>')
+      +'</div>'
+      +'<div style="font-size:11px;color:rgba(255,255,255,0.7);">'+(dd?dd.city:'')+'</div>'
+    +'</div>';
+
+    // PAC money summary for district
+    if(distCu>0 || distBanker>0){
+      var gapClr = distBanker>distCu ? '#DC2626' : '#15803D';
+      var gapLabel = distBanker>distCu ? 'Bankers ahead by $'+(distBanker-distCu).toLocaleString() : distCu>distBanker ? 'CUPAC ahead by $'+(distCu-distBanker).toLocaleString() : 'Tied';
+      html += '<div style="padding:8px 16px;background:var(--surface);border-bottom:1px solid var(--border);font-size:12px;display:flex;gap:16px;align-items:center;">'
+        +'<span>CUPAC: <strong style="color:var(--teal);">$'+distCu.toLocaleString()+'</strong></span>'
+        +'<span>Bankers: <strong style="color:var(--red-text);">$'+distBanker.toLocaleString()+'</strong></span>'
+        +'<span style="color:'+gapClr+';font-weight:700;">'+gapLabel+'</span>'
+      +'</div>';
+    }
+
+    // Candidates table
+    if(!isOdd){
+      html += '<div style="padding:12px 16px;font-size:12px;color:var(--text-muted);font-style:italic;">Even district — not on 2026 ballot. Current legislators serve through 2028.</div>';
+    } else {
+      html += '<table style="width:100%;border-collapse:collapse;font-size:12px;">'
+        +'<thead><tr style="background:var(--surface);">'
+        +'<th style="padding:8px 12px;text-align:left;font-size:10px;text-transform:uppercase;color:var(--text-muted);">Candidate</th>'
+        +'<th style="padding:8px 12px;text-align:center;font-size:10px;text-transform:uppercase;color:var(--text-muted);">SB 2266</th>'
+        +'<th style="padding:8px 12px;text-align:right;font-size:10px;text-transform:uppercase;color:var(--text-muted);">CUPAC Hist.</th>'
+        +'<th style="padding:8px 12px;text-align:left;font-size:10px;text-transform:uppercase;color:var(--text-muted);">Recommendation</th>'
+        +'</tr></thead><tbody>';
+
+      // Sort: Senate first, then House; incumbents first
+      var sorted = cands.slice().sort(function(a,b){
+        if(a.ch!==b.ch) return a.ch==='Senate'?-1:1;
+        return (b.incumbent?1:0)-(a.incumbent?1:0);
+      });
+
+      sorted.forEach(function(c, ci){
+        var vote = getSB2266Vote(c.name, c.ch);
+        var h = CUPAC_HIST[c.name];
+        var rec = getCupacRec(c.name, d, c.ch, c.party, c.incumbent);
+        if(rec.amt) totalRecommended += rec.amt;
+        var voteClr = vote==='YEA'?'var(--green-text)':vote==='NAY'?'var(--red-text)':'var(--text-muted)';
+        var voteTxt = vote||'—';
+        var recClr = rec.color||'var(--text-muted)';
+        var bg2 = ci%2===0?'var(--white)':'var(--surface)';
+        var chamberIcon = c.ch==='Senate'?'🏛':'🏠';
+
+        html += '<tr style="background:'+bg2+';">'
+          +'<td style="padding:8px 12px;"><strong>'+c.name+'</strong> <span style="font-size:10px;color:var(--text-muted);">'+chamberIcon+' '+c.ch+' · '+c.party+(c.incumbent?' · ★ Incumbent':'')+'</span></td>'
+          +'<td style="padding:8px 12px;text-align:center;font-weight:700;color:'+voteClr+';">'+voteTxt+'</td>'
+          +'<td style="padding:8px 12px;text-align:right;color:var(--teal-dark);font-weight:600;">'+(h?h.amt:'—')+'</td>'
+          +'<td style="padding:8px 12px;"><span style="font-size:11px;font-weight:700;color:'+recClr+';">'+rec.icon+' '+rec.tier+(rec.amt?' · $'+rec.amt:'')+'</span></td>'
+        +'</tr>';
+      });
+
+      html += '</tbody></table>';
+    }
+
+    // Talking points for this district
+    html += '<div style="padding:10px 16px;background:var(--teal-light);border-top:1px solid var(--teal-mid);">'
+      +'<div style="font-size:10px;font-weight:700;color:var(--teal-dark);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Talking Points — District '+d+'</div>'
+      +'<ul style="font-size:11px;color:var(--teal-dark);line-height:1.7;margin:0;padding-left:16px;">';
+
+    if(isContested) html += '<li>⚔ Contested primary — review candidates before June 9 and decide endorsements</li>';
+    var yeaVoters = cands.filter(function(c){return getSB2266Vote(c.name,c.ch)==='YEA';});
+    var nayVoters = cands.filter(function(c){return getSB2266Vote(c.name,c.ch)==='NAY';});
+    if(yeaVoters.length) html += '<li>'+yeaVoters.map(function(c){return c.name;}).join(', ')+' voted YEA on SB 2266 — reinforce relationship, prioritize funding</li>';
+    if(nayVoters.length) html += '<li>'+nayVoters.map(function(c){return c.name;}).join(', ')+' voted NAY — assess whether outreach could shift position on FOM</li>';
+    if(distBanker > distCu) html += '<li>Bankers outspend us $'+distBanker.toLocaleString()+' to $'+distCu.toLocaleString()+' in this district — consider increasing CUPAC presence</li>';
+    html += '<li>District lean: '+leanLabel+' — '+(Math.abs(margin)<10?'competitive district, every dollar matters':'safe seat, focus on policy alignment')+'</li>';
+    html += '</ul></div>';
+
+    html += '</div>'; // close district card
+  });
+
+  // Update total recommended
+  html += '<script>document.getElementById("prep-total-rec").innerHTML="<div style=\\"font-size:24px;font-weight:700;color:var(--teal)\\">$'+totalRecommended.toLocaleString()+'</div><div style=\\"font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase\\">Recommended Spend</div>";<\/script>';
+
+  out.innerHTML = html;
+}
+
+function printPrepPacket(){
+  var content = document.getElementById('prep-output').innerHTML;
+  if(!content) return;
+  var w = window.open('','','width=900,height=700');
+  w.document.write('<html><head><title>CUPAC Committee Prep Packet</title><style>body{font-family:sans-serif;padding:24px;font-size:12px;max-width:900px;margin:0 auto}*{box-sizing:border-box}h2,h3{margin:0 0 8px 0}table{width:100%;border-collapse:collapse}th,td{padding:6px 10px;border-bottom:1px solid #eee;text-align:left}@media print{div{break-inside:avoid}}</style></head><body>'+content+'<div style="margin-top:20px;padding-top:10px;border-top:1px solid #ccc;font-size:9px;color:#999;">DakCUPAC — Confidential Committee Use Only — Not for Public Distribution</div></body></html>');
   w.document.close();
   w.print();
 }
