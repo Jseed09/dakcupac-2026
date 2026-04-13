@@ -7582,28 +7582,17 @@ function buildDistrictMap(){
 }
 
 
-// Defer the initial render so it runs after all HTML is parsed and
-// after any CSS has been applied. Also re-runs after a short delay
-// as a safety net so the Leadership tab never shows empty on first
-// paint (the issue where users had to click the tab to force render).
-function _initialRender() {
-  try { buildProfiles(); } catch(e){ console.warn('buildProfiles', e); }
-  try { buildSbStatCards(); } catch(e){ console.warn('buildSbStatCards', e); }
-  try { renderVoteTable(); } catch(e){ console.warn('renderVoteTable', e); }
-  try { renderFight(); } catch(e){ console.warn('renderFight', e); }
-  try { buildCandidates(); } catch(e){ console.warn('buildCandidates', e); }
-  try { buildCommitteeGeo(); } catch(e){ console.warn('buildCommitteeGeo', e); }
-  try { buildDistrictMap(); } catch(e){ console.warn('buildDistrictMap', e); }
-  try { if(typeof broadcastBudget==='function') broadcastBudget(); } catch(e){}
-  try { if(typeof calcBudget==='function' && document.getElementById('bgt-cash')) calcBudget(); } catch(e){}
-}
-if(document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', _initialRender);
-} else {
-  _initialRender();
-}
-// Safety re-render after 250ms in case any dependency was still loading
-setTimeout(function(){ try { buildProfiles(); } catch(e){} }, 250);
+// Initial render — fire directly at script-tail time. Minimal work,
+// no broadcastBudget cascade (which was causing the page to hang on
+// load due to cascading re-renders). Each function wrapped in try so
+// one failure doesn't break the rest.
+try { buildProfiles(); } catch(e){ console.error('buildProfiles failed', e); }
+try { buildSbStatCards(); } catch(e){ console.error('buildSbStatCards failed', e); }
+try { renderVoteTable(); } catch(e){ console.error('renderVoteTable failed', e); }
+try { renderFight(); } catch(e){ console.error('renderFight failed', e); }
+try { buildCandidates(); } catch(e){ console.error('buildCandidates failed', e); }
+try { buildCommitteeGeo(); } catch(e){ console.error('buildCommitteeGeo failed', e); }
+try { buildDistrictMap(); } catch(e){ console.error('buildDistrictMap failed', e); }
 
 </script>
 
