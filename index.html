@@ -2479,6 +2479,7 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
           <button class="bp-preset" onclick="bpPreset(75)">75/25</button>
           <button class="bp-preset" onclick="bpPreset(90)">90/10</button>
           <span style="flex:1;"></span>
+          <button class="bp-bulk" onclick="newsDiagnostic()" title="Test whether CORS proxies are reachable from your browser" style="background:#1D4ED8;border-color:#1E40AF;">🔬 Test News</button>
           <button class="bp-bulk" onclick="refreshAllNews()" title="Fetch latest Google News headlines for every on-ballot candidate" style="background:#CA8A04;border-color:#92400E;">📰 Refresh News</button>
           <button class="bp-bulk" onclick="bpApplyAll()" title="Fill every empty row with the recommended amount">⚡ Apply All Recs</button>
           <button class="bp-bulk bp-bulk-danger" onclick="bpClearAll()" title="Zero every tracker amount">✕ Clear All</button>
@@ -10066,52 +10067,136 @@ function fetchCandidateNews(name, dist, opts) {
   var queryStr = _buildNewsQuery(name, dist, chamber, !!isIncumbent, extras);
   var q = encodeURIComponent(queryStr);
   var rssUrl = 'https://news.google.com/rss/search?q=' + q + '&hl=en-US&gl=US&ceid=US:en';
-  var proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(rssUrl);
-  return fetch(proxyUrl)
-    .then(function(r){
-      if(!r.ok) throw new Error('proxy '+r.status);
+
+  // Parse RSS XML text into a headline array
+  function _parseRss(xml) {
+    var parser = new DOMParser();
+    var doc = parser.parseFromString(xml, 'text/xml');
+    var items = Array.from(doc.querySelectorAll('item')).slice(0, 5);
+    return items.map(function(it){
+      var title = (it.querySelector('title') || {}).textContent || '';
+      var link = (it.querySelector('link') || {}).textContent || '';
+      var pubDate = (it.querySelector('pubDate') || {}).textContent || '';
+      var sourceEl = it.querySelector('source');
+      var source = sourceEl ? (sourceEl.textContent || '') : '';
+      var m = title.match(/^(.*?)\s*-\s*([^-]+)$/);
+      var cleanTitle = m ? m[1] : title;
+      var derivedSource = m ? m[2] : source;
+      return {
+        title: cleanTitle.trim(),
+        link: link.trim(),
+        source: (derivedSource || '').trim(),
+        date: pubDate ? new Date(pubDate).toLocaleDateString() : ''
+      };
+    });
+  }
+
+  // Try a chain of CORS proxies so one outage doesn't kill the feature
+  var proxies = [
+    { name:'allorigins', url: 'https://api.allorigins.win/raw?url=' + encodeURIComponent(rssUrl), parse: 'raw' },
+    { name:'corsproxy',  url: 'https://corsproxy.io/?' + encodeURIComponent(rssUrl),              parse: 'raw' }
+  ];
+  function _tryProxy(idx) {
+    if(idx >= proxies.length) {
+      // All proxies failed
+      cache[key] = { headlines: [], ts: now, error: 'proxies_down' };
+      _saveNewsCache(cache);
+      return Promise.resolve([]);
+    }
+    var p = proxies[idx];
+    return fetch(p.url).then(function(r){
+      if(!r.ok) throw new Error(p.name+' HTTP '+r.status);
       return r.text();
-    })
-    .then(function(xml){
-      var parser = new DOMParser();
-      var doc = parser.parseFromString(xml, 'text/xml');
-      var items = Array.from(doc.querySelectorAll('item')).slice(0, 5);
-      var headlines = items.map(function(it){
-        var title = (it.querySelector('title') || {}).textContent || '';
-        var link = (it.querySelector('link') || {}).textContent || '';
-        var pubDate = (it.querySelector('pubDate') || {}).textContent || '';
-        var sourceEl = it.querySelector('source');
-        var source = sourceEl ? (sourceEl.textContent || '') : '';
-        // Google News titles are usually "Headline - Source Name"
-        // Split out the source if the headline contains it.
-        var m = title.match(/^(.*?)\s*-\s*([^-]+)$/);
-        var cleanTitle = m ? m[1] : title;
-        var derivedSource = m ? m[2] : source;
-        return {
-          title: cleanTitle.trim(),
-          link: link.trim(),
-          source: (derivedSource || '').trim(),
-          date: pubDate ? new Date(pubDate).toLocaleDateString() : ''
-        };
-      });
-      cache[key] = { headlines: headlines, ts: now };
+    }).then(function(xml){
+      var headlines = _parseRss(xml);
+      cache[key] = { headlines: headlines, ts: now, proxy: p.name };
       _saveNewsCache(cache);
       return headlines;
-    })
-    .catch(function(err){
-      console.warn('news fetch failed for '+name, err);
-      // Cache the empty result briefly so we don't hammer the proxy
-      cache[key] = { headlines: [], ts: now, error: true };
-      _saveNewsCache(cache);
-      return [];
+    }).catch(function(err){
+      console.warn('news proxy '+p.name+' failed for '+name+':', err.message || err);
+      return _tryProxy(idx + 1);
     });
+  }
+  return _tryProxy(0);
+}
+
+// ──────────────────────────────────────────────────────────────
+// NEWS DIAGNOSTIC — quick proxy reachability test for the committee.
+// Runs from the user's own browser (not from any server), so it
+// accurately reflects whether news fetching works on this deployment.
+// ──────────────────────────────────────────────────────────────
+function newsDiagnostic() {
+  if(typeof showToast === 'function') showToast({
+    type:'info', icon:'🔬', title:'Running news diagnostic', msg:'Testing CORS proxies from your browser…', duration:3000
+  });
+  var testRss = 'https://news.google.com/rss/search?q=%22North+Dakota%22&hl=en-US&gl=US&ceid=US%3Aen';
+  var tests = [
+    { name:'allorigins.win', url:'https://api.allorigins.win/raw?url=' + encodeURIComponent(testRss) },
+    { name:'corsproxy.io',   url:'https://corsproxy.io/?' + encodeURIComponent(testRss) }
+  ];
+  var results = [];
+  Promise.all(tests.map(function(t){
+    var started = Date.now();
+    return fetch(t.url).then(function(r){
+      var elapsed = Date.now() - started;
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      return r.text().then(function(xml){
+        var parser = new DOMParser();
+        var doc = parser.parseFromString(xml, 'text/xml');
+        var itemCount = doc.querySelectorAll('item').length;
+        results.push({ name: t.name, ok: itemCount > 0, elapsed: elapsed, itemCount: itemCount });
+      });
+    }).catch(function(err){
+      var elapsed = Date.now() - started;
+      results.push({ name: t.name, ok: false, elapsed: elapsed, error: String(err.message || err) });
+    });
+  })).then(function(){
+    var working = results.filter(function(r){ return r.ok; });
+    var msg = results.map(function(r){
+      return r.ok
+        ? '✓ '+r.name+': '+r.itemCount+' items ('+r.elapsed+'ms)'
+        : '✕ '+r.name+': '+(r.error || 'empty')+' ('+r.elapsed+'ms)';
+    }).join('\n');
+    console.log('[News Diagnostic]\n' + msg);
+    if(working.length > 0) {
+      if(typeof showToast === 'function') showToast({
+        type:'success', icon:'🔬',
+        title:'News fetching works ✓',
+        msg: working.length+' of '+tests.length+' proxies reachable. Check console for detail.',
+        duration: 5000
+      });
+    } else {
+      if(typeof showToast === 'function') showToast({
+        type:'danger', icon:'🔬',
+        title:'All CORS proxies down',
+        msg:'Neither allorigins.win nor corsproxy.io is reachable. Check console for details.',
+        duration: 8000
+      });
+    }
+  });
 }
 // Render the live-news block in the slide-over panel.
 function _renderLiveNews(headlines) {
   var el = document.getElementById('pp-news-live');
   if(!el) return;
   if(!headlines || !headlines.length) {
-    el.innerHTML = '<div style="font-size:11px;color:rgba(255,255,255,0.35);font-style:italic;">No recent news found. Click ↻ Refresh to try again.</div>';
+    // Peek at the cache for this person to distinguish "proxy down" from
+    // "no coverage found" — helps the committee triage.
+    var cur = window._ppCurrentNews;
+    var cacheEntry = null;
+    if(cur) {
+      try {
+        var c = _loadNewsCache();
+        cacheEntry = c[_newsKey(cur.name, cur.dist)];
+      } catch(e){}
+    }
+    var msg = 'No recent news found for this name/district.';
+    var hint = 'Try ↻ Refresh, or run 🔬 Test News in Strategy Room.';
+    if(cacheEntry && cacheEntry.error === 'proxies_down') {
+      msg = '⚠ CORS proxies are unreachable right now.';
+      hint = 'Open Strategy Room → 🔬 Test News for details.';
+    }
+    el.innerHTML = '<div style="font-size:11px;color:rgba(255,255,255,0.45);font-style:italic;">'+msg+'<br><span style="opacity:.7;">'+hint+'</span></div>';
     return;
   }
   el.innerHTML = headlines.map(function(h){
