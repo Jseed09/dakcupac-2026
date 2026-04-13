@@ -9454,10 +9454,16 @@ function toggleCollapse(id, headEl){
   saveCollapseState(state);
   if(headEl){
     headEl.classList.toggle('coll-closed', !!state[id]);
-    // For Candidates-tab district headers, also toggle the matching body div
+    // For Candidates-tab + Voting History district headers, also toggle
+    // the matching body div AND clear the inline display style (the
+    // initial render sets display:none/contents inline, which would
+    // otherwise override the class toggle).
     if(headEl.classList.contains('coll-head-cand')){
       var body = document.querySelector('[data-coll-body-for="'+id+'"]');
-      if(body) body.classList.toggle('coll-closed', !!state[id]);
+      if(body) {
+        body.classList.toggle('coll-closed', !!state[id]);
+        body.style.display = state[id] ? 'none' : 'contents';
+      }
     }
   }
 }
