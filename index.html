@@ -5493,17 +5493,33 @@ function expandSbRow(lname, dist){
   const distCands = CANDIDATES.filter(c=>c.dist===dist);
   const statusDot={none:'#ccc',review:'var(--gold-border)',approved:'var(--green-border)',contributed:'var(--teal)',pass:'var(--red-border)'};
   const statusLbl={none:'No Action',review:'Under Review',approved:'Approved',contributed:'Contributed',pass:'Pass'};
+  function _vb2217(v){
+    if(v==='NAY') return '<span class="vote-pill yea" style="font-size:10px;padding:1px 6px" title="NAY on SB 2217 = pro-CU">✓ NAY</span>';
+    if(v==='YEA') return '<span class="vote-pill nay" style="font-size:10px;padding:1px 6px" title="YEA on SB 2217 = anti-CU">✕ YEA</span>';
+    if(v==='ABSENT') return '<span class="vote-pill absent" style="font-size:10px;padding:1px 6px">Abs</span>';
+    return '<span style="color:#999;font-size:11px">—</span>';
+  }
   function miniRow(c,i){
     const ts=getSaved(c.name,c.dist); const h=CUPAC_HIST[c.name];
     const bg=i%2===0?'var(--white)':'var(--teal-light)';
     const pb=c.party==='R'?'<span style="background:#DAEAF5;color:#0D3B66;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px">R</span>':'<span style="background:#F5DAD8;color:#5C1010;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px">D</span>';
     const sb=getSB2266Vote(c.name,c.ch);
+    const sb2=(typeof getSB2217Vote==='function')?getSB2217Vote(c.name,c.ch):null;
+    let recLabel='<span style="color:#888;font-size:11px">—</span>';
+    try {
+      const rec=getScaledRec(c.name,c.dist,c.ch,c.party,c.incumbent);
+      if(rec && rec.amt && rec.amt > 0){
+        recLabel = '<div style="font-size:10px;font-weight:700;color:'+(rec.color||'#6B7280')+';">'+(rec.icon||'')+' '+(rec.tier||'')+'</div><div style="font-size:12px;font-weight:800;color:'+(rec.color||'#6B7280')+';">$'+rec.amt+'</div>';
+      }
+    } catch(e){}
     const ukey=personKey(c.name,c.dist);
     const dot=`<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${statusDot[ts.status]||'#ccc'};margin-right:4px;vertical-align:middle"></span>`;
     return `<tr style="background:${bg}">
       <td style="padding:7px 10px;font-size:13px">${nameLink(c.name,c.dist,c.incumbent)} ${pb} <span style="font-size:11px;color:var(--text-muted)">${c.ch}</span></td>
-      <td style="padding:7px 10px">${sb?voteBadge(sb):'<span style="color:#999;font-size:11px">No prior vote</span>'}</td>
+      <td style="padding:7px 10px">${sb?voteBadge(sb):'<span style="color:#999;font-size:11px">—</span>'}</td>
+      <td style="padding:7px 10px">${_vb2217(sb2)}</td>
       <td style="padding:7px 10px;font-size:12px">${h?`<strong style="color:var(--teal-dark)">${h.amt}</strong>`:'<span style="color:#888">—</span>'}</td>
+      <td style="padding:7px 10px;line-height:1.2">${recLabel}</td>
       <td style="padding:7px 10px;font-size:12px">${dot}${statusLbl[ts.status]||'No Action'}</td>
       <td style="padding:7px 10px">
         <select class="tracker-select status-${ts.status}" onchange="saveDecision(this,'${ukey}')" style="font-size:12px;padding:3px 6px;min-width:120px">
@@ -5520,7 +5536,13 @@ function expandSbRow(lname, dist){
     return `<div style="margin-bottom:12px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--teal-dark);letter-spacing:.06em;margin-bottom:6px">${label}</div>
       <table style="width:100%;border-collapse:collapse;border:1px solid var(--border)">
         <thead><tr style="background:var(--teal-dark);color:white">
-          <th style="padding:6px 10px;font-size:11px;text-align:left">Candidate</th><th style="padding:6px 10px;font-size:11px;text-align:left">SB 2266</th><th style="padding:6px 10px;font-size:11px;text-align:left">Prior DakCUPAC</th><th style="padding:6px 10px;font-size:11px;text-align:left">Status</th><th style="padding:6px 10px;font-size:11px;text-align:left">Update</th>
+          <th style="padding:6px 10px;font-size:11px;text-align:left">Candidate</th>
+          <th style="padding:6px 10px;font-size:11px;text-align:left;background:rgba(13,115,119,0.25);">📜 SB 2266</th>
+          <th style="padding:6px 10px;font-size:11px;text-align:left;background:rgba(180,83,9,0.25);">💳 SB 2217</th>
+          <th style="padding:6px 10px;font-size:11px;text-align:left">Prior DakCUPAC</th>
+          <th style="padding:6px 10px;font-size:11px;text-align:left">CUPAC Rec</th>
+          <th style="padding:6px 10px;font-size:11px;text-align:left">Status</th>
+          <th style="padding:6px 10px;font-size:11px;text-align:left">Update</th>
         </tr></thead>
         <tbody>${cands.map((c,i)=>miniRow(c,i)).join('')}</tbody>
       </table></div>`;
@@ -5933,17 +5955,36 @@ function lookupDistrict(){
   const filed   =CANDIDATES.filter(c=>c.dist===val);
   const statusDot={none:'#ccc',review:'var(--gold-border)',approved:'var(--green-border)',contributed:'var(--teal)',pass:'var(--red-border)'};
   const statusLbl={none:'No Action',review:'Under Review',approved:'Approved',contributed:'Contributed',pass:'Pass'};
+  function voteBadge2217(v){
+    if(v==='NAY') return '<span class="vote-pill yea" style="font-size:10px;padding:1px 6px" title="NAY on SB 2217 = pro-CU">✓ NAY</span>';
+    if(v==='YEA') return '<span class="vote-pill nay" style="font-size:10px;padding:1px 6px" title="YEA on SB 2217 = anti-CU">✕ YEA</span>';
+    if(v==='ABSENT') return '<span class="vote-pill absent" style="font-size:10px;padding:1px 6px">—</span>';
+    return '<span style="color:#999;font-size:11px">—</span>';
+  }
   function candRow(c,i){
     const ts=getSaved(c.name,c.dist); const h=CUPAC_HIST[c.name];
     const bg=i%2===0?'var(--white)':'var(--teal-light)';
     const pb=c.party==='R'?'<span style="background:#DAEAF5;color:#0D3B66;font-size:10px;font-weight:700;padding:1px 5px;border-radius:7px">R</span>':'<span style="background:#F5DAD8;color:#5C1010;font-size:10px;font-weight:700;padding:1px 5px;border-radius:7px">D</span>';
     const sb=getSB2266Vote(c.name,c.ch);
+    const sb2=(typeof getSB2217Vote==='function')?getSB2217Vote(c.name,c.ch):null;
+    // Scaled recommendation
+    let recLabel='<span style="color:#888;font-size:11px">—</span>';
+    try {
+      const rec=getScaledRec(c.name,c.dist,c.ch,c.party,c.incumbent);
+      if(rec && rec.amt && rec.amt > 0){
+        recLabel = '<div style="font-size:10px;font-weight:700;color:'+(rec.color||'#6B7280')+';">'+(rec.icon||'')+' '+(rec.tier||'')+'</div><div style="font-size:12px;font-weight:800;color:'+(rec.color||'#6B7280')+';">$'+rec.amt+'</div>';
+      } else if(rec && rec.tier) {
+        recLabel = '<div style="font-size:10px;font-weight:700;color:'+(rec.color||'#6B7280')+';">'+(rec.icon||'')+' '+(rec.tier||'')+'</div><div style="font-size:10px;color:var(--text-muted);">$0</div>';
+      }
+    } catch(e){}
     const ukey=personKey(c.name,c.dist);
     const dot=`<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${statusDot[ts.status]||'#ccc'};margin-right:4px;vertical-align:middle"></span>`;
     return `<tr style="background:${bg}">
       <td style="padding:7px 10px;font-size:13px">${nameLink(c.name,c.dist,c.incumbent)} ${pb}</td>
       <td style="padding:7px 10px">${sb?voteBadge(sb):'<span style="color:#999;font-size:11px">—</span>'}</td>
+      <td style="padding:7px 10px">${voteBadge2217(sb2)}</td>
       <td style="padding:7px 10px;font-size:12px">${h?`<strong style="color:var(--teal-dark)">${h.amt}</strong>`:'<span style="color:#888">—</span>'}</td>
+      <td style="padding:7px 10px;line-height:1.2">${recLabel}</td>
       <td style="padding:7px 10px;font-size:12px">${dot}${statusLbl[ts.status]||'No Action'}</td>
       <td style="padding:7px 10px">
         <select class="tracker-select status-${ts.status}" onchange="saveDecision(this,'${ukey}')" style="font-size:12px;padding:3px 6px;min-width:120px">
@@ -5959,7 +6000,15 @@ function lookupDistrict(){
     if(!cands.length) return `<p style="font-size:13px;color:var(--text-muted);font-style:italic;margin:4px 0 10px">No ${label} candidates filed for District ${val}.</p>`;
     return `<div style="margin-bottom:14px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--teal-dark);margin-bottom:6px">${label}</div>
       <table style="width:100%;border-collapse:collapse;border:1px solid var(--border)">
-        <thead><tr style="background:var(--teal-dark);color:white"><th style="padding:6px 10px;font-size:11px;text-align:left">Candidate</th><th style="padding:6px 10px;font-size:11px;text-align:left">SB 2266</th><th style="padding:6px 10px;font-size:11px;text-align:left">Prior DakCUPAC</th><th style="padding:6px 10px;font-size:11px;text-align:left">Status</th><th style="padding:6px 10px;font-size:11px;text-align:left">Update</th></tr></thead>
+        <thead><tr style="background:var(--teal-dark);color:white">
+          <th style="padding:6px 10px;font-size:11px;text-align:left">Candidate</th>
+          <th style="padding:6px 10px;font-size:11px;text-align:left;background:rgba(13,115,119,0.25);">📜 SB 2266</th>
+          <th style="padding:6px 10px;font-size:11px;text-align:left;background:rgba(180,83,9,0.25);">💳 SB 2217</th>
+          <th style="padding:6px 10px;font-size:11px;text-align:left">Prior DakCUPAC</th>
+          <th style="padding:6px 10px;font-size:11px;text-align:left">CUPAC Rec</th>
+          <th style="padding:6px 10px;font-size:11px;text-align:left">Status</th>
+          <th style="padding:6px 10px;font-size:11px;text-align:left">Update</th>
+        </tr></thead>
         <tbody>${cands.map((c,i)=>candRow(c,i)).join('')}</tbody>
       </table></div>`;
   }
@@ -10386,6 +10435,7 @@ function generateOnePager() {
   var c = CANDIDATES.find(function(x){return x.name===name;});
   var ldr = LEADERS.find(function(l){return l.name===name;});
   var vote = getSB2266Vote(name, c?c.ch:(ldr?ldr.chamber:''));
+  var vote2 = (typeof getSB2217Vote==='function') ? getSB2217Vote(name, c?c.ch:(ldr?ldr.chamber:'')) : null;
   var h = CUPAC_HIST[name];
   var fd = null;
   FIGHT_DATA.forEach(function(r){ if(r.n.toLowerCase()===name.toLowerCase()) fd=r; });
@@ -10404,9 +10454,12 @@ function generateOnePager() {
     +'<div style="text-align:right;"><div style="font-size:10px;color:var(--text-muted);letter-spacing:.06em;text-transform:uppercase;">DakCUPAC Briefing</div>'
     +'<div style="font-size:11px;color:var(--text-dim);">Generated '+new Date().toLocaleDateString()+'</div></div></div>';
 
-  // Key metrics row
-  html += '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px;">';
-  html += '<div style="text-align:center;padding:10px;background:var(--surface);border-radius:8px;"><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;">SB 2266</div><div style="font-size:16px;font-weight:700;color:'+(vote==='YEA'?'#15803D':vote==='NAY'?'#B91C1C':'var(--text-muted)')+';">'+(vote||'N/A')+'</div></div>';
+  // Key metrics row — 6 columns now (added SB 2217)
+  html += '<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:20px;">';
+  html += '<div style="text-align:center;padding:10px;background:rgba(13,115,119,0.08);border:1px solid var(--teal);border-radius:8px;"><div style="font-size:10px;color:var(--teal-dark);text-transform:uppercase;letter-spacing:.06em;font-weight:700;">📜 SB 2266</div><div style="font-size:16px;font-weight:700;color:'+(vote==='YEA'?'#15803D':vote==='NAY'?'#B91C1C':'var(--text-muted)')+';">'+(vote||'—')+'</div></div>';
+  var _v2Color = vote2==='NAY'?'#15803D':vote2==='YEA'?'#B91C1C':'var(--text-muted)';
+  var _v2Display = vote2==='NAY'?'NAY ✓':vote2==='YEA'?'YEA ✕':vote2||'—';
+  html += '<div style="text-align:center;padding:10px;background:rgba(180,83,9,0.08);border:1px solid #B45309;border-radius:8px;"><div style="font-size:10px;color:#92400E;text-transform:uppercase;letter-spacing:.06em;font-weight:700;">💳 SB 2217</div><div style="font-size:16px;font-weight:700;color:'+_v2Color+';">'+_v2Display+'</div></div>';
   html += '<div style="text-align:center;padding:10px;background:var(--surface);border-radius:8px;"><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;">CUPAC Total</div><div style="font-size:16px;font-weight:700;color:var(--teal);">'+(h?h.amt:'$0')+'</div></div>';
   html += '<div style="text-align:center;padding:10px;background:var(--surface);border-radius:8px;"><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;">Win Prob</div><div style="font-size:16px;font-weight:700;">'+(prob?Math.round(prob*100)+'%':'N/A')+'</div></div>';
   html += '<div style="text-align:center;padding:10px;background:var(--surface);border-radius:8px;"><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;">Rel. Score</div><div style="font-size:16px;font-weight:700;">'+(rel||'N/A')+'</div></div>';
@@ -10759,7 +10812,8 @@ function generatePrepPacket(){
       html += '<table style="width:100%;border-collapse:collapse;font-size:12px;">'
         +'<thead><tr style="background:var(--surface);">'
         +'<th style="padding:8px 12px;text-align:left;font-size:10px;text-transform:uppercase;color:var(--text-muted);">Candidate</th>'
-        +'<th style="padding:8px 12px;text-align:center;font-size:10px;text-transform:uppercase;color:var(--text-muted);">SB 2266</th>'
+        +'<th style="padding:8px 12px;text-align:center;font-size:10px;text-transform:uppercase;color:var(--teal-dark);background:rgba(13,115,119,0.12);">📜 SB 2266</th>'
+        +'<th style="padding:8px 12px;text-align:center;font-size:10px;text-transform:uppercase;color:#92400E;background:rgba(180,83,9,0.12);">💳 SB 2217</th>'
         +'<th style="padding:8px 12px;text-align:right;font-size:10px;text-transform:uppercase;color:var(--text-muted);">CUPAC Hist.</th>'
         +'<th style="padding:8px 12px;text-align:left;font-size:10px;text-transform:uppercase;color:var(--text-muted);">Recommendation</th>'
         +'</tr></thead><tbody>';
@@ -10772,11 +10826,15 @@ function generatePrepPacket(){
 
       sorted.forEach(function(c, ci){
         var vote = getSB2266Vote(c.name, c.ch);
+        var vote2217 = (typeof getSB2217Vote==='function') ? getSB2217Vote(c.name, c.ch) : null;
         var h = CUPAC_HIST[c.name];
         var rec = getScaledRec(c.name, d, c.ch, c.party, c.incumbent);
         if(rec.amt) totalRecommended += rec.amt;
         var voteClr = vote==='YEA'?'var(--green-text)':vote==='NAY'?'var(--red-text)':'var(--text-muted)';
         var voteTxt = vote||'—';
+        // SB 2217: NAY = pro-CU (green), YEA = anti-CU (red)
+        var vote2217Clr = vote2217==='NAY'?'var(--green-text)':vote2217==='YEA'?'var(--red-text)':'var(--text-muted)';
+        var vote2217Txt = vote2217==='NAY'?'NAY ✓':vote2217==='YEA'?'YEA ✕':(vote2217||'—');
         var recClr = rec.color||'var(--text-muted)';
         var bg2 = ci%2===0?'var(--white)':'var(--surface)';
         var chamberIcon = c.ch==='Senate'?'🏛':'🏠';
@@ -10784,6 +10842,7 @@ function generatePrepPacket(){
         html += '<tr style="background:'+bg2+';">'
           +'<td style="padding:8px 12px;"><strong>'+c.name+'</strong> <span style="font-size:10px;color:var(--text-muted);">'+chamberIcon+' '+c.ch+' · '+c.party+(c.incumbent?' · ★ Incumbent':'')+'</span></td>'
           +'<td style="padding:8px 12px;text-align:center;font-weight:700;color:'+voteClr+';">'+voteTxt+'</td>'
+          +'<td style="padding:8px 12px;text-align:center;font-weight:700;color:'+vote2217Clr+';">'+vote2217Txt+'</td>'
           +'<td style="padding:8px 12px;text-align:right;color:var(--teal-dark);font-weight:600;">'+(h?h.amt:'—')+'</td>'
           +'<td style="padding:8px 12px;"><span style="font-size:11px;font-weight:700;color:'+recClr+';">'+rec.icon+' '+rec.tier+(rec.amt?' · $'+rec.amt:'')+'</span></td>'
         +'</tr>';
