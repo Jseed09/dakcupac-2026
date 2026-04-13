@@ -567,6 +567,12 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
 .bp-row .bp-accept.accepted{background:var(--green);border-color:var(--green)}
 .bp-tier-sub-row{padding:8px 16px;background:var(--surface-2);font-size:11px;color:var(--text-muted);display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}
 .bp-tier-empty{padding:12px 16px;font-size:11px;color:var(--text-muted);font-style:italic;text-align:center}
+.bp-preset{font-size:11px;font-weight:700;padding:4px 9px;border-radius:14px;background:var(--white);color:var(--teal);border:1.5px solid var(--teal);cursor:pointer;font-family:var(--font-display)}
+.bp-preset:hover{background:var(--teal);color:#fff}
+.bp-bulk{font-size:11px;font-weight:700;padding:5px 12px;border-radius:8px;background:var(--teal);color:#fff;border:1.5px solid var(--teal-dark);cursor:pointer;font-family:var(--font-display)}
+.bp-bulk:hover{background:var(--teal-dark)}
+.bp-bulk.bp-bulk-danger{background:#fff;color:#B91C1C;border-color:#FCA5A5}
+.bp-bulk.bp-bulk-danger:hover{background:#FEE2E2}
 /* ── TIMELINE ── */
 .timeline{display:flex;border-radius:6px;overflow:hidden;border:1px solid var(--border);box-shadow:0 2px 8px var(--shadow);margin:20px 0 28px}
 .timeline-step{flex:1;padding:16px;background:var(--white);border-right:1px solid var(--border)}
@@ -2294,7 +2300,7 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
         <div><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:.5px;">Unallocated</div><div id="bp-unalloc" style="font-size:22px;font-weight:800;color:var(--green);">$0</div></div>
       </div>
 
-      <!-- Row 2: split slider -->
+      <!-- Row 2: split slider + presets + bulk actions -->
       <div style="background:var(--surface-2);border-radius:10px;padding:12px 16px;margin-bottom:14px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:12px;">
           <span style="font-weight:700;color:#B45309;">⚔ Primary · <span id="bp-split-p">67</span>%</span>
@@ -2302,7 +2308,18 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
         </div>
         <input type="range" id="bp-split-slider" min="50" max="90" value="67" oninput="bpSetSplit(this.value)" style="width:100%;accent-color:var(--teal);">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;font-size:10px;color:var(--text-muted);">
-          <span>50/50</span><span>Drag to adjust primary-vs-general split</span><span>90/10</span>
+          <span>50/50</span><span>Drag slider or tap a preset — every recommendation across the dashboard rescales live</span><span>90/10</span>
+        </div>
+        <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;align-items:center;">
+          <span style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;">Presets:</span>
+          <button class="bp-preset" onclick="bpPreset(50)">50/50</button>
+          <button class="bp-preset" onclick="bpPreset(60)">60/40</button>
+          <button class="bp-preset" onclick="bpPreset(67)">67/33</button>
+          <button class="bp-preset" onclick="bpPreset(75)">75/25</button>
+          <button class="bp-preset" onclick="bpPreset(90)">90/10</button>
+          <span style="flex:1;"></span>
+          <button class="bp-bulk" onclick="bpApplyAll()" title="Fill every empty row with the recommended amount">⚡ Apply All Recs</button>
+          <button class="bp-bulk bp-bulk-danger" onclick="bpClearAll()" title="Zero every tracker amount">✕ Clear All</button>
         </div>
       </div>
 
@@ -2315,6 +2332,12 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
             <span>Allocated: <strong id="bp-alloc-p" style="color:#B45309;">$0</strong></span>
             <span>Remaining: <strong id="bp-rem-p">$0</strong></span>
           </div>
+          <div style="margin-top:8px;">
+            <div style="height:6px;background:rgba(180,83,9,0.15);border-radius:3px;overflow:hidden;">
+              <div id="bp-util-p" style="height:100%;background:#B45309;width:0%;transition:width .25s;"></div>
+            </div>
+            <div style="font-size:10px;color:var(--text-muted);margin-top:2px;display:flex;justify-content:space-between;"><span>Utilization</span><span id="bp-util-p-pct">0%</span></div>
+          </div>
         </div>
         <div style="background:var(--teal-light);border:2px solid var(--teal);border-radius:10px;padding:14px;">
           <div style="font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.5px;">🗳 General Pot — Jun 10 → Nov 3</div>
@@ -2322,6 +2345,12 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
           <div style="font-size:11px;color:var(--text-muted);display:flex;justify-content:space-between;">
             <span>Allocated: <strong id="bp-alloc-g" style="color:var(--teal);">$0</strong></span>
             <span>Remaining: <strong id="bp-rem-g">$0</strong></span>
+          </div>
+          <div style="margin-top:8px;">
+            <div style="height:6px;background:rgba(13,115,119,0.15);border-radius:3px;overflow:hidden;">
+              <div id="bp-util-g" style="height:100%;background:var(--teal);width:0%;transition:width .25s;"></div>
+            </div>
+            <div style="font-size:10px;color:var(--text-muted);margin-top:2px;display:flex;justify-content:space-between;"><span>Utilization</span><span id="bp-util-g-pct">0%</span></div>
           </div>
         </div>
       </div>
@@ -3285,6 +3314,8 @@ function showPanel(id, el){
   if(target) target.classList.add('active');
   if(el) el.classList.add('active');
   window.scrollTo({top:0,behavior:'smooth'});
+  // Ensure scale factors reflect current budget before any render runs
+  if(typeof _computeScaleFactors === 'function') _computeScaleFactors();
   if(id==='history' && window.initHistoryCharts) setTimeout(window.initHistoryCharts, 80);
   if(id==='sb2266') renderFight();
   if(id==='committee'){
@@ -3293,6 +3324,11 @@ function showPanel(id, el){
   }
   if(id==='winprob') setTimeout(renderWPTable, 50);
   if(id==='strategy') setTimeout(function(){ if(typeof initStrategyRoom==='function') initStrategyRoom(); }, 100);
+  // Re-render candidate grid / vote table / leadership when switching in,
+  // so scaled ghost placeholders reflect the latest slider state.
+  if(id==='candidates' && typeof filterCandidates === 'function') setTimeout(filterCandidates, 50);
+  if(id==='sb2266' && typeof renderVoteTable === 'function') setTimeout(renderVoteTable, 80);
+  if(id==='leadership' && typeof buildProfiles === 'function') setTimeout(buildProfiles, 50);
   // Apply tier filter state to newly rendered tab
   setTimeout(function(){ if(typeof applyTierFilter==='function') applyTierFilter(); }, 200);
 }
@@ -4497,9 +4533,9 @@ function personCard(cfg){
     var qkBtns=[200,300,400,500].map(function(amt){
       return '<button class="quick-amt-btn'+(saved.amt===amt?' active':'')+'" onclick="ppSetAmtCard(\''+ukey+'\','+amt+')">$'+amt+'</button>';
     }).join('');
-    // Ghost placeholder: suggested amount from getCupacRec
+    // Ghost placeholder: scaled suggested amount (responds to budget slider)
     var _ghostRec = null;
-    try { _ghostRec = getCupacRec(name, parseInt(dist)||0, chamber, party, cfg.incumbent); } catch(e){}
+    try { _ghostRec = getScaledRec(name, parseInt(dist)||0, chamber, party, cfg.incumbent); } catch(e){}
     var _ghostAmt = (_ghostRec && _ghostRec.amt) ? _ghostRec.amt : 0;
     var _ghostPlaceholder = _ghostAmt ? ('$'+_ghostAmt+' rec') : '$';
     var _ghostCls = (!saved.amt && _ghostAmt) ? ' ghost' : '';
@@ -5674,13 +5710,17 @@ function openPersonCard(name, dist){
   const sel=document.getElementById('pp-status-select'); sel.value=saved.status||'none'; sel.className='tracker-select status-'+(saved.status||'none');
   var _ppAmtEl = document.getElementById('pp-amt-input');
   _ppAmtEl.value = saved.amt || '';
-  // Ghost placeholder from getCupacRec
+  // Ghost placeholder from getScaledRec (responds to budget slider)
   try {
-    var _ppRec = getCupacRec(name, parseInt(dist)||0, (ldr&&ldr.chamber)||(cand&&cand.ch)||'House', (ldr&&ldr.party)||(cand&&cand.party)||'R', (cand&&cand.incumbent)||false);
+    _computeScaleFactors();
+    var _ppRec = getScaledRec(name, parseInt(dist)||0, (ldr&&ldr.chamber)||(cand&&cand.ch)||'House', (ldr&&ldr.party)||(cand&&cand.party)||'R', (cand&&cand.incumbent)||false);
     if(_ppRec && _ppRec.amt) {
       _ppAmtEl.placeholder = '$'+_ppRec.amt+' rec';
       if(!saved.amt) _ppAmtEl.classList.add('ghost');
       else _ppAmtEl.classList.remove('ghost');
+    } else {
+      _ppAmtEl.placeholder = 'Custom $';
+      _ppAmtEl.classList.remove('ghost');
     }
   } catch(e){}
   document.getElementById('pp-notes').value=saved.notes||'';
@@ -8725,6 +8765,98 @@ function renderWPTable() {
 // ──────────────────────────────────────────────────────────────
 var _bpTierFilter = 'all';
 
+// ── Scale-factor engine ──
+// Slider and target drive a scale factor that cascades into every
+// getCupacRec-derived amount across the dashboard. The base amounts
+// come from getCupacRec (static, tier-driven). Scale factors are
+// recomputed whenever the budget changes.
+var _scaleCache = {primaryFactor: 1, generalFactor: 1, baseP: 0, baseG: 0, primaryPot: 0, generalPot: 0, stamp: 0};
+
+function _computeScaleFactors() {
+  var b = getBudget();
+  var target = b.target || 30000;
+  var splitPct = b.splitPct != null ? b.splitPct : 67;
+  var primaryPot = Math.round(target * splitPct / 100);
+  var generalPot = target - primaryPot;
+  var baseP = 0, baseG = 0;
+  var _seen = {};
+  CANDIDATES.forEach(function(c) {
+    if(parseInt(c.dist) % 2 !== 1) return;
+    var k = c.name + '_' + c.dist;
+    if(_seen[k]) return;
+    _seen[k] = 1;
+    var rec = getCupacRec(c.name, parseInt(c.dist), c.ch, c.party, c.incumbent);
+    if(!rec.amt || rec.amt <= 0) return;
+    if(rec.inPrimary) baseP += rec.amt;
+    else baseG += rec.amt;
+  });
+  _scaleCache.primaryFactor = baseP > 0 ? (primaryPot / baseP) : 1;
+  _scaleCache.generalFactor = baseG > 0 ? (generalPot / baseG) : 1;
+  _scaleCache.baseP = baseP;
+  _scaleCache.baseG = baseG;
+  _scaleCache.primaryPot = primaryPot;
+  _scaleCache.generalPot = generalPot;
+  _scaleCache.stamp = Date.now();
+}
+
+// getScaledRec — wraps getCupacRec, returns a new object with `amt`
+// scaled and `baseAmt` preserved for display. Rounds to nearest $50.
+function getScaledRec(name, dist, chamber, party, incumbent) {
+  var rec = getCupacRec(name, parseInt(dist)||0, chamber, party, incumbent);
+  if(!rec || !rec.amt) return rec;
+  var factor = rec.inPrimary ? _scaleCache.primaryFactor : _scaleCache.generalFactor;
+  // Round to nearest $50, minimum $50 for non-zero tiers
+  var scaled = Math.round((rec.amt * factor) / 50) * 50;
+  if(scaled < 50 && rec.amt > 0) scaled = 50;
+  // Return a shallow clone so callers don't mutate the cache
+  var out = {};
+  for(var k in rec) out[k] = rec[k];
+  out.baseAmt = rec.amt;
+  out.amt = scaled;
+  return out;
+}
+
+// refreshAllocations — cascade re-render after any budget change.
+// Re-renders the currently visible panel and Strategy Room.
+function refreshAllocations() {
+  _computeScaleFactors();
+  // Re-render Strategy Room pieces
+  if(typeof renderBudgetPlan === 'function' && document.getElementById('budget-plan-list')) renderBudgetPlan();
+  if(typeof renderStrategy === 'function' && document.getElementById('strat-grid')) renderStrategy();
+  if(typeof renderPhasePlan === 'function' && document.getElementById('phase1-cards')) renderPhasePlan();
+  if(typeof updateStrategyTotals === 'function') updateStrategyTotals();
+  // Re-render whichever candidate list is active on another tab
+  try {
+    var cp = document.getElementById('panel-candidates');
+    if(cp && cp.classList.contains('active') && typeof filterCandidates === 'function') filterCandidates();
+    var sp = document.getElementById('panel-sb2266');
+    if(sp && sp.classList.contains('active') && typeof renderVoteTable === 'function') renderVoteTable();
+    var lp = document.getElementById('panel-leadership');
+    if(lp && lp.classList.contains('active') && typeof buildProfiles === 'function') buildProfiles();
+  } catch(e){}
+  // Refresh open profile card placeholder if a panel is open
+  try {
+    var ppOpen = document.getElementById('person-panel');
+    if(ppOpen && ppOpen.classList.contains('open')) {
+      var pName = (window._comparePersonA || '').toString();
+      if(pName && typeof openPersonCard === 'function') {
+        // Just update the placeholder without re-opening
+        var _ppInput = document.getElementById('pp-amt-input');
+        if(_ppInput) {
+          // Find the current person's district from the panel title
+          var _pDistEl = document.querySelector('#person-panel .pp-dist');
+          var _pDist = _pDistEl ? parseInt(_pDistEl.textContent.replace(/\D/g,''))||0 : 0;
+          var _ppRec2 = getScaledRec(pName, _pDist, 'House', 'R', false);
+          if(_ppRec2 && _ppRec2.amt) {
+            _ppInput.placeholder = '$'+_ppRec2.amt+' rec';
+            if(!_ppInput.value) _ppInput.classList.add('ghost');
+          }
+        }
+      }
+    }
+  } catch(e){}
+}
+
 var BP_TIER_ORDER = ['PROTECT','MAINTAIN','BUILD','HEDGE','EVALUATE','HOLD','NOT RECOMMENDED','ALIGNED'];
 var BP_TIER_META = {
   'PROTECT':         {icon:'🛡️', color:'#15803D', label:'PROTECT',          sub:'Proven YEA allies under banker attack — fund at max'},
@@ -8746,12 +8878,13 @@ function bpBuildRows() {
     var k = c.name + '_' + c.dist;
     if(_seen[k]) return;
     _seen[k] = 1;
-    var rec = getCupacRec(c.name, parseInt(c.dist), c.ch, c.party, c.incumbent);
+    var rec = getScaledRec(c.name, parseInt(c.dist), c.ch, c.party, c.incumbent);
     rows.push({
       name: c.name, ch: c.ch, dist: parseInt(c.dist), party: c.party,
       incumbent: !!c.incumbent,
       tier: rec.tier || 'EVALUATE',
-      recAmt: rec.amt || 0,
+      recAmt: rec.amt || 0,          // scaled (active) recommendation
+      baseAmt: rec.baseAmt || rec.amt || 0, // original getCupacRec amount
       icon: rec.icon || '',
       color: rec.color || '#6B7280',
       inPrimary: !!rec.inPrimary,
@@ -8772,10 +8905,13 @@ function bpCurrentAmt(name, dist) {
 function renderBudgetPlan() {
   var listEl = document.getElementById('budget-plan-list');
   if(!listEl) return;
+  // Always recompute scale factors before building rows so the
+  // displayed amounts reflect the current target/split state.
+  _computeScaleFactors();
   var bgt = getBudget();
   var cash = bgt.cash || 0;
   var target = bgt.target || 30000;
-  var splitPct = bgt.splitPct || 67;
+  var splitPct = bgt.splitPct != null ? bgt.splitPct : 67;
   var primaryPot = Math.round(target * splitPct / 100);
   var generalPot = target - primaryPot;
   var reserve = cash - target;
@@ -8853,12 +8989,20 @@ function renderBudgetPlan() {
         ? '<span class="bp-flag bp-flag-contest">⚔ Primary</span>'
         : '<span class="bp-flag bp-flag-uncontest">General</span>';
 
+      // Base vs scaled display — shows when they differ
+      var recLabel = 'rec $'+r.recAmt;
+      if(r.baseAmt && r.baseAmt !== r.recAmt) {
+        var arrow = r.recAmt > r.baseAmt ? '▲' : '▼';
+        var arrowColor = r.recAmt > r.baseAmt ? '#15803D' : '#B45309';
+        recLabel = '<span style="color:var(--text-muted);text-decoration:line-through;font-size:10px;">$'+r.baseAmt+'</span> <span style="color:'+arrowColor+';font-size:10px;">'+arrow+'</span> <strong>$'+r.recAmt+'</strong>';
+      }
+
       html += '<div class="bp-row" onclick="openPersonCard(\''+safeName+'\','+r.dist+')">'
         + '<div class="bp-dist">'+distLabel+'</div>'
         + '<div style="min-width:0;"><div class="bp-name">'+r.name+'</div><div class="bp-sub">'+incSub+' · '+(r.reasons[0]||'')+'</div></div>'
         + '<div class="bp-party '+partyCls+'">'+r.party+'</div>'
         + '<div>'+contestFlag+'</div>'
-        + '<div class="bp-rec">rec $'+r.recAmt+'</div>'
+        + '<div class="bp-rec">'+recLabel+'</div>'
         + '<div onclick="event.stopPropagation()"><input type="number" class="bp-input'+ghostClass+'" id="bp_amt_'+ukey+'" value="'+curVal+'" placeholder="$'+(r.recAmt||0)+'" min="0" step="50" onblur="bpSetAmt(\''+safeName+'\','+r.dist+',this.value)" onclick="event.stopPropagation()"></div>'
         + '<div style="text-align:right;">'+(curVal?'<span style="color:var(--green);font-weight:700;font-size:11px;">✓ set</span>':'')+'</div>'
         + '<div onclick="event.stopPropagation()"><button class="bp-accept'+(curVal==r.recAmt?' accepted':'')+'" onclick="bpAcceptRec(\''+safeName+'\','+r.dist+','+r.recAmt+')">Accept rec</button></div>'
@@ -8886,6 +9030,22 @@ function renderBudgetPlan() {
   setText('bp-rem-p', '$' + (primaryPot - allocPrimary).toLocaleString());
   setText('bp-rem-g', '$' + (generalPot - allocGeneral).toLocaleString());
 
+  // Utilization bars — how much of each pot the current decisions use
+  var utilP = primaryPot > 0 ? Math.min(100, Math.round(allocPrimary / primaryPot * 100)) : 0;
+  var utilG = generalPot > 0 ? Math.min(100, Math.round(allocGeneral / generalPot * 100)) : 0;
+  var utilPEl = document.getElementById('bp-util-p');
+  var utilGEl = document.getElementById('bp-util-g');
+  if(utilPEl) {
+    utilPEl.style.width = utilP + '%';
+    utilPEl.style.background = allocPrimary > primaryPot ? '#B91C1C' : '#B45309';
+  }
+  if(utilGEl) {
+    utilGEl.style.width = utilG + '%';
+    utilGEl.style.background = allocGeneral > generalPot ? '#B91C1C' : 'var(--teal)';
+  }
+  setText('bp-util-p-pct', utilP + '%' + (allocPrimary > primaryPot ? ' ⚠ OVER' : ''));
+  setText('bp-util-g-pct', utilG + '%' + (allocGeneral > generalPot ? ' ⚠ OVER' : ''));
+
   var slider = document.getElementById('bp-split-slider');
   if(slider && slider.value != splitPct) slider.value = splitPct;
 
@@ -8909,7 +9069,11 @@ function bpSetSplit(val) {
   var b = getBudget();
   b.splitPct = parseInt(val) || 67;
   try { localStorage.setItem(BUDGET_KEY, JSON.stringify(b)); } catch(e){}
-  renderBudgetPlan();
+  refreshAllocations();
+}
+
+function bpPreset(pct) {
+  bpSetSplit(pct);
 }
 
 function bpEditTarget() {
@@ -8920,7 +9084,7 @@ function bpEditTarget() {
   var newTarget = parseInt(inp.toString().replace(/[$,]/g,'')) || cur;
   b.target = newTarget;
   try { localStorage.setItem(BUDGET_KEY, JSON.stringify(b)); } catch(e){}
-  renderBudgetPlan();
+  refreshAllocations();
 }
 
 function bpFilterTier(tier) {
@@ -8944,6 +9108,43 @@ function bpSetAmt(name, dist, val) {
 
 function bpAcceptRec(name, dist, recAmt) {
   bpSetAmt(name, dist, recAmt);
+}
+
+// Apply All — commits every scaled recommendation as the user's
+// tracker amount (only overwrites rows where no decision is saved yet).
+function bpApplyAll() {
+  if(!confirm('Fill every empty $ input with the current recommended amount? This will not overwrite rows where you\'ve already entered a value.')) return;
+  var tracker = loadTracker();
+  var rows = bpBuildRows();
+  var count = 0;
+  rows.forEach(function(r) {
+    if(!r.recAmt || r.recAmt <= 0) return;
+    var key = personKey(r.name, r.dist);
+    var cur = tracker[key] && tracker[key].amt ? parseInt(tracker[key].amt) : 0;
+    if(cur > 0) return; // don't overwrite manual decisions
+    if(!tracker[key]) tracker[key] = {status:'none', notes:'', amt:0};
+    tracker[key].amt = r.recAmt;
+    count++;
+  });
+  saveTracker(tracker);
+  refreshAllocations();
+  setTimeout(function(){ alert('Applied recommended amounts to '+count+' candidate'+(count===1?'':'s')+'.'); }, 50);
+}
+
+// Clear All — zeros every tracker.amt (keeps status and notes).
+function bpClearAll() {
+  if(!confirm('Clear every $ amount in the tracker? Status and notes are preserved. This cannot be undone.')) return;
+  var tracker = loadTracker();
+  var count = 0;
+  Object.keys(tracker).forEach(function(k) {
+    if(tracker[k] && tracker[k].amt) {
+      tracker[k].amt = 0;
+      count++;
+    }
+  });
+  saveTracker(tracker);
+  refreshAllocations();
+  setTimeout(function(){ alert('Cleared $ amounts for '+count+' candidate'+(count===1?'':'s')+'.'); }, 50);
 }
 
 var _strategyInited = false;
@@ -8974,12 +9175,13 @@ function renderPhasePlan() {
   var p2El = document.getElementById('phase2-cards');
   var barEl = document.getElementById('phase-budget-bar');
   if(!p1El || !p2El) return;
+  _computeScaleFactors();
 
   var cands2026 = CANDIDATES.filter(function(c){ return parseInt(c.dist) % 2 === 1; });
   var phase1 = [], phase2 = [], phase1Total = 0, phase2Total = 0;
 
   cands2026.forEach(function(c) {
-    var rec = getCupacRec(c.name, c.dist, c.ch, c.party, c.incumbent);
+    var rec = getScaledRec(c.name, c.dist, c.ch, c.party, c.incumbent);
     if(rec.amt <= 0) return;
 
     var entry = {name:c.name, ch:c.ch, dist:c.dist, party:c.party, amt:rec.amt, tier:rec.tier, icon:rec.icon, color:rec.color, action:rec.action, inPrimary:rec.inPrimary};
@@ -9166,8 +9368,9 @@ function renderROI() {
 
 // ── 2. STRATEGY RECOMMENDER ──
 function computeStrategyScore(c) {
-  // Unified — delegates to getCupacRec so every tab shows the same numbers
-  var rec = getCupacRec(c.name, c.dist, c.ch, c.party, c.incumbent);
+  // Unified — delegates to getScaledRec so every tab reflects the current
+  // budget target + split. Base rec still comes from getCupacRec internally.
+  var rec = getScaledRec(c.name, c.dist, c.ch, c.party, c.incumbent);
   var prob = computeWinProb(c.dist, c.party, c.incumbent, c.ch);
   // Score for sorting: PROTECT=90, MAINTAIN=70, BUILD=60, EVALUATE=40, ASSESS=20, others=0
   var tierScores = {'PROTECT':90,'MAINTAIN':70,'BUILD':60,'EVALUATE':40,'ASSESS':20,'RECONSIDER':5,'DO NOT FUND':0,'SKIP':0};
