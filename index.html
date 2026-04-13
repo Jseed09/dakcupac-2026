@@ -2775,6 +2775,7 @@ function saveTracker(d){
     if(typeof updateStrategyTotals==='function') updateStrategyTotals();
     if(typeof updateBudgetSidebar==='function') updateBudgetSidebar();
     if(typeof broadcastBudget==='function') broadcastBudget();
+    if(typeof updateTabBadges==='function') updateTabBadges();
   }, 50);
   try{ localStorage.setItem(TRACKER_KEY,JSON.stringify(d)); } catch(e){}
   try{
@@ -5339,10 +5340,25 @@ function personCard(cfg){
 // Helper: set amount from card quick buttons
 function ppSetAmtCard(ukey, val){
   val = parseInt(val)||0;
-  var d=loadTracker(); if(!d[ukey]) d[ukey]={status:'none',notes:''}; d[ukey].amt=val; saveTracker(d);
+  var d=loadTracker();
+  var prev = (d[ukey] && d[ukey].amt) || 0;
+  if(!d[ukey]) d[ukey]={status:'none',notes:''};
+  d[ukey].amt=val;
+  saveTracker(d);
   var inp=document.getElementById('amt_'+ukey); if(inp) inp.value=val||'';
-  [200,300,400,500].forEach(function(n){ var b=document.getElementById('qb_'+ukey+'_'+n)||document.querySelector('.pcard [id="amt_'+ukey+'"]'); });
   calcBudget&&calcBudget();
+  // Toast feedback so the user knows the change persisted
+  if(typeof showToast === 'function' && val !== prev) {
+    // Derive a friendly name from the ukey ("person_lastname_dist")
+    var nameParts = ukey.replace(/^person_/,'').split('_');
+    var last = nameParts[0] || '';
+    var prettyName = last ? (last.charAt(0).toUpperCase() + last.slice(1)) : 'Candidate';
+    if(val > 0) {
+      showToast({type:'success', icon:'✓', title:'Saved $'+val, msg:'Updated allocation for '+prettyName});
+    } else {
+      showToast({type:'info', icon:'↺', title:'Cleared allocation', msg:prettyName+' set to $0'});
+    }
+  }
 }
 
 
@@ -5820,6 +5836,14 @@ function renderCandidates(list){
     });
     html += '</div></div>'; // close inner grid + coll-body-cand
   });
+  if(!sortedDists.length) {
+    html = '<div class="empty-state">'
+      + '<div class="empty-state-icon">🔍</div>'
+      + '<div class="empty-state-title">No candidates match your filters</div>'
+      + '<div>Try clearing a filter or searching a different name.</div>'
+      + '<div class="empty-state-hint">Tip: press <span class="gs-kbd">/</span> to open global search.</div>'
+      + '</div>';
+  }
   tbody.innerHTML = html;
   document.getElementById('cand-count').textContent = list.length+' of '+CANDIDATES.length+' candidates · '+sortedDists.length+' districts';
 }
@@ -7766,6 +7790,8 @@ try { renderFight(); } catch(e){ console.error('renderFight failed', e); }
 try { buildCandidates(); } catch(e){ console.error('buildCandidates failed', e); }
 try { buildCommitteeGeo(); } catch(e){ console.error('buildCommitteeGeo failed', e); }
 try { buildDistrictMap(); } catch(e){ console.error('buildDistrictMap failed', e); }
+// Populate nav tab badges with live counts
+try { updateTabBadges(); } catch(e){ console.warn('tab badges', e); }
 // Show onboarding banner for first-time visitors
 try { _showOnboardingIfNew(); } catch(e){ console.warn('onboarding', e); }
 
