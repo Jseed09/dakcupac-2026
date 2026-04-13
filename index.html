@@ -607,6 +607,31 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
 .tier-legend-card .tl-sub{font-size:10px;color:var(--text-muted);margin-top:3px;line-height:1.3}
 .tier-legend-card .tl-amt{font-size:11px;font-weight:700;color:var(--teal-dark);margin-top:4px}
 .tier-legend.tl-collapsed .tier-legend-grid{display:none}
+/* ── NAV TAB BADGES ── */
+.nav-badge{display:none;margin-left:6px;padding:2px 7px;border-radius:10px;background:rgba(144,238,144,0.2);color:#90EE90;border:1px solid rgba(144,238,144,0.4);font-size:10px;font-weight:800;letter-spacing:.3px;vertical-align:middle}
+.nav-badge.show{display:inline-block}
+.nav-badge.warn{background:rgba(252,211,77,0.2);color:#FCD34D;border-color:rgba(252,211,77,0.4)}
+.nav-badge.danger{background:rgba(252,165,165,0.2);color:#FCA5A5;border-color:rgba(252,165,165,0.4)}
+/* ── GLOBAL SEARCH MODAL ── */
+#global-search-overlay{position:fixed;inset:0;background:rgba(10,20,25,0.75);backdrop-filter:blur(4px);z-index:10000;display:none;align-items:flex-start;justify-content:center;padding-top:12vh}
+#global-search-overlay.open{display:flex}
+#global-search-modal{background:var(--white);border-radius:16px;box-shadow:0 30px 80px rgba(0,0,0,0.5);width:92%;max-width:620px;overflow:hidden;animation:search-in .2s ease}
+@keyframes search-in{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+#gs-input{width:100%;padding:18px 22px;font-size:17px;border:none;outline:none;border-bottom:1px solid var(--border);font-family:var(--font-body);box-sizing:border-box}
+#gs-results{max-height:55vh;overflow-y:auto}
+.gs-result{padding:12px 22px;cursor:pointer;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;transition:background .1s}
+.gs-result:hover,.gs-result.focused{background:var(--teal-light)}
+.gs-result-name{font-weight:700;color:var(--ink);font-size:14px}
+.gs-result-meta{font-size:11px;color:var(--text-muted);margin-top:2px}
+.gs-icon{flex-shrink:0;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;background:var(--surface-2);color:var(--text-muted)}
+.gs-footer{padding:10px 22px;background:var(--surface-2);font-size:11px;color:var(--text-muted);display:flex;justify-content:space-between;align-items:center}
+.gs-kbd{display:inline-block;padding:2px 6px;background:var(--white);border:1px solid var(--border);border-radius:4px;font-family:monospace;font-size:10px;margin:0 2px}
+.gs-empty{padding:32px;text-align:center;color:var(--text-muted);font-style:italic}
+/* ── EMPTY STATE ── */
+.empty-state{padding:40px 20px;text-align:center;color:var(--text-muted);font-style:italic;font-size:14px;grid-column:1/-1}
+.empty-state-icon{font-size:36px;margin-bottom:12px;opacity:.5}
+.empty-state-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;font-style:normal}
+.empty-state-hint{font-size:12px;opacity:.7;margin-top:8px}
 /* ── COLLAPSIBLE SECTIONS ── */
 .coll-head{cursor:pointer;user-select:none;position:relative}
 .coll-head::before{content:'▾';display:inline-block;margin-right:8px;font-size:14px;transition:transform .18s ease;color:var(--teal);font-weight:700}
@@ -1779,6 +1804,18 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
   </div>
 </div>
 
+<!-- Global Search Modal -->
+<div id="global-search-overlay" onclick="if(event.target===this) closeGlobalSearch()">
+  <div id="global-search-modal">
+    <input type="text" id="gs-input" placeholder="🔍 Search legislators, candidates, or districts…" autocomplete="off">
+    <div id="gs-results"></div>
+    <div class="gs-footer">
+      <span><span class="gs-kbd">↑↓</span> navigate <span class="gs-kbd">↵</span> open <span class="gs-kbd">esc</span> close</span>
+      <span>Press <span class="gs-kbd">⌘K</span> or <span class="gs-kbd">/</span> to open anywhere</span>
+    </div>
+  </div>
+</div>
+
 <!-- HEADER -->
 <header class="site-header">
   <div class="header-left">
@@ -1802,12 +1839,12 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
 <!-- 5 TABS NAV -->
 <nav class="nav-bar" role="navigation">
   <button class="nav-tab active" onclick="showPanel('leadership',this)"><span class="tab-icon">🏛️</span> Leadership Profiles</button>
-  <button class="nav-tab" onclick="showPanel('sb2266',this)"><span class="tab-icon">📜</span> Voting History</button>
+  <button class="nav-tab" onclick="showPanel('sb2266',this)"><span class="tab-icon">📜</span> Voting History <span class="nav-badge" id="nav-badge-sb2266"></span></button>
   <button class="nav-tab" onclick="showPanel('history',this)"><span class="tab-icon">📊</span> DakCUPAC History</button>
-  <button class="nav-tab" onclick="showPanel('candidates',this)"><span class="tab-icon">🗳️</span> 2026 Candidates &amp; Funding</button>
+  <button class="nav-tab" onclick="showPanel('candidates',this)"><span class="tab-icon">🗳️</span> 2026 Candidates &amp; Funding <span class="nav-badge" id="nav-badge-candidates"></span></button>
   <button class="nav-tab" onclick="showPanel('committee',this)"><span class="tab-icon">🤝</span> Committee &amp; Overview</button>
-  <button class="nav-tab" onclick="showPanel('winprob',this)"><span class="tab-icon">📐</span> Win Probability</button>
-  <button class="nav-tab" onclick="showPanel('strategy',this)"><span class="tab-icon">🎯</span> Strategy Room</button>
+  <button class="nav-tab" onclick="showPanel('winprob',this)"><span class="tab-icon">📐</span> Win Probability <span class="nav-badge" id="nav-badge-winprob"></span></button>
+  <button class="nav-tab" onclick="showPanel('strategy',this)"><span class="tab-icon">🎯</span> Strategy Room <span class="nav-badge" id="nav-badge-strategy"></span></button>
 </nav>
 
 <!-- ── BUDGET SIDEBAR (pull tab + collapsible) ── -->
@@ -4264,16 +4301,25 @@ function getCupacRec(name, dist, chamber, party, isIncumbent) {
     var _isLdr = LEADERS.find(function(l) { return l.name === name; });
     var _isIbl = (cand && (cand.ibl || cand.ib)) || (_isLdr && (_isLdr.ibl || _isLdr.ib));
     var _isTransfer = cand && (cand.formerHouse || cand.formerSenate);
-    var _strongerTiers = {'PROTECT':1,'MAINTAIN':1,'BUILD':1};
+    // Only PROTECT and the explicitly-stronger MAINTAIN should prevent
+    // this override. BUILD removed — an IBL Vice Chair like Keith Boehm
+    // must be MAINTAIN-tier even if the baseline would've classified him
+    // as BUILD (first-time funding target). IBL sits on the committee
+    // that passes our bills — we're buying the committee vote, not the
+    // race.
+    var _strongerTiers = {'PROTECT':1,'MAINTAIN':1};
     if((_isLdr || _isIbl || _isTransfer) && !_strongerTiers[tier]) {
       tier = 'MAINTAIN';
       icon = '✅';
       color = '#0D7377';
       amt = Math.max(amt, inPrimary ? 400 : 300);
-      var reason = _isIbl ? '🏛 IBL / IB Committee member'
-                 : _isLdr ? '👑 Leadership position'
+      // Extract a specific IBL role for the reason line if present.
+      var _iblLabel = (cand && cand.ibl) || (_isLdr && _isLdr.ibl) || 'IBL Committee member';
+      var _ibLabel  = (cand && cand.ib)  || (_isLdr && _isLdr.ib)  || 'IB Committee member';
+      var reason = _isIbl ? '🏛 '+(_iblLabel || _ibLabel)+' — sits on the committee that hears credit-union bills'
+                 : _isLdr ? '👑 Leadership position ('+(_isLdr.role||'')+')'
                  : '🔄 Transferring to new chamber — seeking new leadership role';
-      action = reason + ' — committee policy requires maintaining this relationship regardless of vote history. ' + (action || '');
+      action = reason + '. Committee policy requires maintaining this relationship regardless of vote history. ' + (action || '');
       reasons.unshift('🏛 Floored at MAINTAIN: '+reason);
     }
   }
@@ -6445,8 +6491,24 @@ function openPersonCard(name, dist){
   var ppIblTxt = document.getElementById('pp-ibl-text');
   var ppIblVal = (cand&&cand.ibl)||(ldr&&ldr.ibl)||null;
   if(ppIblTag && ppIblTxt){
-    ppIblTxt.textContent = ppIblVal || '';
+    // More prominent label: spell out why it matters. IBL is the committee
+    // that hears all credit-union legislation — a Chair or Vice Chair is
+    // effectively a gatekeeper on our bills.
+    var _iblLine = ppIblVal || '';
+    if(ppIblVal && /chair/i.test(ppIblVal)) {
+      _iblLine = '🏛 ' + ppIblVal + ' — committee gatekeeper for CU bills';
+    } else if(ppIblVal) {
+      _iblLine = '🏛 ' + ppIblVal + ' — sits on the committee that hears CU bills';
+    }
+    ppIblTxt.textContent = _iblLine;
     ppIblTag.style.display = ppIblVal ? 'block' : 'none';
+    if(ppIblVal) {
+      ppIblTxt.style.background = 'rgba(180,83,9,0.45)';
+      ppIblTxt.style.color = '#FCD34D';
+      ppIblTxt.style.borderColor = '#CA8A04';
+      ppIblTxt.style.fontSize = '12px';
+      ppIblTxt.style.padding = '4px 10px';
+    }
   }
   document.getElementById('pp-ballot').innerHTML=ballot;
 
@@ -9593,6 +9655,219 @@ function renderWPTable() {
 // ──────────────────────────────────────────────────────────────
 const COLLAPSE_KEY = 'cupac_collapse_2026';
 function loadCollapseState(){ try{return JSON.parse(localStorage.getItem(COLLAPSE_KEY)||'{}')}catch(e){return{}} }
+
+// ──────────────────────────────────────────────────────────────
+// TAB BADGES — dynamic counts on nav tabs
+// ──────────────────────────────────────────────────────────────
+function updateTabBadges() {
+  try {
+    var tracker = loadTracker();
+    var decisionCount = 0;
+    var totalAllocated = 0;
+    Object.keys(tracker).forEach(function(k){
+      var t = tracker[k];
+      var amt = parseInt(t && t.amt) || 0;
+      if(amt > 0 || (t && t.status && t.status !== 'none')) decisionCount++;
+      if(amt > 0) totalAllocated += amt;
+    });
+
+    // Voting History — show on-ballot legislator count
+    var sb = document.getElementById('nav-badge-sb2266');
+    if(sb) {
+      var onBallot = (typeof ALL_VOTES !== 'undefined') ? ALL_VOTES.filter(function(r){return r.onBallot && !r.notRunning;}).length : 0;
+      sb.textContent = onBallot;
+      sb.classList.add('show');
+    }
+
+    // 2026 Candidates — show $ allocated / target
+    var cb = document.getElementById('nav-badge-candidates');
+    if(cb) {
+      var bgt = (typeof getBudget==='function') ? getBudget() : {target:30000};
+      var target = bgt.target || 30000;
+      var pct = Math.round((totalAllocated / target) * 100);
+      cb.textContent = '$'+Math.round(totalAllocated/1000)+'k/'+Math.round(target/1000)+'k';
+      cb.classList.add('show');
+      cb.classList.remove('warn','danger');
+      if(pct >= 90) cb.classList.add('danger');
+      else if(pct >= 60) cb.classList.add('warn');
+    }
+
+    // Win Probability — show contested primary count
+    var wp = document.getElementById('nav-badge-winprob');
+    if(wp && typeof CANDIDATES !== 'undefined') {
+      var ck = {};
+      CANDIDATES.forEach(function(c){ if(parseInt(c.dist)%2===1){ var k=c.ch+'-'+c.dist+'-'+c.party; ck[k]=(ck[k]||0)+1; }});
+      var contested = new Set();
+      Object.keys(ck).forEach(function(k){
+        var parts = k.split('-'); var ch = parts[0]; var dist = parts[1];
+        var seats = ch==='Senate' ? 1 : 2;
+        if(ck[k] > seats) contested.add(ch+'-'+dist);
+      });
+      wp.textContent = contested.size + ' contested';
+      wp.classList.add('show');
+      wp.classList.add('warn');
+    }
+
+    // Strategy Room — show decisions made
+    var st = document.getElementById('nav-badge-strategy');
+    if(st) {
+      st.textContent = decisionCount + ' set';
+      st.classList.add('show');
+    }
+  } catch(e){}
+}
+
+// ──────────────────────────────────────────────────────────────
+// GLOBAL SEARCH — Cmd/Ctrl+K modal that finds any person
+// ──────────────────────────────────────────────────────────────
+var _gsFocusIdx = 0;
+var _gsResults = [];
+function openGlobalSearch() {
+  var overlay = document.getElementById('global-search-overlay');
+  if(!overlay) return;
+  overlay.classList.add('open');
+  var input = document.getElementById('gs-input');
+  if(input) { input.value = ''; input.focus(); }
+  renderGlobalSearch('');
+}
+function closeGlobalSearch() {
+  var overlay = document.getElementById('global-search-overlay');
+  if(overlay) overlay.classList.remove('open');
+}
+function renderGlobalSearch(q) {
+  var box = document.getElementById('gs-results');
+  if(!box) return;
+  q = (q || '').toLowerCase().trim();
+  var results = [];
+  var seen = {};
+  // Search CANDIDATES
+  if(typeof CANDIDATES !== 'undefined') {
+    CANDIDATES.forEach(function(c){
+      var k = c.name+'_'+c.dist;
+      if(seen[k]) return;
+      var match = !q || c.name.toLowerCase().indexOf(q) >= 0 || String(c.dist).indexOf(q) >= 0;
+      if(match) {
+        seen[k] = 1;
+        results.push({name:c.name, dist:c.dist, ch:c.ch, party:c.party, type:'candidate'});
+      }
+    });
+  }
+  // Search LEADERS
+  if(typeof LEADERS !== 'undefined') {
+    LEADERS.forEach(function(l){
+      var k = l.name+'_'+l.distNum;
+      if(seen[k]) return;
+      var match = !q || l.name.toLowerCase().indexOf(q) >= 0 || String(l.distNum).indexOf(q) >= 0;
+      if(match) {
+        seen[k] = 1;
+        results.push({name:l.name, dist:l.distNum, ch:l.chamber, party:l.party, type:'leader', role:l.role});
+      }
+    });
+  }
+  // If query is just a number, add district result at top
+  if(q && /^\d+$/.test(q)) {
+    var dn = parseInt(q);
+    if(dn >= 1 && dn <= 47) {
+      results.unshift({type:'district', dist:dn});
+    }
+  }
+  results = results.slice(0, 20);
+  _gsResults = results;
+  _gsFocusIdx = 0;
+  if(!results.length) {
+    box.innerHTML = '<div class="gs-empty">No matches for "'+q+'". Try a legislator name or district number.</div>';
+    return;
+  }
+  var html = results.map(function(r, i){
+    if(r.type === 'district') {
+      return '<div class="gs-result'+(i===0?' focused':'')+'" onclick="gsSelect('+i+')"><div class="gs-icon" style="background:var(--teal);color:#fff;">🏛</div><div><div class="gs-result-name">District '+r.dist+'</div><div class="gs-result-meta">Jump to district detail</div></div></div>';
+    }
+    var icon = r.type === 'leader' ? '👑' : (r.ch === 'Senate' ? 'S' : 'H');
+    var meta = (r.ch||'')+' · Dist. '+(r.dist||'—')+' · '+(r.party||'');
+    if(r.role) meta += ' · ' + r.role.replace(/ — .*/,'').substring(0,40);
+    return '<div class="gs-result'+(i===0?' focused':'')+'" onclick="gsSelect('+i+')"><div class="gs-icon">'+icon+'</div><div><div class="gs-result-name">'+r.name+'</div><div class="gs-result-meta">'+meta+'</div></div></div>';
+  }).join('');
+  box.innerHTML = html;
+}
+function gsSelect(idx) {
+  var r = _gsResults[idx];
+  if(!r) return;
+  closeGlobalSearch();
+  if(r.type === 'district') {
+    // Jump to committee tab and populate district lookup
+    showPanel('committee', document.querySelectorAll('.nav-tab')[3]);
+    setTimeout(function(){
+      var el = document.getElementById('district-lookup');
+      if(el) { el.value = r.dist; if(typeof lookupDistrict==='function') lookupDistrict(); }
+    }, 100);
+  } else {
+    if(typeof openPersonCard === 'function') openPersonCard(r.name, r.dist || 0);
+  }
+}
+function gsMove(delta) {
+  if(!_gsResults.length) return;
+  _gsFocusIdx = (_gsFocusIdx + delta + _gsResults.length) % _gsResults.length;
+  var items = document.querySelectorAll('.gs-result');
+  items.forEach(function(el, i){ el.classList.toggle('focused', i === _gsFocusIdx); });
+  var focused = items[_gsFocusIdx];
+  if(focused) focused.scrollIntoView({block:'nearest'});
+}
+
+// ──────────────────────────────────────────────────────────────
+// KEYBOARD SHORTCUTS — 1-7 tabs, / search, ? help, esc close
+// ──────────────────────────────────────────────────────────────
+document.addEventListener('keydown', function(e){
+  var tag = (e.target && e.target.tagName) || '';
+  var isTyping = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
+  var modalOpen = document.getElementById('global-search-overlay');
+  var isSearchOpen = modalOpen && modalOpen.classList.contains('open');
+
+  // Search modal hotkeys
+  if(isSearchOpen) {
+    if(e.key === 'Escape') { e.preventDefault(); closeGlobalSearch(); return; }
+    if(e.key === 'ArrowDown') { e.preventDefault(); gsMove(1); return; }
+    if(e.key === 'ArrowUp') { e.preventDefault(); gsMove(-1); return; }
+    if(e.key === 'Enter') { e.preventDefault(); gsSelect(_gsFocusIdx); return; }
+    return;
+  }
+
+  // Cmd/Ctrl + K → open search (works even when typing)
+  if((e.metaKey || e.ctrlKey) && e.key === 'k') {
+    e.preventDefault(); openGlobalSearch(); return;
+  }
+
+  // Don't hijack shortcuts while user is typing in a field
+  if(isTyping) return;
+
+  // / → open search
+  if(e.key === '/') { e.preventDefault(); openGlobalSearch(); return; }
+
+  // 1-6 → jump tabs
+  var tabMap = {'1':'leadership','2':'sb2266','3':'history','4':'candidates','5':'committee','6':'winprob','7':'strategy'};
+  if(tabMap[e.key]) {
+    var tabs = document.querySelectorAll('.nav-tab');
+    var order = ['leadership','sb2266','history','candidates','committee','winprob','strategy'];
+    var idx = order.indexOf(tabMap[e.key]);
+    if(idx >= 0 && tabs[idx]) {
+      e.preventDefault();
+      showPanel(tabMap[e.key], tabs[idx]);
+    }
+    return;
+  }
+
+  // Escape — close slide-over if open
+  if(e.key === 'Escape') {
+    var pp = document.getElementById('person-panel');
+    if(pp && pp.classList.contains('open') && typeof closePersonCard === 'function') {
+      closePersonCard();
+    }
+  }
+});
+// Wire up the search input
+setTimeout(function(){
+  var input = document.getElementById('gs-input');
+  if(input) input.addEventListener('input', function(){ renderGlobalSearch(input.value); });
+}, 100);
 
 // ──────────────────────────────────────────────────────────────
 // TOAST NOTIFICATIONS — lightweight feedback for user actions
