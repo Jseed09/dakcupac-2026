@@ -555,9 +555,10 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
 .bp-row .bp-party{font-weight:800;font-size:10px;text-align:center;padding:3px 4px;border-radius:8px}
 .bp-row .bp-party-R{background:#DAEAF5;color:#0D3B66}
 .bp-row .bp-party-D{background:#F5DAD8;color:#5C1010}
-.bp-row .bp-flag{font-size:9px;font-weight:700;padding:3px 6px;border-radius:8px;text-align:center;white-space:nowrap}
-.bp-row .bp-flag-contest{background:#FEF3C7;color:#B45309;border:1px solid #FCD34D}
-.bp-row .bp-flag-uncontest{background:var(--surface-3);color:var(--text-muted);border:1px solid var(--border)}
+.bp-row .bp-flag{font-size:12px;font-weight:900;padding:6px 12px;border-radius:10px;text-align:center;white-space:nowrap;letter-spacing:.06em;text-transform:uppercase}
+.bp-row .bp-flag-contest{background:#B45309;color:#fff;border:2px solid #92400E;box-shadow:0 2px 6px rgba(180,83,9,0.4);animation:contest-pulse 2.5s ease-in-out infinite}
+.bp-row .bp-flag-uncontest{background:var(--surface-3);color:var(--text-muted);border:1px solid var(--border);font-size:10px;font-weight:700;padding:4px 10px}
+@keyframes contest-pulse{0%,100%{box-shadow:0 2px 6px rgba(180,83,9,0.4)}50%{box-shadow:0 2px 14px rgba(180,83,9,0.7)}}
 .bp-row .bp-rec{font-weight:700;color:var(--teal);text-align:right;font-size:11px}
 .bp-row .bp-input{width:78px;font-size:13px;font-weight:700;border:1.5px solid var(--border);border-radius:4px;padding:4px 6px;background:var(--white);outline:none;text-align:right}
 .bp-row .bp-input:focus{border-color:var(--teal)}
@@ -3980,7 +3981,7 @@ function profileCard(l){
     <div style="background:${accentColor};padding:12px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
       <div>
         <div style="font-family:var(--font-display);font-size:16px;font-weight:700;color:var(--white);cursor:pointer;line-height:1.2" onclick="openPersonCard('${l.name.replace(/'/g,"\\'")}',${l.distNum||0})" title="Open full profile">
-          ${l.name}${l.priority?' ⭐':''} ${_statusLabel?'<span style="font-size:11px;opacity:.85">('+_statusLabel+')</span>':''} <span style="font-size:12px;opacity:.6">▸</span>
+          ${l.chamber === 'Senate' ? 'Sen. ' : 'Rep. '}${l.name}${l.priority?' ⭐':''} ${_statusLabel?'<span style="font-size:11px;opacity:.85">('+_statusLabel+')</span>':''} <span style="font-size:12px;opacity:.6">▸</span>
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:3px">${_badges}</div>
         <div style="font-size:12px;color:rgba(255,255,255,0.75);margin-top:2px">${l.role}</div>
@@ -10614,6 +10615,20 @@ var BP_TIER_META = {
   'ALIGNED':         {icon:'👍', color:'#6B7280', label:'ALIGNED',          sub:'Supported FOM but in unwinnable district — no funding'}
 };
 
+// Derive a friendly role label for a candidate.
+// A sitting House member running for Senate (or vice versa) is
+// classified as a CHALLENGER in that race per standard political
+// terminology — they don't get incumbent advantages for the seat
+// they're pursuing, even though they currently hold office elsewhere.
+function bpRoleLabel(c) {
+  if(c.incumbent) return 'Incumbent';
+  if(c.currentHouseMember) return 'House Rep · Senate Challenger';
+  if(c.currentSenateMember) return 'Sen. · House Challenger';
+  if(c.formerHouse) return 'Fmr. House Rep · Challenger';
+  if(c.formerSenate) return 'Fmr. Senator · Challenger';
+  if(c.formerLegislator) return 'Fmr. Legislator · Challenger';
+  return 'Challenger';
+}
 function bpBuildRows() {
   // Only 2026 ballot candidates (odd-numbered districts this cycle)
   var rows = [];
@@ -10627,6 +10642,7 @@ function bpBuildRows() {
     rows.push({
       name: c.name, ch: c.ch, dist: parseInt(c.dist), party: c.party,
       incumbent: !!c.incumbent,
+      roleLabel: bpRoleLabel(c),
       tier: rec.tier || 'EVALUATE',
       recAmt: rec.amt || 0,          // scaled (active) recommendation
       baseAmt: rec.baseAmt || rec.amt || 0, // original getCupacRec amount
@@ -10736,7 +10752,7 @@ function renderBudgetPlan() {
       var partyCls = r.party === 'R' ? 'bp-party-R' : r.party === 'D' ? 'bp-party-D' : '';
       var chamberLabel = r.ch === 'Senate' ? 'S' : 'H';
       var distLabel = chamberLabel + r.dist;
-      var incSub = r.incumbent ? 'Incumbent' : 'New Candidate';
+      var incSub = r.roleLabel || (r.incumbent ? 'Incumbent' : 'New Candidate');
       var contestFlag = r.inPrimary
         ? '<span class="bp-flag bp-flag-contest">⚔ Primary</span>'
         : '<span class="bp-flag bp-flag-uncontest">General</span>';
