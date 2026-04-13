@@ -2011,7 +2011,7 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
         <td class="amt"><a href="https://cf.sos.nd.gov/search/showcommittee.aspx?cid=281&amp;yr=2020" target="_blank" rel="noopener noreferrer" style="color:var(--teal-dark);font-weight:700;text-decoration:underline">$19,980</a></td>
         <td class="amt"><a href="https://cf.sos.nd.gov/search/showcommittee.aspx?cid=281&amp;yr=2022" target="_blank" rel="noopener noreferrer" style="color:var(--teal-dark);font-weight:700;text-decoration:underline">$20,947</a></td>
         <td class="amt"><a href="https://cf.sos.nd.gov/search/showcommittee.aspx?cid=281&amp;yr=2024" target="_blank" rel="noopener noreferrer" style="color:var(--teal-dark);font-weight:700;text-decoration:underline">$16,960</a></td>
-        <td><a href="https://cf.sos.nd.gov/search/showcommittee.aspx?cid=281" target="_blank" rel="noopener noreferrer" class="contact-chip web" style="font-size:11px">All yrs</a></td>
+        <td class="amt" style="color:var(--teal-dark);font-weight:800;">$134,821</td>
       </tr>
       <tr>
         <td>NDBankPAC — ND Bankers Association</td>
@@ -2020,7 +2020,7 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
         <td class="amt"><a href="https://cf.sos.nd.gov/search/showcommittee.aspx?cid=276&amp;yr=2020" target="_blank" rel="noopener noreferrer" style="color:var(--red-text);text-decoration:underline">$18,895</a></td>
         <td class="amt"><a href="https://cf.sos.nd.gov/search/showcommittee.aspx?cid=276&amp;yr=2022" target="_blank" rel="noopener noreferrer" style="color:var(--red-text);text-decoration:underline">$20,750</a></td>
         <td class="amt"><a href="https://cf.sos.nd.gov/search/showcommittee.aspx?cid=276&amp;yr=2024" target="_blank" rel="noopener noreferrer" style="color:var(--red-text);text-decoration:underline">$22,800</a></td>
-        <td><a href="https://cf.sos.nd.gov/search/showcommittee.aspx?cid=276" target="_blank" rel="noopener noreferrer" class="contact-chip news" style="font-size:11px">All yrs</a></td>
+        <td class="amt" style="color:var(--red-text);font-weight:800;">$101,410</td>
       </tr>
       <tr>
         <td>ICBankPAC — Indep. Community Bankers ND</td>
@@ -2029,7 +2029,7 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
         <td class="amt"><a href="https://cf.sos.nd.gov/search/showcommittee.aspx?cid=3&amp;yr=2020" target="_blank" rel="noopener noreferrer" style="color:var(--red-text);text-decoration:underline">$11,500</a></td>
         <td class="amt"><a href="https://cf.sos.nd.gov/search/showcommittee.aspx?cid=3&amp;yr=2022" target="_blank" rel="noopener noreferrer" style="color:var(--red-text);text-decoration:underline">$13,900</a></td>
         <td class="amt"><a href="https://cf.sos.nd.gov/search/showcommittee.aspx?cid=3&amp;yr=2024" target="_blank" rel="noopener noreferrer" style="color:var(--red-text);text-decoration:underline">$19,950</a></td>
-        <td><a href="https://cf.sos.nd.gov/search/showcommittee.aspx?cid=3" target="_blank" rel="noopener noreferrer" class="contact-chip news" style="font-size:11px">All yrs</a></td>
+        <td class="amt" style="color:var(--red-text);font-weight:800;">$68,215</td>
       </tr>
     </tbody>
   </table></div>
@@ -2069,6 +2069,7 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
     <select id="cand-chamber" onchange="filterCandidates()"><option value="ALL">All Chambers</option><option value="Senate">Senate</option><option value="House">House</option></select>
     <select id="cand-cupac-f" onchange="filterCandidates()"><option value="ALL">All Candidates</option><option value="YES">History Only</option><option value="NO">No History</option></select>
     <select id="cand-sb2266-f" onchange="filterCandidates()"><option value="ALL">All SB 2266</option><option value="YEA">YEA — Supported CUs</option><option value="NAY">NAY — Opposed CUs</option><option value="NONE">No prior vote</option></select>
+    <select id="cand-sb2217-f" onchange="filterCandidates()"><option value="ALL">All SB 2217</option><option value="NAY">NAY — Pro-CU (opposed cap)</option><option value="YEA">YEA — Anti-CU (supported cap)</option><option value="NONE">No prior vote</option></select>
     <button class="btn" onclick="resetCandidates()">Reset</button>
     <span class="result-count" id="cand-count"></span>
   </div>
@@ -2103,9 +2104,9 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
       </div>
       <div class="sub">2016: $4,986 · 2018: $7,373</div>
     </div>
-    <div class="stat-card green"><div class="label">Total Available for ND</div><div class="value" id="bgt-total" style="font-size:26px">$46,029</div><div class="sub">Cash + Raise − Federal</div></div>
+    <div class="stat-card green"><div class="label">Total Available for ND</div><div class="value" id="bgt-total" style="font-size:26px">$36,222</div><div class="sub">Cash + Raise − Federal</div></div>
     <div class="stat-card gold"><div class="label">Committed to Candidates</div><div class="value" id="bgt-committed" style="font-size:26px;color:var(--gold-text)">$0</div></div>
-    <div class="stat-card"><div class="label">Remaining Balance</div><div class="value" id="bgt-remaining" style="font-size:26px">$46,029</div></div>
+    <div class="stat-card"><div class="label">Remaining Balance</div><div class="value" id="bgt-remaining" style="font-size:26px">$36,222</div></div>
   </div>
 
   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:24px" id="pool-grid"></div>
@@ -2572,11 +2573,14 @@ function getBudget() {
     var saved = JSON.parse(localStorage.getItem(BUDGET_KEY));
     if(saved && saved.cash != null) {
       // One-time migration: old schema had {cash, raise, federal} and no v.
-      // Force-reset target to $30k and split to 67 so legacy state doesn't
-      // bleed "raise" into the new target slot.
+      // Force-reset target/split AND replace any stale cash value that
+      // matches the old $34,029 default (which leaked into localStorage
+      // from earlier sessions) with the current $36,222.12.
       if(saved.v !== BUDGET_SCHEMA_VERSION) {
+        var _staleCashValues = {34029: 1, 34030: 1, '34029.32': 1};
+        var _cashOk = saved.cash && saved.cash > 1000 && !_staleCashValues[Math.round(saved.cash)] && !_staleCashValues[saved.cash];
         var migrated = {
-          cash: (saved.cash && saved.cash > 1000) ? saved.cash : 36222.12,
+          cash: _cashOk ? saved.cash : 36222.12,
           target: 30000,
           splitPct: 67,
           v: BUDGET_SCHEMA_VERSION
@@ -2584,6 +2588,12 @@ function getBudget() {
         migrated.total = migrated.cash;
         try { localStorage.setItem(BUDGET_KEY, JSON.stringify(migrated)); } catch(e){}
         return migrated;
+      }
+      // Also force-reset if an already-v2 state somehow has the stale 34029 value
+      if(Math.round(saved.cash) === 34029) {
+        saved.cash = 36222.12;
+        saved.total = saved.cash;
+        try { localStorage.setItem(BUDGET_KEY, JSON.stringify(saved)); } catch(e){}
       }
       if(saved.target == null) saved.target = 30000;
       if(saved.splitPct == null) saved.splitPct = 67;
@@ -2644,6 +2654,10 @@ function broadcastBudget(b) {
   if(typeof updateStrategyTotals === 'function') updateStrategyTotals();
   // Re-render the budget plan card if loaded
   if(typeof renderBudgetPlan === 'function' && document.getElementById('budget-plan-list')) renderBudgetPlan();
+  // Legacy Browser-Persistent budget panel on Candidates tab — update if present
+  if(typeof calcBudget === 'function' && document.getElementById('bgt-cash')) {
+    try { calcBudget(); } catch(e){}
+  }
 }
 function loadTracker(){ try{return JSON.parse(localStorage.getItem(TRACKER_KEY)||'{}')}catch(e){return{}} }
 function saveTracker(d){
@@ -4317,19 +4331,8 @@ setTimeout(function(){
   var sbRaise = document.getElementById('bsb-raise-input');
   if(sbCash && savedBgt.cash) sbCash.value = savedBgt.cash;
   if(sbRaise && savedBgt.raise != null) sbRaise.value = savedBgt.raise;
-  // Cleanup: reset ALL tracker amounts to $0 except committee-approved candidates
-  // Only Dawson Holle ($500) and Karen Rohr ($500) are approved
-  var _tracker = loadTracker();
-  var _cleaned = false;
-  var _approvedKeys = {'person_holle_31':true, 'person_rohr_31':true};
-  Object.keys(_tracker).forEach(function(k){
-    var amt = parseInt(_tracker[k].amt) || 0;
-    if(!_approvedKeys[k] && amt > 0){
-      _tracker[k].amt = 0;
-      _cleaned = true;
-    }
-  });
-  if(_cleaned) saveTracker(_tracker);
+  // (Removed legacy cleanup that was zeroing user decisions on every page load.
+  // That defeated the purpose of the tracker. Decisions now persist normally.)
 
   // Pre-seed confirmed contributions (Dawson Holle + Karen Rohr — committee approved)
   var _preSeeded = false;
@@ -5556,10 +5559,13 @@ function buildCandidates(){
 
 function renderCandidates(list){
   const tbody = document.getElementById('cand-tbody');
-  // Group by district
+  // Group by district — 2026 ballot = ODD districts only.
+  // Even districts (26, 42, etc.) only appear via unexpired-term special
+  // elections and would be confusing here; skip them.
   const byDist = {};
   list.forEach(c=>{
     const d = c.dist || 0;
+    if(parseInt(d) % 2 !== 1) return; // skip even districts
     if(!byDist[d]) byDist[d]=[];
     byDist[d].push(c);
   });
@@ -5667,6 +5673,7 @@ function filterCandidates(){
   const ch  = document.getElementById('cand-chamber').value;
   const cup = document.getElementById('cand-cupac-f').value;
   const sb  = document.getElementById('cand-sb2266-f').value;
+  const sb2 = (document.getElementById('cand-sb2217-f')||{value:'ALL'}).value;
   let f   = CANDIDATES.filter(c=>{
     if(q  && !c.name.toLowerCase().includes(q)) return false;
     if(ch !=='ALL' && c.ch!==ch) return false;
@@ -5676,6 +5683,11 @@ function filterCandidates(){
       const vote=getSB2266Vote(c.name,c.ch)||'NONE';
       if(sb==='NONE' && vote!=='NONE') return false;
       if(sb!=='NONE' && vote!==sb) return false;
+    }
+    if(sb2!=='ALL'){
+      const v2=(typeof getSB2217Vote==='function' ? getSB2217Vote(c.name,c.ch) : null)||'NONE';
+      if(sb2==='NONE' && v2!=='NONE') return false;
+      if(sb2!=='NONE' && v2!==sb2) return false;
     }
     return true;
   });
@@ -5732,17 +5744,27 @@ function buildPools(){
 function savePoolVal(id,val){ const d=loadBudget(); d['pool_'+id]=parseInt(val)||0; saveCandBudget(d); }
 
 function calcBudget(){
-  const cash   =parseInt(document.getElementById('bgt-cash').value)||0;
+  // Always pull cash from the centralized budget so this legacy panel
+  // stays in sync with the Budget Plan card / header badge / sidebar.
+  var _centralBgt = getBudget();
+  var _cashInput = document.getElementById('bgt-cash');
+  if(_cashInput && Math.round(parseInt(_cashInput.value)||0) !== Math.round(_centralBgt.cash||0)) {
+    _cashInput.value = Math.round(_centralBgt.cash||0);
+  }
+  const cash   = Math.round(_centralBgt.cash||0);
   const raise  =parseInt(document.getElementById('bgt-raise').value)||0;
   const fed    =parseInt(document.getElementById('bgt-federal').value)||0;
-  const total  =cash+raise-fed;
-  // Save to centralized budget — state PAC only, so only persist cash.
-  // target/splitPct are controlled by the Budget Plan card, not this legacy panel.
+  // Committed from the shared tracker (same source as header badge)
+  var _trk = loadTracker();
+  var trackerCommitted = 0;
+  Object.keys(_trk).forEach(function(k){ trackerCommitted += parseInt(_trk[k] && _trk[k].amt) || 0; });
+  const total = cash + raise - fed;
+  // Persist only cash to the centralized budget (preserves target/splitPct)
   saveBudget({cash: cash});
   const te=document.getElementById('bgt-total'); te.textContent='$'+total.toLocaleString(); te.style.color=total<0?'var(--red-text)':'var(--teal-dark)';
-  const d=loadBudget(); let committed=0; const poolUsed={};
+  const d=loadBudget(); let committed=trackerCommitted; const poolUsed={};
   POOLS.forEach(p=>poolUsed[p.id]=0);
-  CANDIDATES.forEach(c=>{ const ck=candKey(c); const amt=parseInt(d['amt_'+ck])||0; const pid=d['pool_'+ck]||''; committed+=amt; if(pid&&poolUsed[pid]!==undefined)poolUsed[pid]+=amt; });
+  CANDIDATES.forEach(c=>{ const ck=candKey(c); const pid=d['pool_'+ck]||''; var amtHere=parseInt(d['amt_'+ck])||0; if(pid&&poolUsed[pid]!==undefined)poolUsed[pid]+=amtHere; });
   document.getElementById('bgt-committed').textContent='$'+committed.toLocaleString();
   const rem=total-committed;
   const re=document.getElementById('bgt-remaining'); re.textContent='$'+Math.abs(rem).toLocaleString()+(rem<0?' OVER':''); re.style.color=rem<0?'var(--red-text)':rem<2000?'var(--gold-text)':'var(--green-text)';
