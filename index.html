@@ -4061,15 +4061,31 @@ function getCupacRec(name, dist, chamber, party, isIncumbent) {
   // These run AFTER the baseline tier logic so committee policy can
   // override the algorithm on a per-person basis.
 
-  // 1) CU CHAMPIONS — designated top-tier allies, always PROTECT at $500+
-  //    regardless of vote, banker situation, or contested status.
+  // 1) CU CHAMPIONS — designated top-tier allies, always floored at $500.
+  //    But if they voted YEA on SB 2217 (bad direction — wanted to pass the
+  //    interchange cap), drop them into PROTECT-WATCH as a sub-tier right
+  //    below the clean Champion tier. Still $500, still protected, but
+  //    flagged for a P&P conversation about the contradiction.
   if(typeof CU_CHAMPIONS !== 'undefined' && CU_CHAMPIONS[name]) {
-    tier = 'PROTECT';
-    icon = '⭐';
-    color = '#15803D';
-    amt = Math.max(amt, 500);
-    action = 'Credit Union Champion — committee-designated top ally. ' + (action || 'Fund at maximum to reinforce relationship.');
-    reasons.unshift('⭐ CU Champion — committee-designated top-tier ally');
+    var _sb2217 = (typeof getSB2217Vote === 'function') ? getSB2217Vote(name, ch) : null;
+    var _hasContradiction = (_sb2217 === 'YEA'); // YEA = opposed CUs on interchange
+    if(_hasContradiction) {
+      tier = 'PROTECT-WATCH';
+      icon = '⭐⚠';
+      color = '#CA8A04';
+      amt = Math.max(amt, 500);
+      action = 'CU Champion with mixed voting record — voted YEA on SB 2217 (interchange cap, bad direction). Maintain relationship at $500 but schedule P&P conversation to address the contradiction before the 70th Assembly.';
+      reasons.unshift('⚠ Voted YEA on SB 2217 — contradictory stance (interchange cap bill credit unions opposed)');
+      reasons.unshift('⭐ CU Champion — committee-designated top ally, floored at $500 despite SB 2217 contradiction');
+    } else {
+      tier = 'PROTECT';
+      icon = '⭐';
+      color = '#15803D';
+      amt = Math.max(amt, 500);
+      action = 'Credit Union Champion — committee-designated top ally. ' + (action || 'Fund at maximum to reinforce relationship.');
+      reasons.unshift('⭐ CU Champion — committee-designated top-tier ally');
+      if(_sb2217 === 'NAY') reasons.unshift('✓ Voted NAY on SB 2217 — opposed interchange cap, consistent pro-CU voting record');
+    }
   }
   // 2) IBL / IB Committee / Leadership / House→Senate transfers — floor at MAINTAIN.
   //    Committee policy: these relationships must be preserved regardless of
@@ -5826,9 +5842,13 @@ function openPersonCard(name, dist){
         _recAmt.style.color = _rec.amt > 0 ? '#86EFAC' : 'rgba(255,255,255,0.3)';
       }
       if(_recTiming) _recTiming.textContent = _rec.timing || '';
-      // Category pills: champion / IBL / leadership / transfer / contested primary
+      // Category pills: champion / IBL / leadership / transfer / contested primary / contradiction
       var _cats = [];
-      if(typeof CU_CHAMPIONS !== 'undefined' && CU_CHAMPIONS[name]) _cats.push('⭐ CU Champion');
+      var _isChampion = (typeof CU_CHAMPIONS !== 'undefined' && CU_CHAMPIONS[name]);
+      if(_isChampion) _cats.push('⭐ CU Champion');
+      // Contradiction flag — voted YEA on SB 2217 (interchange cap, bad direction)
+      var _sb2217Cat = (typeof getSB2217Vote === 'function') ? getSB2217Vote(name, _recChamber) : null;
+      if(_isChampion && _sb2217Cat === 'YEA') _cats.push('⚠ SB 2217 contradiction — P&P needed');
       if((cand && (cand.ibl || cand.ib)) || (ldr && (ldr.ibl || ldr.ib))) _cats.push('🏛 IBL / IB Committee');
       if(ldr) _cats.push('👑 Leadership');
       if(cand && (cand.formerHouse || cand.formerSenate)) _cats.push('🔄 Chamber transfer');
@@ -9278,9 +9298,10 @@ function refreshAllocations() {
   } catch(e){}
 }
 
-var BP_TIER_ORDER = ['PROTECT','MAINTAIN','BUILD','HEDGE','EVALUATE','HOLD','NOT RECOMMENDED','ALIGNED'];
+var BP_TIER_ORDER = ['PROTECT','PROTECT-WATCH','MAINTAIN','BUILD','HEDGE','EVALUATE','HOLD','NOT RECOMMENDED','ALIGNED'];
 var BP_TIER_META = {
-  'PROTECT':         {icon:'🛡️', color:'#15803D', label:'PROTECT',          sub:'Proven YEA allies under banker attack — fund at max'},
+  'PROTECT':         {icon:'⭐', color:'#15803D', label:'CHAMPION',         sub:'CU Champions — floor $500, consistent pro-CU voting record'},
+  'PROTECT-WATCH':   {icon:'⭐⚠', color:'#CA8A04', label:'CHAMPION · WATCH', sub:'CU Champions with mixed voting record (e.g. SB 2217 contradiction) — fund at $500 but schedule P&P conversation'},
   'MAINTAIN':        {icon:'✅', color:'#0D7377', label:'MAINTAIN',         sub:'Consistent YEA supporters with prior CUPAC history'},
   'BUILD':           {icon:'🤝', color:'#1A9B9B', label:'BUILD',            sub:'Supported FOM without prior CUPAC relationship'},
   'HEDGE':           {icon:'🔀', color:'#7C3AED', label:'HEDGE',            sub:'New candidate in contested primary — no voting record yet'},
