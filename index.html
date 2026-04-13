@@ -1803,7 +1803,7 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
     <div class="bsb-sub">Current balance — click to edit</div>
     <div style="display:flex;align-items:baseline;gap:2px;margin-top:6px;">
       <span style="font-size:11px;color:rgba(255,255,255,0.4);">+ $</span>
-      <input type="number" id="bsb-raise-input" value="12000" min="0" style="font-size:13px;font-weight:700;color:rgba(13,190,195,0.9);background:transparent;border:none;border-bottom:1px dashed rgba(255,255,255,0.15);width:70px;outline:none;" onchange="onSidebarBudgetChange()">
+      <input type="number" id="bsb-raise-input" value="8000" min="0" style="font-size:13px;font-weight:700;color:rgba(13,190,195,0.9);background:transparent;border:none;border-bottom:1px dashed rgba(255,255,255,0.15);width:70px;outline:none;" onchange="onSidebarBudgetChange()">
       <span style="font-size:10px;color:rgba(255,255,255,0.3);">projected</span>
     </div>
   </div>
@@ -2103,7 +2103,7 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
       <div class="label">Projected Fundraising</div>
       <div style="display:flex;align-items:center;gap:4px;margin-top:4px">
         <span style="font-size:18px;color:var(--text-muted)">$</span>
-        <input type="number" id="bgt-raise" value="12000" min="0" onchange="calcBudget()" style="font-family:var(--font-display);font-size:26px;font-weight:700;color:var(--teal-dark);border:none;background:transparent;width:130px;outline:none">
+        <input type="number" id="bgt-raise" value="8000" min="0" onchange="calcBudget()" style="font-family:var(--font-display);font-size:26px;font-weight:700;color:var(--teal-dark);border:none;background:transparent;width:130px;outline:none">
       </div>
       <div class="sub">Estimated — update as dues arrive</div>
     </div>
@@ -5404,19 +5404,24 @@ function renderVoteTable(){
     return (isNaN(na)?999:na)-(isNaN(nb)?999:nb);
   });
   var voteHtml='';
+  var _collState = (typeof loadCollapseState === 'function') ? loadCollapseState() : {};
   voteDists.forEach(function(dist){
     var distRows=voteByDist[dist];
     var isOdd=parseInt(dist)%2===1;
     var onBallotBadge=isOdd&&!isNaN(parseInt(dist))?'<span style="font-size:11px;font-weight:600;padding:1px 7px;border-radius:8px;background:var(--green-bg);color:var(--green-text);border:1px solid var(--green-border);margin-left:6px;">★ 2026 Ballot</span>':'';
     var covering=COMMITTEE_MEMBERS.filter(function(m){return m.districts.includes(parseInt(dist));}).map(function(m){return m.name;});
     var coverStr=covering.length?covering.join(', '):'';
+    var _distCollKey = 'vote_dist_' + dist;
+    var _distClosed = !!_collState[_distCollKey];
+    var _caret = _distClosed ? '▸' : '▾';
     if(dist&&dist!=='—'){
       var _totalCands = CANDIDATES.filter(function(c){return parseInt(c.dist)===parseInt(dist);}).length;
       var _candCountBadge = _totalCands ? '<span style="font-size:11px;font-weight:400;margin-left:8px;color:rgba(255,255,255,0.7);">'+_totalCands+' candidate'+(_totalCands>1?'s':'')+' filed</span>' : '';
-      voteHtml+='<div style="grid-column:1/-1;margin-top:16px;margin-bottom:4px;padding:8px 14px;background:var(--teal-dark);color:#fff;border-radius:6px;display:flex;align-items:center;justify-content:space-between;">'
-        +'<span style="font-family:var(--font-display);font-size:15px;font-weight:700;">District '+dist+onBallotBadge+distLeanBadge(dist)+_candCountBadge+'</span>'
+      voteHtml+='<div data-coll-id="'+_distCollKey+'" class="coll-head-cand'+(_distClosed?' coll-closed':'')+'" onclick="toggleCollapse(\''+_distCollKey+'\',this)" style="grid-column:1/-1;margin-top:16px;margin-bottom:4px;padding:8px 14px;background:var(--teal-dark);color:#fff;border-radius:6px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;">'
+        +'<span style="font-family:var(--font-display);font-size:15px;font-weight:700;"><span class="cand-caret" style="display:inline-block;margin-right:8px;">'+_caret+'</span>District '+dist+onBallotBadge+distLeanBadge(dist)+_candCountBadge+'</span>'
         +(coverStr?'<span style="font-size:11px;color:rgba(255,255,255,0.65);">📍 '+coverStr+'</span>':'')
         +'</div>';
+      voteHtml += '<div class="coll-body-cand'+(_distClosed?' coll-closed':'')+'" data-coll-body-for="'+_distCollKey+'" style="grid-column:1/-1;display:'+(_distClosed?'none':'contents')+';">';
     }
     voteHtml+=distRows.map(function(r){
     const isNotRunning = r.notRunning===true;
@@ -5453,6 +5458,9 @@ function renderVoteTable(){
       actionRead: actionRead
     });
     }).join('');
+    if(dist&&dist!=='—'){
+      voteHtml += '</div>'; // close coll-body-cand
+    }
   });
   tbody.innerHTML=voteHtml;
 }
@@ -7553,13 +7561,28 @@ function buildDistrictMap(){
 }
 
 
-buildProfiles();
-buildSbStatCards();
-renderVoteTable();
-renderFight();
-buildCandidates();
-buildCommitteeGeo();
-buildDistrictMap();
+// Defer the initial render so it runs after all HTML is parsed and
+// after any CSS has been applied. Also re-runs after a short delay
+// as a safety net so the Leadership tab never shows empty on first
+// paint (the issue where users had to click the tab to force render).
+function _initialRender() {
+  try { buildProfiles(); } catch(e){ console.warn('buildProfiles', e); }
+  try { buildSbStatCards(); } catch(e){ console.warn('buildSbStatCards', e); }
+  try { renderVoteTable(); } catch(e){ console.warn('renderVoteTable', e); }
+  try { renderFight(); } catch(e){ console.warn('renderFight', e); }
+  try { buildCandidates(); } catch(e){ console.warn('buildCandidates', e); }
+  try { buildCommitteeGeo(); } catch(e){ console.warn('buildCommitteeGeo', e); }
+  try { buildDistrictMap(); } catch(e){ console.warn('buildDistrictMap', e); }
+  try { if(typeof broadcastBudget==='function') broadcastBudget(); } catch(e){}
+  try { if(typeof calcBudget==='function' && document.getElementById('bgt-cash')) calcBudget(); } catch(e){}
+}
+if(document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', _initialRender);
+} else {
+  _initialRender();
+}
+// Safety re-render after 250ms in case any dependency was still loading
+setTimeout(function(){ try { buildProfiles(); } catch(e){} }, 250);
 
 </script>
 
