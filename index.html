@@ -10453,14 +10453,29 @@ function generateAgenda() {
   var out = document.getElementById('agenda-output');
   out.style.display = 'block';
 
-  // Gather live data
-  var tracker = JSON.parse(localStorage.getItem('cupac_tracker_2026') || '{}');
-  var decisions = Object.keys(tracker).filter(function(k){return tracker[k].status && tracker[k].status!=='none';});
+  // Gather live data — use the correct tracker key and count
+  // any entry with a committed $ amount OR a non-default status.
+  var tracker = loadTracker();
   var totalAllocated = 0;
-  decisions.forEach(function(k){ totalAllocated += (tracker[k].amt || 0); });
-  var pending = decisions.filter(function(k){return tracker[k].status==='review';}).length;
-  var approved = decisions.filter(function(k){return tracker[k].status==='approved';}).length;
-  var contributed = decisions.filter(function(k){return tracker[k].status==='contributed';}).length;
+  var pending = 0, approved = 0, contributed = 0;
+  var decisionCount = 0;
+  Object.keys(tracker).forEach(function(k){
+    var t = tracker[k];
+    var amt = parseInt(t && t.amt) || 0;
+    var hasStatus = t && t.status && t.status !== 'none';
+    if(amt > 0 || hasStatus) {
+      decisionCount++;
+      totalAllocated += amt;
+      if(t.status === 'review') pending++;
+      if(t.status === 'approved') approved++;
+      if(t.status === 'contributed') contributed++;
+    }
+  });
+  // Live cash on hand from the centralized budget
+  var _bgtForAgenda = getBudget();
+  var _cashForAgenda = _bgtForAgenda.cash || 36222.12;
+  var _remainingForAgenda = _cashForAgenda - totalAllocated;
+  var decisions = {length: decisionCount};
 
   // Contested primaries
   var ck={}; CANDIDATES.forEach(function(c){if(parseInt(c.dist)%2===1){var k=c.ch+'_'+c.dist+'_'+c.party;ck[k]=(ck[k]||0)+1;}});
@@ -10482,23 +10497,23 @@ function generateAgenda() {
   html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;">'
     +'<div style="text-align:center;padding:12px;background:var(--gold-light);border:1px solid var(--gold-border);border-radius:10px;"><div style="font-size:24px;font-weight:700;color:var(--gold);">'+daysToPrimary+'</div><div style="font-size:10px;font-weight:700;color:var(--gold);text-transform:uppercase;">Days to Primary</div></div>'
     +'<div style="text-align:center;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:10px;"><div style="font-size:24px;font-weight:700;color:var(--ink);">'+daysToGeneral+'</div><div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;">Days to General</div></div>'
-    +'<div style="text-align:center;padding:12px;background:var(--teal-light);border:1px solid var(--teal-mid);border-radius:10px;"><div style="font-size:24px;font-weight:700;color:var(--teal);">$'+(36222-totalAllocated).toLocaleString()+'</div><div style="font-size:10px;font-weight:700;color:var(--teal);text-transform:uppercase;">Unallocated</div></div>'
+    +'<div style="text-align:center;padding:12px;background:var(--teal-light);border:1px solid var(--teal-mid);border-radius:10px;"><div style="font-size:24px;font-weight:700;color:var(--teal);">$'+Math.round(_remainingForAgenda).toLocaleString()+'</div><div style="font-size:10px;font-weight:700;color:var(--teal);text-transform:uppercase;">Cash Available</div></div>'
     +'<div style="text-align:center;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:10px;"><div style="font-size:24px;font-weight:700;color:var(--ink);">'+contestedDists.size+'</div><div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;">Contested Primaries</div></div>'
   +'</div>';
 
   // Agenda items
   html += '<div style="margin-bottom:20px;"><h3 style="font-size:15px;color:var(--ink);margin-bottom:12px;">1. Budget Status</h3>'
     +'<div style="font-size:13px;line-height:1.8;padding-left:16px;">'
-    +'<div>Opening balance: <strong>$36,222.32</strong></div>'
-    +'<div>Allocated to date: <strong style="color:var(--teal);">$'+totalAllocated.toLocaleString()+'</strong> ('+decisions.length+' decisions)</div>'
+    +'<div>Cash on hand: <strong>$'+_cashForAgenda.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})+'</strong></div>'
+    +'<div>Allocated to date: <strong style="color:var(--teal);">$'+totalAllocated.toLocaleString()+'</strong> ('+decisionCount+' decisions)</div>'
     +'<div>Under review: <strong style="color:var(--gold);">'+pending+'</strong> · Approved: <strong style="color:var(--green);">'+approved+'</strong> · Contributed: <strong style="color:var(--teal);">'+contributed+'</strong></div>'
-    +'<div>Remaining: <strong style="color:'+(36222-totalAllocated>0?'var(--green)':'var(--red)')+';">$'+(36222-totalAllocated).toLocaleString()+'</strong></div>'
+    +'<div>Remaining: <strong style="color:'+(_remainingForAgenda>0?'var(--green)':'var(--red)')+';">$'+Math.round(_remainingForAgenda).toLocaleString()+'</strong></div>'
     +'</div></div>';
 
   html += '<div style="margin-bottom:20px;"><h3 style="font-size:15px;color:var(--ink);margin-bottom:12px;">2. Contested Primaries — Action Required Before June 9</h3>'
     +'<div style="font-size:13px;line-height:1.8;padding-left:16px;">'
     +'<div>'+contestedDists.size+' districts have genuine primary contests</div>'
-    +'<div>Action: Review matchup cards in Strategy Room, confirm endorsements</div>'
+    +'<div>Action: Review the Budget Plan tiered list in Strategy Room, confirm endorsements</div>'
     +'</div></div>';
 
   // Upcoming P&P events
