@@ -1617,11 +1617,20 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
       </div>
     </div>
 
-    <!-- ROW 2: Vote + Ballot + IBL -->
+    <!-- ROW 2: Voting History + Relationship + Ballot -->
     <div class="bento-grid">
-      <div class="bento-tile accent" id="pp-vote-tile">
-        <div class="bt-label">SB 2266 — FOM Vote (2023)</div>
-        <div id="pp-sb2266" style="margin-top:4px;"></div>
+      <div class="bento-tile accent" id="pp-vote-tile" style="grid-column:span 2;">
+        <div class="bt-label">Voting History</div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:6px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.55);min-width:110px;"><a href="https://ndlegis.gov/assembly/68-2023/regular/bill-overview/bo2266.html" target="_blank" rel="noopener noreferrer" style="color:rgba(255,255,255,0.7);text-decoration:none;">SB 2266 · FOM ↗</a></div>
+            <div id="pp-sb2266" style="flex:1;"></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.55);min-width:110px;"><a href="https://ndlegis.gov/files/resource/68-2023/library/sb2217.pdf" target="_blank" rel="noopener noreferrer" style="color:rgba(255,255,255,0.7);text-decoration:none;">SB 2217 · Interchange ↗</a></div>
+            <div id="pp-sb2217" style="flex:1;"></div>
+          </div>
+        </div>
       </div>
       <div class="bento-tile" style="border:1px solid rgba(255,255,255,0.08);">
         <div class="bt-label">Relationship Score</div>
@@ -1635,6 +1644,24 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
           <span id="pp-ibl-text" style="display:inline-block;background:rgba(139,69,19,0.4);color:#f0c080;font-size:11px;padding:2px 8px;border-radius:8px;font-weight:700;border:1px solid rgba(139,69,19,0.5);"></span>
         </div>
       </div>
+    </div>
+
+    <!-- ROW 2.5: CUPAC recommendation — tier, suggested amount, and WHY -->
+    <div class="bento-tile bento-full" id="pp-rec-tile" style="border:1px solid rgba(90,200,160,0.3);background:linear-gradient(135deg,rgba(13,115,119,0.18),rgba(21,128,61,0.12));">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div id="pp-rec-icon" style="font-size:28px;">⭐</div>
+          <div>
+            <div class="bt-label">CUPAC Recommendation · <span id="pp-rec-tier" style="font-weight:800;">—</span></div>
+            <div id="pp-rec-category" style="font-size:11px;color:rgba(255,255,255,0.55);margin-top:2px;"></div>
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <div id="pp-rec-amt" style="font-size:22px;font-weight:800;color:#86EFAC;">$0</div>
+          <div id="pp-rec-timing" style="font-size:10px;color:rgba(255,255,255,0.5);font-style:italic;"></div>
+        </div>
+      </div>
+      <div id="pp-rec-reasons" style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:4px;"></div>
     </div>
 
     <!-- ROW 3: Giving history — full width bento with spark bars -->
@@ -1725,7 +1752,7 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
 <!-- 5 TABS NAV -->
 <nav class="nav-bar" role="navigation">
   <button class="nav-tab active" onclick="showPanel('leadership',this)"><span class="tab-icon">🏛️</span> Leadership Profiles</button>
-  <button class="nav-tab" onclick="showPanel('sb2266',this)"><span class="tab-icon">📜</span> SB 2266 Vote Record</button>
+  <button class="nav-tab" onclick="showPanel('sb2266',this)"><span class="tab-icon">📜</span> Voting History</button>
   <button class="nav-tab" onclick="showPanel('history',this)"><span class="tab-icon">📊</span> DakCUPAC History</button>
   <button class="nav-tab" onclick="showPanel('candidates',this)"><span class="tab-icon">🗳️</span> 2026 Candidates &amp; Funding</button>
   <button class="nav-tab" onclick="showPanel('committee',this)"><span class="tab-icon">🤝</span> Committee &amp; Overview</button>
@@ -1834,8 +1861,12 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
 <!-- ═══ TAB 2: SB 2266 VOTE RECORD ═══ -->
 <div id="panel-sb2266" class="panel">
   <div class="page-header">
-    <h1>SB 2266 Vote Record — 68th Legislative Assembly</h1>
-    <div class="subtitle">Expanded credit union field of membership from 75-mile to 125-mile radius (NDCC §06-06-07) · Senate passed 24-23 (Feb 10, 2023) · House failed 39-53 (Apr 6, 2023) · Click on-ballot names ▾ for district detail</div>
+    <h1>Voting History — 68th Legislative Assembly (2023)</h1>
+    <div class="subtitle">
+      <div><strong>SB 2266 — FOM:</strong> Expanded credit union field of membership from 75-mile to 125-mile radius (NDCC §06-06-07) · Senate passed 24-23 (Feb 10, 2023) · House failed 39-53 (Apr 6, 2023). <a href="https://ndlegis.gov/assembly/68-2023/regular/bill-overview/bo2266.html" target="_blank" rel="noopener noreferrer" style="color:var(--teal);">Bill overview ↗</a></div>
+      <div style="margin-top:4px;"><strong>SB 2217 — Interchange:</strong> Would have capped credit card interchange fees on tax &amp; tip portions · Senate passed 26-21 (Jan 26, 2023) · House failed 29-64. CU-aligned vote = NAY. <a href="https://ndlegis.gov/files/resource/68-2023/library/sb2217.pdf" target="_blank" rel="noopener noreferrer" style="color:var(--teal);">Bill PDF ↗</a></div>
+      <div style="margin-top:4px;font-size:11px;opacity:.75;">Click on-ballot names ▾ for district detail. Main table below tracks the primary CU litmus test (SB 2266).</div>
+    </div>
   </div>
   <div class="card-row" id="sb-stat-cards"></div>
   <div class="chip-bar" id="sb-chip-bar">
@@ -2959,6 +2990,236 @@ function getSB2266Vote(name, chamber){
     if(chamberMatch) return chamberMatch.vote;
   }
   return matches[0].vote;
+}
+
+// ════════════════════════════════════════════════════════════════
+// SB 2217 — 2023 Credit Card Interchange Bill (68th ND Assembly)
+// Passed Senate 01/26/2023 (26-21-0), failed House (29-64-1)
+// ndlegis.gov/files/resource/68-2023/library/sb2217.pdf
+// Direction: CU-ALIGNED vote was NAY (opposing interchange cap).
+// Names stored as last name (with first initial where the roll call
+// distinguished between legislators sharing a surname, e.g. J. Roers /
+// K. Roers, D. Anderson / K. Anderson). getSB2217Vote flexibly matches
+// full names from CANDIDATES/LEADERS via last-name + first-initial.
+// ════════════════════════════════════════════════════════════════
+const SB2217_SENATE = [
+  // 26 YEAs
+  {name:'Barta',      chamber:'Senate', vote:'YEA'},
+  {name:'Beard',      chamber:'Senate', vote:'YEA'},
+  {name:'Boehm',      chamber:'Senate', vote:'YEA'},
+  {name:'Braunberger',chamber:'Senate', vote:'YEA'},
+  {name:'Burckhard',  chamber:'Senate', vote:'YEA'},
+  {name:'Clemens',    chamber:'Senate', vote:'YEA'},
+  {name:'Conley',     chamber:'Senate', vote:'YEA'},
+  {name:'Elkin',      chamber:'Senate', vote:'YEA'},
+  {name:'Erbele',     chamber:'Senate', vote:'YEA'},
+  {name:'Estenson',   chamber:'Senate', vote:'YEA'},
+  {name:'Hogue',      chamber:'Senate', vote:'YEA'},
+  {name:'Klein',      chamber:'Senate', vote:'YEA'},
+  {name:'Krebsbach',  chamber:'Senate', vote:'YEA'},
+  {name:'Larsen',     chamber:'Senate', vote:'YEA'},
+  {name:'Larson',     chamber:'Senate', vote:'YEA'},
+  {name:'Lee',        chamber:'Senate', vote:'YEA'},
+  {name:'Lemm',       chamber:'Senate', vote:'YEA'},
+  {name:'Magrum',     chamber:'Senate', vote:'YEA'},
+  {name:'Mathern',    chamber:'Senate', vote:'YEA'},
+  {name:'Myrdal',     chamber:'Senate', vote:'YEA'},
+  {name:'Paulson',    chamber:'Senate', vote:'YEA'},
+  {name:'Piepkorn',   chamber:'Senate', vote:'YEA'},
+  {name:'J. Roers',   chamber:'Senate', vote:'YEA'},
+  {name:'Rust',       chamber:'Senate', vote:'YEA'},
+  {name:'Vedaa',      chamber:'Senate', vote:'YEA'},
+  {name:'Weber',      chamber:'Senate', vote:'YEA'},
+  // 21 NAYs (CU-ALIGNED)
+  {name:'Axtman',     chamber:'Senate', vote:'NAY'},
+  {name:'Bekkedahl',  chamber:'Senate', vote:'NAY'},
+  {name:'Cleary',     chamber:'Senate', vote:'NAY'},
+  {name:'Davison',    chamber:'Senate', vote:'NAY'},
+  {name:'Dever',      chamber:'Senate', vote:'NAY'},
+  {name:'Dwyer',      chamber:'Senate', vote:'NAY'},
+  {name:'Hogan',      chamber:'Senate', vote:'NAY'},
+  {name:'Kannianen',  chamber:'Senate', vote:'NAY'},
+  {name:'Kessel',     chamber:'Senate', vote:'NAY'},
+  {name:'Kreun',      chamber:'Senate', vote:'NAY'},
+  {name:'Luick',      chamber:'Senate', vote:'NAY'},
+  {name:'Meyer',      chamber:'Senate', vote:'NAY'},
+  {name:'Patten',     chamber:'Senate', vote:'NAY'},
+  {name:'K. Roers',   chamber:'Senate', vote:'NAY'},
+  {name:'Rummel',     chamber:'Senate', vote:'NAY'},
+  {name:'Schaible',   chamber:'Senate', vote:'NAY'},
+  {name:'Sickler',    chamber:'Senate', vote:'NAY'},
+  {name:'Sorvaag',    chamber:'Senate', vote:'NAY'},
+  {name:'Wanzek',     chamber:'Senate', vote:'NAY'},
+  {name:'Weston',     chamber:'Senate', vote:'NAY'},
+  {name:'Wobbema',    chamber:'Senate', vote:'NAY'}
+];
+const SB2217_HOUSE = [
+  // 29 YEAs
+  {name:'D. Anderson',     chamber:'House', vote:'YEA'},
+  {name:'Bahl',            chamber:'House', vote:'YEA'},
+  {name:'Boschee',         chamber:'House', vote:'YEA'},
+  {name:'Conmy',           chamber:'House', vote:'YEA'},
+  {name:'Davis',           chamber:'House', vote:'YEA'},
+  {name:'Dobervich',       chamber:'House', vote:'YEA'},
+  {name:'Dockter',         chamber:'House', vote:'YEA'},
+  {name:'Dyk',             chamber:'House', vote:'YEA'},
+  {name:'Frelich',         chamber:'House', vote:'YEA'},
+  {name:'Hager',           chamber:'House', vote:'YEA'},
+  {name:'Holle',           chamber:'House', vote:'YEA'},
+  {name:'Hoverson',        chamber:'House', vote:'YEA'},
+  {name:'D. Johnson',      chamber:'House', vote:'YEA'},
+  {name:'Kempenich',       chamber:'House', vote:'YEA'},
+  {name:'Kiefert',         chamber:'House', vote:'YEA'},
+  {name:'Marschall',       chamber:'House', vote:'YEA'},
+  {name:'Monson',          chamber:'House', vote:'YEA'},
+  {name:'S. Olson',        chamber:'House', vote:'YEA'},
+  {name:'Prichard',        chamber:'House', vote:'YEA'},
+  {name:'Richter',         chamber:'House', vote:'YEA'},
+  {name:'D. Ruby',         chamber:'House', vote:'YEA'},
+  {name:'Satrom',          chamber:'House', vote:'YEA'},
+  {name:'Schneider',       chamber:'House', vote:'YEA'},
+  {name:'Schreiber-Beck',  chamber:'House', vote:'YEA'},
+  {name:'Steiner',         chamber:'House', vote:'YEA'},
+  {name:'Thomas',          chamber:'House', vote:'YEA'},
+  {name:'Tveit',           chamber:'House', vote:'YEA'},
+  {name:'VanWinkle',       chamber:'House', vote:'YEA'},
+  {name:'Vetter',          chamber:'House', vote:'YEA'},
+  // 64 NAYs (CU-ALIGNED)
+  {name:'B. Anderson',     chamber:'House', vote:'NAY'},
+  {name:'K. Anderson',     chamber:'House', vote:'NAY'},
+  {name:'Bellew',          chamber:'House', vote:'NAY'},
+  {name:'Beltz',           chamber:'House', vote:'NAY'},
+  {name:'Bosch',           chamber:'House', vote:'NAY'},
+  {name:'Brandenburg',     chamber:'House', vote:'NAY'},
+  {name:'Christensen',     chamber:'House', vote:'NAY'},
+  {name:'Christy',         chamber:'House', vote:'NAY'},
+  {name:'Cory',            chamber:'House', vote:'NAY'},
+  {name:'Dakane',          chamber:'House', vote:'NAY'},
+  {name:'Fegley',          chamber:'House', vote:'NAY'},
+  {name:'Finley-DeVille',  chamber:'House', vote:'NAY'},
+  {name:'Fisher',          chamber:'House', vote:'NAY'},
+  {name:'Grueneich',       chamber:'House', vote:'NAY'},
+  {name:'Hagert',          chamber:'House', vote:'NAY'},
+  {name:'Hanson',          chamber:'House', vote:'NAY'},
+  {name:'Hatlestad',       chamber:'House', vote:'NAY'},
+  {name:'Hauck',           chamber:'House', vote:'NAY'},
+  {name:'Headland',        chamber:'House', vote:'NAY'},
+  {name:'Heilman',         chamber:'House', vote:'NAY'},
+  {name:'Heinert',         chamber:'House', vote:'NAY'},
+  {name:'Henderson',       chamber:'House', vote:'NAY'},
+  {name:'Ista',            chamber:'House', vote:'NAY'},
+  {name:'J. Johnson',      chamber:'House', vote:'NAY'},
+  {name:'Jonas',           chamber:'House', vote:'NAY'},
+  {name:'Karls',           chamber:'House', vote:'NAY'},
+  {name:'Kasper',          chamber:'House', vote:'NAY'},
+  {name:'Klemin',          chamber:'House', vote:'NAY'},
+  {name:'Koppelman',       chamber:'House', vote:'NAY'},
+  {name:'Kreidt',          chamber:'House', vote:'NAY'},
+  {name:'Lefor',           chamber:'House', vote:'NAY'},
+  {name:'Longmuir',        chamber:'House', vote:'NAY'},
+  {name:'Louser',          chamber:'House', vote:'NAY'},
+  {name:'Martinson',       chamber:'House', vote:'NAY'},
+  {name:'McLeod',          chamber:'House', vote:'NAY'},
+  {name:'Meier',           chamber:'House', vote:'NAY'},
+  {name:'Mitskog',         chamber:'House', vote:'NAY'},
+  {name:'Mock',            chamber:'House', vote:'NAY'},
+  {name:'Murphy',          chamber:'House', vote:'NAY'},
+  {name:'Nathe',           chamber:'House', vote:'NAY'},
+  {name:'Nelson',          chamber:'House', vote:'NAY'},
+  {name:'Novak',           chamber:'House', vote:'NAY'},
+  {name:"O'Brien",         chamber:'House', vote:'NAY'},
+  {name:'J. Olson',        chamber:'House', vote:'NAY'},
+  {name:'Ostlie',          chamber:'House', vote:'NAY'},
+  {name:'Porter',          chamber:'House', vote:'NAY'},
+  {name:'Pyle',            chamber:'House', vote:'NAY'},
+  {name:'Rios',            chamber:'House', vote:'NAY'},
+  {name:'Roers Jones',     chamber:'House', vote:'NAY'},
+  {name:'Rohr',            chamber:'House', vote:'NAY'},
+  {name:'M. Ruby',         chamber:'House', vote:'NAY'},
+  {name:'Sanford',         chamber:'House', vote:'NAY'},
+  {name:'Schatz',          chamber:'House', vote:'NAY'},
+  {name:'Schauer',         chamber:'House', vote:'NAY'},
+  {name:'Schobinger',      chamber:'House', vote:'NAY'},
+  {name:'Stemen',          chamber:'House', vote:'NAY'},
+  {name:'Strinden',        chamber:'House', vote:'NAY'},
+  {name:'Swiontek',        chamber:'House', vote:'NAY'},
+  {name:'Timmons',         chamber:'House', vote:'NAY'},
+  {name:'Toman',           chamber:'House', vote:'NAY'},
+  {name:'Vigesaa',         chamber:'House', vote:'NAY'},
+  {name:'Wagner',          chamber:'House', vote:'NAY'},
+  {name:'Warrey',          chamber:'House', vote:'NAY'},
+  {name:'Weisz',           chamber:'House', vote:'NAY'},
+  // 1 ABSENT / Not Voting
+  {name:'Motschenbacher',  chamber:'House', vote:'ABSENT'}
+];
+const ALL_SB2217_VOTES = [...SB2217_SENATE, ...SB2217_HOUSE];
+// SB2217 lookup is more permissive than SB2266 — the roll call used
+// surnames (and first initials only where disambiguation was needed).
+// Build a last-name index, and for disambiguated entries (J. Roers vs
+// K. Roers) build a first-letter + last-name index as well.
+const SB2217_LOOKUP_LAST = {};        // 'barta' -> {chamber,vote}
+const SB2217_LOOKUP_INIT_LAST = {};   // 'janderson' -> {chamber,vote}
+ALL_SB2217_VOTES.forEach(function(r){
+  var parts = r.name.trim().split(/\s+/);
+  var last = parts[parts.length-1].toLowerCase().replace(/[^a-z]/g,'');
+  var firstTok = parts.length > 1 ? parts[0].replace(/[^A-Za-z]/g,'').toLowerCase() : '';
+  if(firstTok){
+    // Disambiguated entry (e.g. "J. Roers", "D. Anderson")
+    var key = firstTok[0] + last + '_' + (r.chamber[0] || '').toLowerCase();
+    SB2217_LOOKUP_INIT_LAST[key] = r.vote;
+  } else {
+    // Surname-only entry — stored by (chamber, last)
+    SB2217_LOOKUP_LAST[last + '_' + (r.chamber[0] || '').toLowerCase()] = r.vote;
+  }
+});
+
+// getSB2217Vote — flexibly matches a full legislator name from
+// CANDIDATES/LEADERS against the surname-based roll call.
+function getSB2217Vote(name, chamber){
+  if(!name) return null;
+  var parts = name.trim().split(/\s+/);
+  var last = parts[parts.length-1].toLowerCase().replace(/[^a-z]/g,'');
+  var first = parts[0].toLowerCase().replace(/[^a-z]/g,'');
+  var firstInit = first.charAt(0);
+  var chKey = ((chamber || '').charAt(0) || '').toLowerCase(); // 'h' or 's'
+  var tryChambers = chKey ? [chKey] : ['s','h'];
+  for(var i = 0; i < tryChambers.length; i++){
+    var c = tryChambers[i];
+    // Exact first-initial + last disambiguated match first
+    var v = SB2217_LOOKUP_INIT_LAST[firstInit + last + '_' + c];
+    if(v) return v;
+    // Then surname-only (no disambiguation in roll call)
+    var v2 = SB2217_LOOKUP_LAST[last + '_' + c];
+    if(v2) return v2;
+  }
+  // Special-case: "Roers Jones" is a compound surname in our data
+  if(parts.length >= 2){
+    var compoundLast = (parts[parts.length-2] + ' ' + parts[parts.length-1]).toLowerCase().replace(/\s+/g,' ');
+    var v3 = SB2217_LOOKUP_LAST[compoundLast.replace(/[^a-z]/g,'') + '_h'];
+    if(v3) return v3;
+  }
+  return null;
+}
+// Shared helper — returns array of {bill, label, shortLabel, year, vote, proCuVote, url} for a legislator
+function getVotingHistory(name, chamber){
+  var out = [];
+  var sb2266 = getSB2266Vote(name, chamber);
+  out.push({
+    bill: 'SB 2266', label: 'SB 2266 — Field of Membership (FOM)', shortLabel: 'SB 2266 · FOM', year: 2023,
+    url: 'https://ndlegis.gov/assembly/68-2023/regular/bill-overview/bo2266.html',
+    vote: sb2266 || null,
+    // For FOM: YEA = supported credit unions; NAY = opposed
+    proCuVote: 'YEA'
+  });
+  var sb2217 = getSB2217Vote(name, chamber);
+  out.push({
+    bill: 'SB 2217', label: 'SB 2217 — Interchange Fee Reform', shortLabel: 'SB 2217 · Interchange', year: 2023,
+    url: 'https://ndlegis.gov/files/resource/68-2023/library/sb2217.pdf',
+    vote: sb2217 || null,
+    // For SB 2217: NAY = supported credit unions (opposing merchant-driven interchange cap)
+    proCuVote: 'NAY'
+  });
+  return out;
 }
 
 const CANDIDATES = [
@@ -5503,9 +5764,12 @@ function openPersonCard(name, dist){
   if(_src&&_src.employer) links+='<div style="width:100%;margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.08);font-size:11px;color:rgba(255,255,255,0.6);">💼 '+_src.employer+'</div>';
   document.getElementById('pp-links').innerHTML=links;
 
-  // SB2266 — bento styled vote badge
-  let sb=ldr?ldr.sb2266:null;
-  if(!sb){ const ln=name.split(' ').pop().toLowerCase().replace(/[^a-z]/g,''); sb=SB2266_LOOKUP[ln]||null; }
+  // SB2266 — use the robust getSB2266Vote lookup, not a last-name-only match
+  let sb = (ldr && ldr.sb2266) || null;
+  if(!sb && typeof getSB2266Vote === 'function') {
+    var _chamberForVote = (cand && cand.ch) || (ldr && ldr.chamber) || null;
+    sb = getSB2266Vote(name, _chamberForVote) || getSB2266Vote(name, null);
+  }
   // Relationship score
   var relScore = (typeof RELATIONSHIP_SCORE !== 'undefined' && RELATIONSHIP_SCORE[name]) ? RELATIONSHIP_SCORE[name] : null;
   var relEl = document.getElementById('pp-rel-score');
@@ -5525,6 +5789,61 @@ function openPersonCard(name, dist){
     else if(sb==='ABSENT') sbEl.innerHTML='<span class="pp-vote-absent">— Absent / Not Voting</span>';
     else sbEl.innerHTML='<span style="font-size:12px;color:rgba(255,255,255,0.35);font-style:italic;">No vote record — new candidate or pre-2023</span>';
   }
+
+  // SB 2217 (Interchange) — CU-ALIGNED direction is NAY
+  var sb2217 = null;
+  if(typeof getSB2217Vote === 'function') {
+    var _chForIc = (cand && cand.ch) || (ldr && ldr.chamber) || null;
+    sb2217 = getSB2217Vote(name, _chForIc);
+  }
+  var sb2217El = document.getElementById('pp-sb2217');
+  if(sb2217El){
+    if(sb2217 === 'NAY') sb2217El.innerHTML = '<span class="pp-vote-yea">✓ NAY — Supported CUs</span>';
+    else if(sb2217 === 'YEA') sb2217El.innerHTML = '<span class="pp-vote-nay">✕ YEA — Opposed CUs</span>';
+    else if(sb2217 === 'ABSENT') sb2217El.innerHTML = '<span class="pp-vote-absent">— Absent / Not Voting</span>';
+    else sb2217El.innerHTML = '<span style="font-size:12px;color:rgba(255,255,255,0.35);font-style:italic;">No vote record — new candidate or pre-2023</span>';
+  }
+
+  // ── CUPAC RECOMMENDATION BLOCK ──
+  // Populates the "Why this recommendation" tile with tier, amount, and reasoning.
+  try {
+    _computeScaleFactors();
+    var _recChamber = (cand && cand.ch) || (ldr && ldr.chamber) || 'House';
+    var _recParty = (cand && cand.party) || (ldr && ldr.party) || 'R';
+    var _recInc = (cand && cand.incumbent) || (ldr && true) || false;
+    var _rec = getScaledRec(name, parseInt(dist)||0, _recChamber, _recParty, _recInc);
+    var _recTier = document.getElementById('pp-rec-tier');
+    var _recIcon = document.getElementById('pp-rec-icon');
+    var _recAmt = document.getElementById('pp-rec-amt');
+    var _recTiming = document.getElementById('pp-rec-timing');
+    var _recReasons = document.getElementById('pp-rec-reasons');
+    var _recCategory = document.getElementById('pp-rec-category');
+    if(_rec) {
+      if(_recTier) _recTier.textContent = _rec.tier || '—';
+      if(_recIcon) _recIcon.textContent = _rec.icon || '•';
+      if(_recAmt) {
+        _recAmt.textContent = '$' + (_rec.amt || 0).toLocaleString();
+        _recAmt.style.color = _rec.amt > 0 ? '#86EFAC' : 'rgba(255,255,255,0.3)';
+      }
+      if(_recTiming) _recTiming.textContent = _rec.timing || '';
+      // Category pills: champion / IBL / leadership / transfer / contested primary
+      var _cats = [];
+      if(typeof CU_CHAMPIONS !== 'undefined' && CU_CHAMPIONS[name]) _cats.push('⭐ CU Champion');
+      if((cand && (cand.ibl || cand.ib)) || (ldr && (ldr.ibl || ldr.ib))) _cats.push('🏛 IBL / IB Committee');
+      if(ldr) _cats.push('👑 Leadership');
+      if(cand && (cand.formerHouse || cand.formerSenate)) _cats.push('🔄 Chamber transfer');
+      if(_rec.inPrimary) _cats.push('⚔ Contested primary');
+      if(_recCategory) _recCategory.innerHTML = _cats.length ? _cats.join(' · ') : '<span style="opacity:.4;">No special category</span>';
+      // Reasons list
+      if(_recReasons && _rec.reasons && _rec.reasons.length) {
+        _recReasons.innerHTML = _rec.reasons.slice(0, 6).map(function(r) {
+          return '<div style="font-size:11px;color:rgba(255,255,255,0.75);display:flex;gap:6px;"><span style="color:rgba(255,255,255,0.35);">›</span><span>'+r+'</span></div>';
+        }).join('');
+      } else if(_recReasons) {
+        _recReasons.innerHTML = '<div style="font-size:11px;color:rgba(255,255,255,0.4);font-style:italic;">No specific reasoning available.</div>';
+      }
+    }
+  } catch(e){ console && console.warn && console.warn('pp rec error', e); }
 
   // Latest news — from candidate news: field or leader note: field
   const newsNote = (cand && cand.news) || (ldr && ldr.note ? ldr.note : null) || null;
