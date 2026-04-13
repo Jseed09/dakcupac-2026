@@ -2497,24 +2497,54 @@ const TRACKER_KEY = 'cupac_tracker_2026_v4';
 // State PAC only — cash, campaign target, and primary/general split percentage.
 // Persists to localStorage. Every component reads from getBudget().
 const BUDGET_KEY = 'cupac_budget_2026';
+const BUDGET_SCHEMA_VERSION = 2;
 function getBudget() {
   try {
     var saved = JSON.parse(localStorage.getItem(BUDGET_KEY));
     if(saved && saved.cash != null) {
-      // Backward-compat: ensure target/splitPct exist
+      // One-time migration: old schema had {cash, raise, federal} and no v.
+      // Force-reset target to $30k and split to 67 so legacy state doesn't
+      // bleed "raise" into the new target slot.
+      if(saved.v !== BUDGET_SCHEMA_VERSION) {
+        var migrated = {
+          cash: (saved.cash && saved.cash > 1000) ? saved.cash : 36222.12,
+          target: 30000,
+          splitPct: 67,
+          v: BUDGET_SCHEMA_VERSION
+        };
+        migrated.total = migrated.cash;
+        try { localStorage.setItem(BUDGET_KEY, JSON.stringify(migrated)); } catch(e){}
+        return migrated;
+      }
       if(saved.target == null) saved.target = 30000;
       if(saved.splitPct == null) saved.splitPct = 67;
       return saved;
     }
   } catch(e){}
-  return {cash: 36222.12, target: 30000, splitPct: 67}; // defaults (state PAC only)
+  return {cash: 36222.12, target: 30000, splitPct: 67, v: BUDGET_SCHEMA_VERSION}; // defaults (state PAC only)
 }
-function saveBudget(cash, target, splitPct) {
+// saveBudget is polymorphic:
+//   saveBudget({cash, target, splitPct})  ← preferred, only updates keys present
+//   saveBudget(cash)                      ← updates cash only, preserves target/splitPct
+//   saveBudget(cash, target, splitPct)    ← full positional form (use only when all 3 are intentional)
+// Any key that is undefined (or absent from the object) is preserved from existing state.
+function saveBudget(cashOrObj, target, splitPct) {
+  var existing = getBudget();
   var b = {
-    cash: cash!=null ? cash : 36222.12,
-    target: target!=null ? target : 30000,
-    splitPct: splitPct!=null ? splitPct : 67
+    cash: existing.cash,
+    target: existing.target,
+    splitPct: existing.splitPct,
+    v: BUDGET_SCHEMA_VERSION
   };
+  if(typeof cashOrObj === 'object' && cashOrObj !== null) {
+    if('cash' in cashOrObj && cashOrObj.cash != null) b.cash = cashOrObj.cash;
+    if('target' in cashOrObj && cashOrObj.target != null) b.target = cashOrObj.target;
+    if('splitPct' in cashOrObj && cashOrObj.splitPct != null) b.splitPct = cashOrObj.splitPct;
+  } else {
+    if(cashOrObj != null) b.cash = cashOrObj;
+    if(target != null && arguments.length >= 2) b.target = target;
+    if(splitPct != null && arguments.length >= 3) b.splitPct = splitPct;
+  }
   b.total = b.cash; // state PAC: total available === cash on hand
   try { localStorage.setItem(BUDGET_KEY, JSON.stringify(b)); } catch(e){}
   broadcastBudget(b);
@@ -3751,14 +3781,50 @@ function getCupacRec(name, dist, chamber, party, isIncumbent) {
     reasons.push('Recommend P&P invitation to evaluate credit union priorities');
   }
 
+  // ════ COMMITTEE-LEVEL OVERRIDES ════
+  // These run AFTER the baseline tier logic so committee policy can
+  // override the algorithm on a per-person basis.
+
+  // 1) CU CHAMPIONS — designated top-tier allies, always PROTECT at $500+
+  //    regardless of vote, banker situation, or contested status.
+  if(typeof CU_CHAMPIONS !== 'undefined' && CU_CHAMPIONS[name]) {
+    tier = 'PROTECT';
+    icon = '⭐';
+    color = '#15803D';
+    amt = Math.max(amt, 500);
+    action = 'Credit Union Champion — committee-designated top ally. ' + (action || 'Fund at maximum to reinforce relationship.');
+    reasons.unshift('⭐ CU Champion — committee-designated top-tier ally');
+  }
+  // 2) IBL / IB Committee / Leadership / House→Senate transfers — floor at MAINTAIN.
+  //    Committee policy: these relationships must be preserved regardless of
+  //    one-off votes. Only override if baseline tier is not already stronger.
+  else {
+    var _isLdr = LEADERS.find(function(l) { return l.name === name; });
+    var _isIbl = (cand && (cand.ibl || cand.ib)) || (_isLdr && (_isLdr.ibl || _isLdr.ib));
+    var _isTransfer = cand && (cand.formerHouse || cand.formerSenate);
+    var _strongerTiers = {'PROTECT':1,'MAINTAIN':1,'BUILD':1};
+    if((_isLdr || _isIbl || _isTransfer) && !_strongerTiers[tier]) {
+      tier = 'MAINTAIN';
+      icon = '✅';
+      color = '#0D7377';
+      amt = Math.max(amt, inPrimary ? 400 : 300);
+      var reason = _isIbl ? '🏛 IBL / IB Committee member'
+                 : _isLdr ? '👑 Leadership position'
+                 : '🔄 Transferring to new chamber — seeking new leadership role';
+      action = reason + ' — committee policy requires maintaining this relationship regardless of vote history. ' + (action || '');
+      reasons.unshift('🏛 Floored at MAINTAIN: '+reason);
+    }
+  }
+
   // Timing as first line
   reasons.unshift('⏱ '+timing);
   // Budget phase — reads live numbers
   if(amt > 0) {
-    var _b = (typeof getBudget==='function') ? getBudget() : {cash:34029,raise:12000};
+    var _b = (typeof getBudget==='function') ? getBudget() : {cash:36222,target:30000};
+    var _balForMsg = _b.cash || 36222;
     reasons.push(inPrimary
-      ? '💰 Phase 1 allocation — from $'+(_b.cash||34029).toLocaleString()+' current balance'
-      : '💰 Phase 2 allocation — from $'+((_b.cash||34029)+(_b.raise||0)).toLocaleString()+' total available (balance + projected)');
+      ? '💰 Phase 1 allocation — from $'+_balForMsg.toLocaleString()+' current balance'
+      : '💰 Phase 2 allocation — from $'+_balForMsg.toLocaleString()+' current balance');
   }
   if(competitive && amt > 0) reasons.push('Competitive district (margin '+margin+'pts)');
 
@@ -3766,6 +3832,19 @@ function getCupacRec(name, dist, chamber, party, isIncumbent) {
   _recCache[key] = result;
   return result;
 }
+
+// ════ COMMITTEE POLICY CONSTANTS ════
+// CU Champions — committee-designated top allies. Always floor at $500
+// PROTECT tier regardless of vote history, banker competition, etc.
+// Names must match the name field in CANDIDATES / LEGISLATORS exactly.
+var CU_CHAMPIONS = {
+  'Jayme Davis': true,
+  'Kent Weston': true,
+  'Judy Estenson': true,
+  'Kathy Frelich': true,
+  'Dawson Holle': true,
+  'Karen Rohr': true
+};
 
 // ════ BUDGET SIDEBAR — updates in real-time from tracker ════
 function updateBudgetSidebar() {
@@ -3868,12 +3947,14 @@ setTimeout(function(){
   if(typeof calcBudget==='function') calcBudget();
 }, 500);
 
-// Sidebar budget inputs changed — save and sync everywhere
+// Sidebar budget inputs changed — save and sync everywhere.
+// State PAC only: the raise/federal inputs still exist for legacy display
+// but we only persist `cash` to the central budget (target/splitPct are
+// controlled exclusively by the Budget Plan card).
 function onSidebarBudgetChange() {
   var cash = parseInt(document.getElementById('bsb-cash-input').value) || 0;
   var raise = parseInt(document.getElementById('bsb-raise-input').value) || 0;
-  var fed = getBudget().federal || 0;
-  saveBudget(cash, raise, fed);
+  saveBudget({cash: cash});
   // Sync to Candidates tab inputs
   var ci = document.getElementById('bgt-cash'); if(ci) ci.value = cash;
   var ri = document.getElementById('bgt-raise'); if(ri) ri.value = raise;
@@ -5219,8 +5300,9 @@ function calcBudget(){
   const raise  =parseInt(document.getElementById('bgt-raise').value)||0;
   const fed    =parseInt(document.getElementById('bgt-federal').value)||0;
   const total  =cash+raise-fed;
-  // Save to centralized budget
-  saveBudget(cash, raise, fed);
+  // Save to centralized budget — state PAC only, so only persist cash.
+  // target/splitPct are controlled by the Budget Plan card, not this legacy panel.
+  saveBudget({cash: cash});
   const te=document.getElementById('bgt-total'); te.textContent='$'+total.toLocaleString(); te.style.color=total<0?'var(--red-text)':'var(--teal-dark)';
   const d=loadBudget(); let committed=0; const poolUsed={};
   POOLS.forEach(p=>poolUsed[p.id]=0);
@@ -8801,6 +8883,7 @@ function _computeScaleFactors() {
 
 // getScaledRec — wraps getCupacRec, returns a new object with `amt`
 // scaled and `baseAmt` preserved for display. Rounds to nearest $50.
+// CU Champions are floored at $500 even when the slider scales down.
 function getScaledRec(name, dist, chamber, party, incumbent) {
   var rec = getCupacRec(name, parseInt(dist)||0, chamber, party, incumbent);
   if(!rec || !rec.amt) return rec;
@@ -8808,6 +8891,10 @@ function getScaledRec(name, dist, chamber, party, incumbent) {
   // Round to nearest $50, minimum $50 for non-zero tiers
   var scaled = Math.round((rec.amt * factor) / 50) * 50;
   if(scaled < 50 && rec.amt > 0) scaled = 50;
+  // CU Champions — hard floor at $500
+  if(typeof CU_CHAMPIONS !== 'undefined' && CU_CHAMPIONS[name] && scaled < 500) {
+    scaled = 500;
+  }
   // Return a shallow clone so callers don't mutate the cache
   var out = {};
   for(var k in rec) out[k] = rec[k];
