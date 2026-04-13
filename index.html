@@ -1778,7 +1778,7 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
 
 <!-- ── BUDGET SIDEBAR (pull tab + collapsible) ── -->
 <!-- Global Recommendation Tier Filters -->
-<div id="tier-filter-bar" style="display:none;position:fixed;top:128px;left:50%;transform:translateX(-50%);z-index:185;background:var(--white);border:1px solid var(--border);border-radius:0 0 12px 12px;padding:6px 12px;box-shadow:var(--shadow-md);display:flex;gap:4px;flex-wrap:wrap;">
+<div id="tier-filter-bar" hidden style="position:fixed;top:128px;left:50%;transform:translateX(-50%);z-index:185;background:var(--white);border:1px solid var(--border);border-radius:0 0 12px 12px;padding:6px 12px;box-shadow:var(--shadow-md);gap:4px;flex-wrap:wrap;">
   <span style="font-size:10px;font-weight:700;color:var(--text-muted);margin-right:4px;align-self:center;">FILTER:</span>
   <button onclick="toggleTierFilter('all')" class="tier-btn" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid var(--teal);background:var(--teal);color:#fff;cursor:pointer;">Show All</button>
   <button onclick="toggleTierFilter('PROTECT')" class="tier-btn" data-tier="PROTECT" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid #15803D;background:#fff;color:#15803D;cursor:pointer;">🛡️ Protect</button>
@@ -2425,7 +2425,7 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
           </div>
         </div>
         <div style="flex-shrink:0;background:#FEF3C7;border:1.5px dashed #B45309;border-radius:10px;padding:10px 14px;min-width:140px;text-align:center;">
-          <div style="font-size:9px;font-weight:700;color:#92400E;text-transform:uppercase;letter-spacing:.4px;">🏦 Reserve Buffer</div>
+          <div style="font-size:9px;font-weight:700;color:#92400E;text-transform:uppercase;letter-spacing:.4px;">🧀 Reserve Cheddar</div>
           <div id="bp-bar-reserve" style="font-size:18px;font-weight:800;color:#B45309;margin-top:2px;">$0</div>
           <div style="font-size:9px;color:#92400E;font-style:italic;">above target</div>
         </div>
@@ -3129,7 +3129,7 @@ const SB2217_HOUSE = [
   {name:'Thomas',          chamber:'House', vote:'YEA'},
   {name:'Tveit',           chamber:'House', vote:'YEA'},
   {name:'VanWinkle',       chamber:'House', vote:'YEA'},
-  {name:'Vetter',          chamber:'House', vote:'YEA'},
+  {name:'S. Vetter',       chamber:'House', vote:'YEA'},
   // 64 NAYs (CU-ALIGNED)
   {name:'B. Anderson',     chamber:'House', vote:'NAY'},
   {name:'K. Anderson',     chamber:'House', vote:'NAY'},
@@ -4761,7 +4761,14 @@ function applyTierFilter(){
 // Show/hide the tier filter bar
 function toggleTierBar() {
   var bar = document.getElementById('tier-filter-bar');
-  bar.style.display = bar.style.display === 'none' ? 'flex' : 'none';
+  if(!bar) return;
+  if(bar.hasAttribute('hidden')) {
+    bar.removeAttribute('hidden');
+    bar.style.display = 'flex';
+  } else {
+    bar.setAttribute('hidden','');
+    bar.style.display = '';
+  }
 }
 
 function toggleBudgetSidebar() {
@@ -4814,15 +4821,10 @@ function personCard(cfg){
     : '<span style="font-size:11px;color:var(--text-muted)">No prior vote</span>';
 
   // SB 2217 (Interchange) vote badge. NAY = pro-CU (opposed the cap).
-  // Only look up the vote if the candidate was plausibly in the 2023
-  // session (incumbent OR former House/Senate / former legislator flag
-  // OR currentHouseMember). This prevents surname collisions like
-  // new candidate Greg Vetter inheriting Steve Vetter's YEA vote.
-  var _candForVote = CANDIDATES.find(function(c){return c.name===name;});
-  var _plausibleVoter = cfg.incumbent
-    || (_candForVote && (_candForVote.formerHouse || _candForVote.formerSenate || _candForVote.formerLegislator || _candForVote.currentHouseMember || _candForVote.currentSenateMember || _candForVote.incumbent))
-    || LEADERS.some(function(l){return l.name===name;});
-  var _sb2217vote = (_plausibleVoter && typeof getSB2217Vote === 'function')
+  // The data disambiguates known surname collisions (S. Vetter,
+  // J. Johnson, K. Anderson, etc.) so first-initial matching blocks
+  // false positives for new candidates who share a surname.
+  var _sb2217vote = (typeof getSB2217Vote === 'function')
     ? getSB2217Vote(name, chamber)
     : null;
   var vb2 = _sb2217vote === 'NAY'
@@ -5006,8 +5008,16 @@ function personCard(cfg){
     // Build the recommendation block
     var _recBg = _rec.amt > 0 ? 'rgba('+(_rec.color==='#15803D'?'21,128,61':_rec.color==='#0D7377'?'13,115,119':_rec.color==='#1D4ED8'?'29,78,216':'107,114,128')+',0.06)' : (_rec.color==='#B91C1C'||_rec.color==='#991B1B'?'#FEF2F2':'var(--surface)');
     var _recId = 'rec_'+name.replace(/[^a-zA-Z0-9]/g,'')+'_'+dist;
+    // LOUD "CONTESTED PRIMARY" banner — committee policy: contested
+    // primary candidates always get more because the primary pot is
+    // concentrated on fewer people. State it prominently at the top
+    // of the rec so nobody wonders why the amount looks high.
+    var _contestedBanner = _rec.inPrimary
+      ? '<div style="background:#B45309;color:#fff;font-weight:800;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:4px 8px;border-radius:6px;margin-bottom:6px;text-align:center;">⚔ CONTESTED PRIMARY — higher allocation by design</div>'
+      : '<div style="background:var(--surface-2);color:var(--text-muted);font-weight:700;font-size:9px;letter-spacing:.05em;text-transform:uppercase;padding:3px 8px;border-radius:6px;margin-bottom:6px;text-align:center;">Uncontested · general-election allocation</div>';
     recBlock = '<div id="'+_recId+'" class="rec-block" data-tier="'+_rec.tier+'" style="padding:8px 10px;background:'+_recBg+';border:2px solid '+_rec.color+';border-radius:10px;margin-top:6px;position:relative;">'
       +'<button onclick="this.parentElement.style.display=\'none\'" style="position:absolute;top:4px;right:6px;background:none;border:none;cursor:pointer;font-size:14px;color:var(--text-muted);line-height:1;padding:2px 4px;" title="Dismiss recommendation">✕</button>'
+      +_contestedBanner
       +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;padding-right:20px;">'
         +'<div style="font-size:11px;font-weight:700;color:'+_rec.color+';letter-spacing:.04em;">'+_rec.icon+' '+_rec.tier+'</div>'
         +(_rec.amt > 0 ? '<div style="font-size:16px;font-weight:700;color:'+_rec.color+';">$'+_rec.amt+'</div>' : '<div style="font-size:11px;font-weight:700;color:'+_rec.color+';">$0 recommended</div>')
@@ -9459,19 +9469,28 @@ function _computeScaleFactors() {
 
 // getScaledRec — wraps getCupacRec, returns a new object with `amt`
 // scaled and `baseAmt` preserved for display. Rounds to nearest $50.
-// CU Champions are floored at $500 even when the slider scales down.
+// Contested-primary candidates naturally get higher scaled amounts
+// because the primary pot is concentrated on fewer people. Champions
+// and double pro-CU voters are floored at $500 regardless of slider.
 function getScaledRec(name, dist, chamber, party, incumbent) {
   var rec = getCupacRec(name, parseInt(dist)||0, chamber, party, incumbent);
   if(!rec || !rec.amt) return rec;
   var factor = rec.inPrimary ? _scaleCache.primaryFactor : _scaleCache.generalFactor;
-  // Round to nearest $50, minimum $50 for non-zero tiers
   var scaled = Math.round((rec.amt * factor) / 50) * 50;
   if(scaled < 50 && rec.amt > 0) scaled = 50;
   // CU Champions — hard floor at $500
   if(typeof CU_CHAMPIONS !== 'undefined' && CU_CHAMPIONS[name] && scaled < 500) {
     scaled = 500;
   }
-  // Return a shallow clone so callers don't mutate the cache
+  // Double pro-CU — $500 floor for incumbents, $400 for new candidates
+  try {
+    var _sbFom = getSB2266Vote(name, chamber) || getSB2266Vote(name, null);
+    var _sbIc  = (typeof getSB2217Vote === 'function') ? getSB2217Vote(name, chamber) : null;
+    if(_sbFom === 'YEA' && _sbIc === 'NAY') {
+      var _floor = incumbent ? 500 : 400;
+      if(scaled < _floor) scaled = _floor;
+    }
+  } catch(e){}
   var out = {};
   for(var k in rec) out[k] = rec[k];
   out.baseAmt = rec.amt;
@@ -9953,37 +9972,69 @@ function renderPhasePlan() {
 function updateStrategyTotals() {
   var el = document.getElementById('strat-live-cards');
   if(!el) return;
-  var tracker = JSON.parse(localStorage.getItem('cupac_tracker_2026') || '{}');
-  var totalAlloc = 0, countDecisions = 0, countYea = 0, countNay = 0, allocYea = 0, allocNay = 0, allocNew = 0;
-  Object.keys(tracker).forEach(function(k) {
-    var t = tracker[k];
-    var amt = t.amt || 0;
-    if(!amt && (!t.status || t.status === 'none')) return;
-    countDecisions++;
-    totalAlloc += amt;
-    // Parse name from key (format: "Name_Dist")
-    var namePart = k.replace(/_\d+$/, '');
-    var vote = getSB2266Vote(namePart, 'House') || getSB2266Vote(namePart, 'Senate');
-    if(vote === 'YEA') { countYea++; allocYea += amt; }
-    else if(vote === 'NAY') { countNay++; allocNay += amt; }
-    else { allocNew += amt; }
+  // Use the correct tracker key
+  var tracker = loadTracker();
+  // Ensure scale factors are current so recommended amounts match the slider
+  if(typeof _computeScaleFactors === 'function') _computeScaleFactors();
+
+  // Iterate CANDIDATES (2026 ballot = odd districts) and for each one compute
+  // both the scaled recommendation AND the committed amount from the tracker.
+  // The cards show what it WOULD look like if you accepted every current rec,
+  // with an overlay showing what you've actually committed so far.
+  var totalRec = 0, totalCommitted = 0;
+  var recYea = 0, recNay = 0, recNew = 0;
+  var commitYea = 0, commitNay = 0, commitNew = 0;
+  var countYea = 0, countNay = 0, countNew = 0;
+  var countCommitted = 0;
+  var _seen = {};
+  CANDIDATES.forEach(function(c){
+    if(parseInt(c.dist) % 2 !== 1) return;
+    var k = c.name + '_' + c.dist;
+    if(_seen[k]) return;
+    _seen[k] = 1;
+    var rec = (typeof getScaledRec === 'function') ? getScaledRec(c.name, c.dist, c.ch, c.party, c.incumbent) : null;
+    var recAmt = (rec && rec.amt) ? rec.amt : 0;
+    var vote = getSB2266Vote(c.name, c.ch);
+    var pkey = personKey(c.name, c.dist);
+    var commit = (tracker[pkey] && tracker[pkey].amt) ? parseInt(tracker[pkey].amt) : 0;
+    totalRec += recAmt;
+    totalCommitted += commit;
+    if(commit > 0) countCommitted++;
+    if(vote === 'YEA') { recYea += recAmt; commitYea += commit; countYea++; }
+    else if(vote === 'NAY') { recNay += recAmt; commitNay += commit; countNay++; }
+    else { recNew += recAmt; commitNew += commit; countNew++; }
   });
+
   var _bgt2 = getBudget();
-  var _totalAvail2 = (_bgt2.cash||36222) + (_bgt2.raise||0) - (_bgt2.federal||0);
-  var remaining = _totalAvail2 - totalAlloc;
+  var _totalAvail2 = _bgt2.cash || 36222;
+  var remaining = _totalAvail2 - totalCommitted;
   var remColor = remaining < 0 ? 'var(--red)' : remaining < 5000 ? 'var(--gold)' : 'var(--green)';
 
+  // Helper to render a card showing "rec $X" with "committed $Y" subtitle
+  function card(cls, label, recAmt, commitAmt, subText, clickFn) {
+    var click = clickFn ? ' style="cursor:pointer" onclick="'+clickFn+'"' : '';
+    var diffLine = commitAmt > 0
+      ? '<div style="font-size:10px;color:var(--teal);font-weight:700;margin-top:2px;">✓ $'+commitAmt.toLocaleString()+' committed</div>'
+      : '<div style="font-size:10px;color:var(--text-muted);margin-top:2px;">$0 committed</div>';
+    return '<div class="stat-card '+cls+'"'+click+'>'
+      + '<div class="label">'+label+'</div>'
+      + '<div class="value" style="color:var(--teal);">$'+recAmt.toLocaleString()+'</div>'
+      + '<div class="sub">'+subText+'</div>'
+      + diffLine
+      + '</div>';
+  }
+
   el.innerHTML = ''
-    +'<div class="stat-card green" style="cursor:pointer" onclick="showPanel(\'candidates\',document.querySelectorAll(\'.nav-tab\')[3])"><div class="label">2026 ALLOCATED</div><div class="value" style="color:var(--teal);">$'+totalAlloc.toLocaleString()+'</div><div class="sub">'+countDecisions+' decisions made ↓ Candidates tab</div></div>'
-    +'<div class="stat-card" style="cursor:pointer" onclick="showPanel(\'candidates\',document.querySelectorAll(\'.nav-tab\')[3])"><div class="label">REMAINING</div><div class="value" style="color:'+remColor+';">$'+remaining.toLocaleString()+'</div><div class="sub">of $'+_totalAvail2.toLocaleString()+' total available</div></div>'
-    +'<div class="stat-card green" style="cursor:pointer" onclick="showPanel(\'sb2266\',document.querySelectorAll(\'.nav-tab\')[1])"><div class="label">2026 → YEA VOTERS</div><div class="value" style="color:var(--green);">$'+allocYea.toLocaleString()+'</div><div class="sub">'+countYea+' legislators ↓ Vote record</div></div>'
-    +'<div class="stat-card red" style="cursor:pointer" onclick="showPanel(\'sb2266\',document.querySelectorAll(\'.nav-tab\')[1])"><div class="label">2026 → NAY VOTERS</div><div class="value" style="color:var(--red);">$'+allocNay.toLocaleString()+'</div><div class="sub">'+countNay+' legislators ↓ Vote record</div></div>'
-    +'<div class="stat-card gold"><div class="label">2026 → NEW CANDIDATES</div><div class="value" style="color:var(--gold);">$'+allocNew.toLocaleString()+'</div><div class="sub">No prior SB 2266 vote</div></div>';
+    + card('green', 'IF ACCEPTED (all recs)', totalRec, totalCommitted, countCommitted+' of '+(countYea+countNay+countNew)+' decisions set', "showPanel('candidates',document.querySelectorAll('.nav-tab')[3])")
+    + '<div class="stat-card" style="cursor:pointer" onclick="showPanel(\'candidates\',document.querySelectorAll(\'.nav-tab\')[3])"><div class="label">CASH REMAINING</div><div class="value" style="color:'+remColor+';">$'+remaining.toLocaleString()+'</div><div class="sub">of $'+_totalAvail2.toLocaleString()+' cash on hand</div></div>'
+    + card('green', '→ YEA VOTERS', recYea, commitYea, countYea+' legislators', "showPanel('sb2266',document.querySelectorAll('.nav-tab')[1])")
+    + card('red',   '→ NAY VOTERS', recNay, commitNay, countNay+' legislators', "showPanel('sb2266',document.querySelectorAll('.nav-tab')[1])")
+    + card('gold',  '→ NEW CANDIDATES', recNew, commitNew, countNew+' no prior vote', null);
 
   // Also update the strategy recommender header totals
   var allocEl = document.getElementById('strat-allocated');
   var remEl = document.getElementById('strat-remaining');
-  if(allocEl) allocEl.textContent = '$' + totalAlloc.toLocaleString();
+  if(allocEl) allocEl.textContent = '$' + totalCommitted.toLocaleString();
   if(remEl) { remEl.textContent = '$' + remaining.toLocaleString(); remEl.style.color = remColor; }
 }
 
