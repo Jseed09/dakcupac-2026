@@ -573,6 +573,18 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
 .bp-bulk:hover{background:var(--teal-dark)}
 .bp-bulk.bp-bulk-danger{background:#fff;color:#B91C1C;border-color:#FCA5A5}
 .bp-bulk.bp-bulk-danger:hover{background:#FEE2E2}
+/* ── COLLAPSIBLE SECTIONS ── */
+.coll-head{cursor:pointer;user-select:none;position:relative}
+.coll-head::before{content:'▾';display:inline-block;margin-right:8px;font-size:14px;transition:transform .18s ease;color:var(--teal);font-weight:700}
+.coll-head.coll-closed::before{transform:rotate(-90deg)}
+.coll-head:hover::before{color:var(--teal-dark)}
+.coll-body{overflow:hidden;transition:max-height .2s ease}
+.coll-head.coll-closed + .coll-body{display:none}
+/* Tier group collapsible (inside Budget Plan list) */
+.bp-tier-head{cursor:pointer;user-select:none}
+.bp-tier-head::after{content:' ▾';font-size:14px;transition:transform .18s ease;display:inline-block;margin-left:6px}
+.bp-tier-head.tier-closed::after{transform:rotate(-90deg)}
+.bp-tier-rows.tier-closed{display:none}
 /* ── TIMELINE ── */
 .timeline{display:flex;border-radius:6px;overflow:hidden;border:1px solid var(--border);box-shadow:0 2px 8px var(--shadow);margin:20px 0 28px}
 .timeline-step{flex:1;padding:16px;background:var(--white);border-right:1px solid var(--border)}
@@ -2318,7 +2330,8 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
 
   <!-- ════ CAMPAIGN BUDGET PLAN — state PAC, $30k target, primary-weighted ════ -->
   <div style="margin-bottom:32px;">
-    <div class="section-title">💰 Campaign Budget Plan — State PAC 2026</div>
+    <div class="section-title coll-head" data-coll-id="budget-plan" onclick="toggleCollapse('budget-plan',this)">💰 Campaign Budget Plan — State PAC 2026</div>
+    <div class="coll-body">
 
     <!-- TOP SUMMARY CARD: cash / target / split slider / pots -->
     <div style="background:var(--white);border:2px solid var(--teal);border-radius:14px;padding:20px;box-shadow:var(--shadow-md);margin-bottom:16px;">
@@ -2433,89 +2446,89 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
       <div id="phase2-cards"></div><div id="phase2-total"></div>
       <div id="phase-budget-bar"></div>
     </div>
+    </div><!-- /coll-body -->
   </div>
 
   <!-- ── ROI SCORECARD ── -->
   <div style="margin-bottom:32px;">
-    <div class="section-title">ROI Scorecard — Where Did Our Money Go? (Historical 2016–2024)</div>
-    <div class="card-row" id="roi-cards" style="margin-bottom:16px;"></div>
-    <div style="background:var(--white);border:1px solid var(--border);border-radius:14px;padding:20px;box-shadow:var(--shadow-sm);">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
-        <div style="position:relative;height:220px;"><canvas id="c-roi-pie"></canvas></div>
-        <div style="position:relative;height:220px;"><canvas id="c-roi-cycle"></canvas></div>
+    <div class="section-title coll-head" data-coll-id="roi" onclick="toggleCollapse('roi',this)">ROI Scorecard — Where Did Our Money Go? (Historical 2016–2024)</div>
+    <div class="coll-body">
+      <div class="card-row" id="roi-cards" style="margin-bottom:16px;"></div>
+      <div style="background:var(--white);border:1px solid var(--border);border-radius:14px;padding:20px;box-shadow:var(--shadow-sm);">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+          <div style="position:relative;height:220px;"><canvas id="c-roi-pie"></canvas></div>
+          <div style="position:relative;height:220px;"><canvas id="c-roi-cycle"></canvas></div>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- ── BANKER GAP ANALYSIS ── -->
   <div style="margin-bottom:32px;">
-    <div class="section-title">District Banker Gap Analysis — Where Are We Being Outspent?</div>
-    <div class="subtitle" style="margin-bottom:12px;">Historical 2016–2024 PAC spending by district. Identifies where banker PACs outspend CUPAC — focus resources where the margin matters.</div>
-    <div class="card-row" id="banker-gap-stats" style="margin-bottom:16px;"></div>
-    <div id="banker-gap-table" style="background:var(--white);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:var(--shadow-sm);"></div>
-  </div>
-
-  <!-- ── STRATEGY RECOMMENDER ── -->
-  <div style="margin-bottom:32px;">
-    <div class="section-title" id="strat-alloc-title">Recommended Allocation</div>
-    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center;">
-      <select id="strat-filter" onchange="renderStrategy()" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--white);">
-        <option value="all">All Recommended</option>
-        <option value="contested">Contested Primaries Only</option>
-        <option value="yea">SB 2266 YEA Only</option>
-        <option value="prior">Prior Recipients Only</option>
-      </select>
-      <input type="text" id="strat-search" placeholder="Search..." class="filter-input" style="max-width:200px;" oninput="renderStrategy()">
-      <div style="margin-left:auto;font-size:13px;color:var(--text-muted);">
-        Allocated: <strong id="strat-allocated" style="color:var(--teal);">$0</strong> /
-        Remaining: <strong id="strat-remaining" style="color:var(--green);">$34,029</strong>
-      </div>
+    <div class="section-title coll-head" data-coll-id="banker-gap" onclick="toggleCollapse('banker-gap',this)">District Banker Gap Analysis — Where Are We Being Outspent?</div>
+    <div class="coll-body">
+      <div class="subtitle" style="margin-bottom:12px;">Historical 2016–2024 PAC spending by district. Identifies where banker PACs outspend CUPAC — focus resources where the margin matters.</div>
+      <div class="card-row" id="banker-gap-stats" style="margin-bottom:16px;"></div>
+      <div id="banker-gap-table" style="background:var(--white);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:var(--shadow-sm);"></div>
     </div>
-    <div id="strat-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;"></div>
   </div>
 
-  <!-- ── PRIMARY MATCHUP CARDS ── -->
-  <div style="margin-bottom:32px;">
-    <div class="section-title">Primary Matchup Cards — June 9, 2026</div>
-    <div class="subtitle" style="margin-bottom:16px;">Side-by-side comparison for every contested primary. <button onclick="printMatchups()" style="font-size:12px;padding:4px 12px;border-radius:6px;background:var(--teal);color:#fff;border:1px solid var(--teal);cursor:pointer;">🖨 Print All Matchups</button></div>
-    <div id="matchup-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(500px,1fr));gap:16px;"></div>
+  <!-- Recommended Allocation section was removed — Budget Plan list above
+       now covers all candidates with their tier, scaled rec amount, and
+       inline $ editing. Hidden placeholders below keep renderStrategy()
+       from erroring if it's still invoked somewhere. -->
+  <div style="display:none;">
+    <div id="strat-grid"></div>
+    <span id="strat-allocated"></span>
+    <span id="strat-remaining"></span>
+    <input id="strat-search" value="">
+    <select id="strat-filter"><option value="all"></option></select>
   </div>
+
+  <!-- Primary Matchup Cards section removed — redundant with Budget Plan tiered list. -->
+  <div style="display:none;"><div id="matchup-grid"></div></div>
 
   <!-- ── LEGISLATOR ONE-PAGER ── -->
   <div style="margin-bottom:32px;">
-    <div class="section-title">Legislator One-Pager Generator</div>
-    <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;">
-      <select id="onepager-select" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--white);flex:1;max-width:300px;">
-        <option value="">Select a legislator...</option>
-      </select>
-      <button onclick="generateOnePager()" style="padding:8px 16px;border-radius:8px;background:var(--teal);color:#fff;border:1px solid var(--teal);cursor:pointer;font-weight:600;font-size:13px;">Generate Briefing</button>
-      <button onclick="printOnePager()" style="padding:8px 16px;border-radius:8px;background:var(--ink);color:#fff;border:1px solid var(--ink);cursor:pointer;font-weight:600;font-size:13px;">🖨 Print</button>
+    <div class="section-title coll-head" data-coll-id="onepager" onclick="toggleCollapse('onepager',this)">Legislator One-Pager Generator</div>
+    <div class="coll-body">
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;">
+        <select id="onepager-select" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--white);flex:1;max-width:300px;">
+          <option value="">Select a legislator...</option>
+        </select>
+        <button onclick="generateOnePager()" style="padding:8px 16px;border-radius:8px;background:var(--teal);color:#fff;border:1px solid var(--teal);cursor:pointer;font-weight:600;font-size:13px;">Generate Briefing</button>
+        <button onclick="printOnePager()" style="padding:8px 16px;border-radius:8px;background:var(--ink);color:#fff;border:1px solid var(--ink);cursor:pointer;font-weight:600;font-size:13px;">🖨 Print</button>
+      </div>
+      <div id="onepager-output" style="display:none;background:var(--white);border:1px solid var(--border);border-radius:14px;padding:32px;box-shadow:var(--shadow-md);max-width:800px;"></div>
     </div>
-    <div id="onepager-output" style="display:none;background:var(--white);border:1px solid var(--border);border-radius:14px;padding:32px;box-shadow:var(--shadow-md);max-width:800px;"></div>
   </div>
 
   <!-- ── COMMITTEE MEETING DASHBOARD ── -->
   <div style="margin-bottom:32px;">
-    <div class="section-title">Committee Meeting Dashboard</div>
-    <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;">
-      <button onclick="generateAgenda()" style="padding:8px 16px;border-radius:8px;background:var(--teal);color:#fff;border:1px solid var(--teal);cursor:pointer;font-weight:600;font-size:13px;">Generate Agenda</button>
-      <button onclick="printAgenda()" style="padding:8px 16px;border-radius:8px;background:var(--ink);color:#fff;border:1px solid var(--ink);cursor:pointer;font-weight:600;font-size:13px;">🖨 Print</button>
+    <div class="section-title coll-head" data-coll-id="agenda" onclick="toggleCollapse('agenda',this)">Committee Meeting Dashboard</div>
+    <div class="coll-body">
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;">
+        <button onclick="generateAgenda()" style="padding:8px 16px;border-radius:8px;background:var(--teal);color:#fff;border:1px solid var(--teal);cursor:pointer;font-weight:600;font-size:13px;">Generate Agenda</button>
+        <button onclick="printAgenda()" style="padding:8px 16px;border-radius:8px;background:var(--ink);color:#fff;border:1px solid var(--ink);cursor:pointer;font-weight:600;font-size:13px;">🖨 Print</button>
+      </div>
+      <div id="agenda-output" style="display:none;background:var(--white);border:1px solid var(--border);border-radius:14px;padding:32px;box-shadow:var(--shadow-md);"></div>
     </div>
-    <div id="agenda-output" style="display:none;background:var(--white);border:1px solid var(--border);border-radius:14px;padding:32px;box-shadow:var(--shadow-md);"></div>
   </div>
 
   <!-- ── COMMITTEE PREP PACKETS ── -->
   <div style="margin-bottom:32px;">
-    <div class="section-title">Committee Member Prep Packets</div>
-    <div class="subtitle" style="margin-bottom:12px;">Generate a per-member briefing with all their assigned districts, candidates, recommendations, and talking points. Print-ready for committee meetings.</div>
-    <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
-      <select id="prep-member-select" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--white);flex:1;max-width:350px;">
-        <option value="">Select a committee member...</option>
-      </select>
-      <button onclick="generatePrepPacket()" style="padding:8px 16px;border-radius:8px;background:var(--teal);color:#fff;border:1px solid var(--teal);cursor:pointer;font-weight:600;font-size:13px;">Generate Packet</button>
-      <button onclick="printPrepPacket()" style="padding:8px 16px;border-radius:8px;background:var(--ink);color:#fff;border:1px solid var(--ink);cursor:pointer;font-weight:600;font-size:13px;">🖨 Print</button>
+    <div class="section-title coll-head" data-coll-id="prep" onclick="toggleCollapse('prep',this)">Committee Member Prep Packets</div>
+    <div class="coll-body">
+      <div class="subtitle" style="margin-bottom:12px;">Generate a per-member briefing with all their assigned districts, candidates, recommendations, and talking points. Print-ready for committee meetings.</div>
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
+        <select id="prep-member-select" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--white);flex:1;max-width:350px;">
+          <option value="">Select a committee member...</option>
+        </select>
+        <button onclick="generatePrepPacket()" style="padding:8px 16px;border-radius:8px;background:var(--teal);color:#fff;border:1px solid var(--teal);cursor:pointer;font-weight:600;font-size:13px;">Generate Packet</button>
+        <button onclick="printPrepPacket()" style="padding:8px 16px;border-radius:8px;background:var(--ink);color:#fff;border:1px solid var(--ink);cursor:pointer;font-weight:600;font-size:13px;">🖨 Print</button>
+      </div>
+      <div id="prep-output" style="display:none;background:var(--white);border:1px solid var(--border);border-radius:14px;padding:32px;box-shadow:var(--shadow-md);max-width:900px;"></div>
     </div>
-    <div id="prep-output" style="display:none;background:var(--white);border:1px solid var(--border);border-radius:14px;padding:32px;box-shadow:var(--shadow-md);max-width:900px;"></div>
   </div>
 </div>
 
@@ -3822,7 +3835,7 @@ function profileCard(l){
       if(!l.distNum || l.distNum%2!==1) return '';
       if(l.notRunning) return ''; // Not running = no recommendation
       if(l.ballot==='no') return ''; // Even district, not on 2026 ballot
-      var rec = getCupacRec(l.name, l.distNum, l.chamber, l.party, true);
+      var rec = getScaledRec(l.name, l.distNum, l.chamber, l.party, true);
       if(!rec.tier) return '';
       var bg = rec.amt>0 ? 'rgba('+(rec.color==='#15803D'?'21,128,61':rec.color==='#0D7377'?'13,115,119':'107,114,128')+',0.06)' : (rec.color==='#B91C1C'||rec.color==='#991B1B'?'#FEF2F2':'var(--surface)');
       return '<div class="rec-block" data-tier="'+rec.tier+'" style="padding:8px 14px;border-bottom:1px solid var(--border)"><div style="padding:6px 8px;background:'+bg+';border:2px solid '+rec.color+';border-radius:8px;position:relative"><button onclick="this.parentElement.parentElement.style.display=\'none\'" style="position:absolute;top:2px;right:4px;background:none;border:none;cursor:pointer;font-size:13px;color:var(--text-muted);padding:2px 4px;" title="Dismiss recommendation">✕</button><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;padding-right:18px"><span style="font-size:10px;font-weight:700;color:'+rec.color+'">'+rec.icon+' '+rec.tier+'</span>'+(rec.amt?'<span style="font-size:14px;font-weight:700;color:'+rec.color+'">$'+rec.amt+'</span>':'<span style="font-size:10px;color:'+rec.color+'">$0</span>')+'</div><div style="font-size:10px;font-weight:600;color:var(--text)">'+rec.action+'</div><div style="font-size:9px;color:var(--text-dim)">'+rec.reasons.join(' · ')+'</div></div></div>';
@@ -4860,8 +4873,10 @@ function personCard(cfg){
   var _isNotRunning = (_ldrMatch && (_ldrMatch.notRunning || _ldrMatch.ballot==='no'));
   var _isOnBallot = parseInt(dist) && parseInt(dist)%2===1 && _candMatch2 && !_isNotRunning;
   if(_isOnBallot) {
-    // Use unified recommendation engine (cached)
-    var _rec = getCupacRec(name, parseInt(dist), chamber, party, cfg.incumbent);
+    // Use scaled recommendation so the rec-block matches the Budget Plan slider.
+    // getScaledRec wraps getCupacRec and applies the current primary/general
+    // scale factor from the Budget Plan target + split.
+    var _rec = getScaledRec(name, parseInt(dist), chamber, party, cfg.incumbent);
 
     // Recommendations are display-only — do NOT auto-fill tracker
     // Only Dawson Holle and Karen Rohr are pre-seeded (committee approved)
@@ -9197,6 +9212,40 @@ function renderWPTable() {
 // ════════════════════════════════════════════════════════════════
 
 // ──────────────────────────────────────────────────────────────
+// COLLAPSIBLE SECTIONS — localStorage-backed open/closed state
+// ──────────────────────────────────────────────────────────────
+const COLLAPSE_KEY = 'cupac_collapse_2026';
+function loadCollapseState(){ try{return JSON.parse(localStorage.getItem(COLLAPSE_KEY)||'{}')}catch(e){return{}} }
+function saveCollapseState(s){ try{localStorage.setItem(COLLAPSE_KEY,JSON.stringify(s))}catch(e){} }
+function toggleCollapse(id, headEl){
+  var state = loadCollapseState();
+  state[id] = !state[id];
+  saveCollapseState(state);
+  if(headEl) headEl.classList.toggle('coll-closed', !!state[id]);
+}
+// Apply saved state on page load / re-render
+function applyCollapseStateAll(){
+  var state = loadCollapseState();
+  document.querySelectorAll('[data-coll-id]').forEach(function(el){
+    var id = el.getAttribute('data-coll-id');
+    if(state[id]) el.classList.add('coll-closed');
+    else el.classList.remove('coll-closed');
+  });
+}
+// Tier-group collapse inside Budget Plan — uses a separate key prefix
+function toggleTierCollapse(tier, headEl){
+  var state = loadCollapseState();
+  var k = 'bpTier_' + tier;
+  state[k] = !state[k];
+  saveCollapseState(state);
+  if(headEl){
+    headEl.classList.toggle('tier-closed', !!state[k]);
+    var body = headEl.nextElementSibling;
+    if(body) body.classList.toggle('tier-closed', !!state[k]);
+  }
+}
+
+// ──────────────────────────────────────────────────────────────
 // CAMPAIGN BUDGET PLAN — tiered, line-by-line candidate allocation
 // ──────────────────────────────────────────────────────────────
 var _bpTierFilter = 'all';
@@ -9258,22 +9307,22 @@ function getScaledRec(name, dist, chamber, party, incumbent) {
 }
 
 // refreshAllocations — cascade re-render after any budget change.
-// Re-renders the currently visible panel and Strategy Room.
+// Re-renders the currently visible panel AND all other panels that
+// contain rec-blocks, so switching tabs never shows stale numbers.
 function refreshAllocations() {
   _computeScaleFactors();
+  // Clear the rec-block dismissal state since scaled amounts are new
   // Re-render Strategy Room pieces
   if(typeof renderBudgetPlan === 'function' && document.getElementById('budget-plan-list')) renderBudgetPlan();
-  if(typeof renderStrategy === 'function' && document.getElementById('strat-grid')) renderStrategy();
   if(typeof renderPhasePlan === 'function' && document.getElementById('phase1-cards')) renderPhasePlan();
   if(typeof updateStrategyTotals === 'function') updateStrategyTotals();
-  // Re-render whichever candidate list is active on another tab
+  // Always re-render every candidate list so profile-card rec-blocks
+  // match the slider state, regardless of which tab is active.
   try {
-    var cp = document.getElementById('panel-candidates');
-    if(cp && cp.classList.contains('active') && typeof filterCandidates === 'function') filterCandidates();
-    var sp = document.getElementById('panel-sb2266');
-    if(sp && sp.classList.contains('active') && typeof renderVoteTable === 'function') renderVoteTable();
-    var lp = document.getElementById('panel-leadership');
-    if(lp && lp.classList.contains('active') && typeof buildProfiles === 'function') buildProfiles();
+    if(typeof filterCandidates === 'function') filterCandidates();
+    if(typeof renderVoteTable === 'function') renderVoteTable();
+    if(typeof buildProfiles === 'function') buildProfiles();
+    if(typeof renderWPTable === 'function') renderWPTable();
   } catch(e){}
   // Refresh open profile card placeholder if a panel is open
   try {
@@ -9403,6 +9452,7 @@ function renderBudgetPlan() {
 
   // Build HTML for tiered list
   var html = '';
+  var _collState = loadCollapseState();
   BP_TIER_ORDER.forEach(function(t) {
     var rows = byTier[t] || [];
     if(!rows.length) return;
@@ -9411,11 +9461,17 @@ function renderBudgetPlan() {
     rows.forEach(function(r) { tierAlloc += bpCurrentAmt(r.name, r.dist); });
     var tierRec = 0;
     rows.forEach(function(r) { tierRec += r.recAmt; });
+    var tierCollapseKey = 'bpTier_' + t;
+    var tierClosed = !!_collState[tierCollapseKey];
+    var headCls = 'bp-tier-head' + (tierClosed ? ' tier-closed' : '');
+    var rowsCls = 'bp-tier-rows' + (tierClosed ? ' tier-closed' : '');
+    var safeTier = t.replace(/'/g,'');
 
-    html += '<div class="bp-tier-head" style="background:'+meta.color+';">'
+    html += '<div class="'+headCls+'" style="background:'+meta.color+';" onclick="toggleTierCollapse(\''+safeTier+'\',this)">'
       + '<span>'+meta.icon+' '+meta.label+' <span class="bp-tier-sub">· '+meta.sub+'</span></span>'
       + '<span>'+rows.length+' candidate'+(rows.length===1?'':'s')+' · rec $'+tierRec.toLocaleString()+' · allocated $'+tierAlloc.toLocaleString()+'</span>'
       + '</div>';
+    html += '<div class="'+rowsCls+'">';
 
     rows.forEach(function(r) {
       var safeName = r.name.replace(/'/g,'&#39;').replace(/"/g,'&quot;');
@@ -9450,6 +9506,7 @@ function renderBudgetPlan() {
         + '<div onclick="event.stopPropagation()"><button class="bp-accept'+(curVal==r.recAmt?' accepted':'')+'" onclick="bpAcceptRec(\''+safeName+'\','+r.dist+','+r.recAmt+')">Accept rec</button></div>'
         + '</div>';
     });
+    html += '</div>'; // close .bp-tier-rows
   });
 
   if(!html) html = '<div class="bp-tier-empty">No candidates match this filter.</div>';
@@ -9615,10 +9672,11 @@ function initStrategyRoom() {
   updateStrategyTotals();
   renderPhasePlan();
   renderBankerGap();
-  renderStrategy();
-  renderMatchups();
+  // renderStrategy() + renderMatchups() removed — sections deleted
   populateOnePagerSelect();
   populatePrepSelect();
+  // Restore collapsed/expanded state for every section in this tab
+  setTimeout(function(){ if(typeof applyCollapseStateAll === 'function') applyCollapseStateAll(); }, 20);
 }
 
 // ── PHASE 1 vs PHASE 2 BUDGET PLANNER ──
@@ -10393,7 +10451,7 @@ function generatePrepPacket(){
       sorted.forEach(function(c, ci){
         var vote = getSB2266Vote(c.name, c.ch);
         var h = CUPAC_HIST[c.name];
-        var rec = getCupacRec(c.name, d, c.ch, c.party, c.incumbent);
+        var rec = getScaledRec(c.name, d, c.ch, c.party, c.incumbent);
         if(rec.amt) totalRecommended += rec.amt;
         var voteClr = vote==='YEA'?'var(--green-text)':vote==='NAY'?'var(--red-text)':'var(--text-muted)';
         var voteTxt = vote||'—';
