@@ -1803,7 +1803,7 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
     <div class="bsb-sub">Current balance — click to edit</div>
     <div style="display:flex;align-items:baseline;gap:2px;margin-top:6px;">
       <span style="font-size:11px;color:rgba(255,255,255,0.4);">+ $</span>
-      <input type="number" id="bsb-raise-input" value="12000" min="0" style="font-size:13px;font-weight:700;color:rgba(13,190,195,0.9);background:transparent;border:none;border-bottom:1px dashed rgba(255,255,255,0.15);width:70px;outline:none;" onchange="onSidebarBudgetChange()">
+      <input type="number" id="bsb-raise-input" value="8000" min="0" style="font-size:13px;font-weight:700;color:rgba(13,190,195,0.9);background:transparent;border:none;border-bottom:1px dashed rgba(255,255,255,0.15);width:70px;outline:none;" onchange="onSidebarBudgetChange()">
       <span style="font-size:10px;color:rgba(255,255,255,0.3);">projected</span>
     </div>
   </div>
@@ -1885,21 +1885,30 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
     </div>
   </div>
   <div class="card-row" id="sb-stat-cards"></div>
-  <div class="chip-bar" id="sb-chip-bar">
-    <div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-right:4px;align-self:center;">SB 2266 (FOM):</div>
-    <button class="qchip" id="chip-yea"  onclick="toggleChip('yea')">✓ YEA <span class="chip-count" id="chip-yea-ct">—</span></button>
-    <button class="qchip" id="chip-nay"  onclick="toggleChip('nay')">✗ NAY <span class="chip-count" id="chip-nay-ct">—</span></button>
-    <button class="qchip" id="chip-new"  onclick="toggleChip('new')">— New / No Vote <span class="chip-count" id="chip-new-ct">—</span></button>
-    <div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-right:4px;align-self:center;margin-left:8px;">SB 2217 (Interchange):</div>
-    <button class="qchip" id="chip-2217-pro"  onclick="toggleChip('2217-pro')">✓ NAY (pro-CU) <span class="chip-count" id="chip-2217-pro-ct">—</span></button>
-    <button class="qchip" id="chip-2217-anti" onclick="toggleChip('2217-anti')">✗ YEA (anti-CU) <span class="chip-count" id="chip-2217-anti-ct">—</span></button>
-    <button class="qchip" id="chip-cont" onclick="toggleChip('cont')">⚔ Contested Primary <span class="chip-count" id="chip-cont-ct">—</span></button>
+  <div class="chip-bar" id="sb-chip-bar" style="display:flex;flex-direction:column;gap:10px;align-items:stretch;">
+    <!-- SB 2266 (FOM) — TEAL themed -->
+    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:8px 12px;background:rgba(13,115,119,0.08);border:2px solid var(--teal);border-radius:10px;">
+      <div style="font-size:11px;font-weight:800;color:var(--teal-dark);text-transform:uppercase;letter-spacing:.5px;margin-right:6px;white-space:nowrap;">📜 SB 2266 · FOM</div>
+      <button class="qchip bill-chip-2266" id="chip-yea"  onclick="toggleChip('yea')">✓ YEA <span class="chip-count" id="chip-yea-ct">—</span></button>
+      <button class="qchip bill-chip-2266" id="chip-nay"  onclick="toggleChip('nay')">✗ NAY <span class="chip-count" id="chip-nay-ct">—</span></button>
+      <button class="qchip bill-chip-2266" id="chip-new"  onclick="toggleChip('new')">— New / No Vote <span class="chip-count" id="chip-new-ct">—</span></button>
+    </div>
+    <!-- SB 2217 (Interchange) — AMBER themed -->
+    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:8px 12px;background:rgba(180,83,9,0.08);border:2px solid #B45309;border-radius:10px;">
+      <div style="font-size:11px;font-weight:800;color:#92400E;text-transform:uppercase;letter-spacing:.5px;margin-right:6px;white-space:nowrap;">💳 SB 2217 · Interchange</div>
+      <button class="qchip bill-chip-2217" id="chip-2217-pro"  onclick="toggleChip('2217-pro')">✓ NAY (pro-CU) <span class="chip-count" id="chip-2217-pro-ct">—</span></button>
+      <button class="qchip bill-chip-2217" id="chip-2217-anti" onclick="toggleChip('2217-anti')">✗ YEA (anti-CU) <span class="chip-count" id="chip-2217-anti-ct">—</span></button>
+    </div>
+    <!-- Shared -->
+    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+      <button class="qchip" id="chip-cont" onclick="toggleChip('cont')">⚔ Contested Primary <span class="chip-count" id="chip-cont-ct">—</span></button>
+    </div>
   </div>
   <div class="controls">
-    <label>SB 2266:</label>
-    <select id="vote-result" onchange="renderVoteTable()"><option value="ALL">All Votes</option><option value="YEA">✓ YEA</option><option value="NAY">✕ NAY</option><option value="ABSENT">Absent</option></select>
-    <label>SB 2217:</label>
-    <select id="vote-2217" onchange="renderVoteTable()"><option value="ALL">All Votes</option><option value="NAY">✓ NAY (pro-CU)</option><option value="YEA">✕ YEA (anti-CU)</option><option value="ABSENT">Absent</option></select>
+    <span style="display:inline-block;padding:4px 10px;border-radius:8px;background:rgba(13,115,119,0.12);border:1.5px solid var(--teal);color:var(--teal-dark);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;">📜 SB 2266 FOM</span>
+    <select id="vote-result" onchange="renderVoteTable()" style="border:1.5px solid var(--teal);background:rgba(13,115,119,0.04);font-weight:700;"><option value="ALL">All Votes</option><option value="YEA">✓ YEA</option><option value="NAY">✕ NAY</option><option value="ABSENT">Absent</option></select>
+    <span style="display:inline-block;padding:4px 10px;border-radius:8px;background:rgba(180,83,9,0.12);border:1.5px solid #B45309;color:#92400E;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;">💳 SB 2217 Interchange</span>
+    <select id="vote-2217" onchange="renderVoteTable()" style="border:1.5px solid #B45309;background:rgba(180,83,9,0.04);font-weight:700;"><option value="ALL">All Votes</option><option value="NAY">✓ NAY (pro-CU)</option><option value="YEA">✕ YEA (anti-CU)</option><option value="ABSENT">Absent</option></select>
     <select id="vote-chamber" onchange="renderVoteTable()"><option value="ALL">Both Chambers</option><option value="Senate">Senate</option><option value="House">House</option></select>
     <select id="vote-ballot" onchange="renderVoteTable()"><option value="ALL">All Legislators</option><option value="yes">★ 2026 Ballot Only</option></select>
     <label style="margin-left:8px">Money:</label>
@@ -2068,8 +2077,10 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
     <input type="text" id="cand-search" placeholder="Search name…" oninput="filterCandidates()" style="min-width:160px">
     <select id="cand-chamber" onchange="filterCandidates()"><option value="ALL">All Chambers</option><option value="Senate">Senate</option><option value="House">House</option></select>
     <select id="cand-cupac-f" onchange="filterCandidates()"><option value="ALL">All Candidates</option><option value="YES">History Only</option><option value="NO">No History</option></select>
-    <select id="cand-sb2266-f" onchange="filterCandidates()"><option value="ALL">All SB 2266</option><option value="YEA">YEA — Supported CUs</option><option value="NAY">NAY — Opposed CUs</option><option value="NONE">No prior vote</option></select>
-    <select id="cand-sb2217-f" onchange="filterCandidates()"><option value="ALL">All SB 2217</option><option value="NAY">NAY — Pro-CU (opposed cap)</option><option value="YEA">YEA — Anti-CU (supported cap)</option><option value="NONE">No prior vote</option></select>
+    <span style="display:inline-block;padding:4px 10px;border-radius:8px;background:rgba(13,115,119,0.12);border:1.5px solid var(--teal);color:var(--teal-dark);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;">📜 SB 2266 FOM</span>
+    <select id="cand-sb2266-f" onchange="filterCandidates()" style="border:1.5px solid var(--teal);background:rgba(13,115,119,0.04);font-weight:700;"><option value="ALL">All Votes</option><option value="YEA">✓ YEA — Supported CUs</option><option value="NAY">✕ NAY — Opposed CUs</option><option value="NONE">No prior vote</option></select>
+    <span style="display:inline-block;padding:4px 10px;border-radius:8px;background:rgba(180,83,9,0.12);border:1.5px solid #B45309;color:#92400E;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;">💳 SB 2217 Interchange</span>
+    <select id="cand-sb2217-f" onchange="filterCandidates()" style="border:1.5px solid #B45309;background:rgba(180,83,9,0.04);font-weight:700;"><option value="ALL">All Votes</option><option value="NAY">✓ NAY — Pro-CU (opposed cap)</option><option value="YEA">✕ YEA — Anti-CU (supported cap)</option><option value="NONE">No prior vote</option></select>
     <button class="btn" onclick="resetCandidates()">Reset</button>
     <span class="result-count" id="cand-count"></span>
   </div>
@@ -2092,7 +2103,7 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
       <div class="label">Projected Fundraising</div>
       <div style="display:flex;align-items:center;gap:4px;margin-top:4px">
         <span style="font-size:18px;color:var(--text-muted)">$</span>
-        <input type="number" id="bgt-raise" value="12000" min="0" onchange="calcBudget()" style="font-family:var(--font-display);font-size:26px;font-weight:700;color:var(--teal-dark);border:none;background:transparent;width:130px;outline:none">
+        <input type="number" id="bgt-raise" value="8000" min="0" onchange="calcBudget()" style="font-family:var(--font-display);font-size:26px;font-weight:700;color:var(--teal-dark);border:none;background:transparent;width:130px;outline:none">
       </div>
       <div class="sub">Estimated — update as dues arrive</div>
     </div>
@@ -4269,25 +4280,44 @@ function updateBudgetSidebar() {
   var tracker = JSON.parse(localStorage.getItem(TRACKER_KEY) || '{}');
   var bgt = getBudget();
   var balance = bgt.cash || 36222;
+  var target = bgt.target || 30000;
+  var splitPct = bgt.splitPct != null ? bgt.splitPct : 67;
+  var primaryPot = Math.round(target * splitPct / 100);
+  var generalPot = target - primaryPot;
+
   var totalAlloc = 0, approved = 0, review = 0, contributed = 0, pass = 0;
   var p1Amt = 0, p1Ct = 0, p2Amt = 0, p2Ct = 0;
 
+  // Build a tracker-key → candidate map so phase classification uses the
+  // same inPrimary flag getScaledRec uses (fixes the old _recCache lookup
+  // which had the wrong key format and mis-classified every decision).
+  var _trackerByKey = {};
+  CANDIDATES.forEach(function(c) {
+    if(parseInt(c.dist) % 2 !== 1) return;
+    var pkey = personKey(c.name, c.dist);
+    _trackerByKey[pkey] = c;
+  });
+
   Object.keys(tracker).forEach(function(k) {
     var t = tracker[k];
-    var amt = t.amt || 0;
-    if(amt > 0 || (t.status && t.status !== 'none')) {
-      totalAlloc += amt;
-      if(t.status === 'approved') approved++;
-      if(t.status === 'review') review++;
-      if(t.status === 'contributed') contributed++;
-      if(t.status === 'pass') pass++;
+    var amt = parseInt(t && t.amt) || 0;
+    if(amt <= 0 && (!t || !t.status || t.status === 'none')) return;
+    totalAlloc += amt;
+    if(t.status === 'approved') approved++;
+    if(t.status === 'review') review++;
+    if(t.status === 'contributed') contributed++;
+    if(t.status === 'pass') pass++;
 
-      // Determine phase from rec cache or candidate data
-      var namePart = k.replace(/_\d+$/, '');
-      var rec = _recCache[k] || null;
-      if(rec && rec.inPrimary) { p1Amt += amt; p1Ct++; }
-      else { p2Amt += amt; p2Ct++; }
+    var c = _trackerByKey[k];
+    var inPrimary = false;
+    if(c) {
+      try {
+        var rec = getScaledRec(c.name, c.dist, c.ch, c.party, c.incumbent);
+        inPrimary = !!(rec && rec.inPrimary);
+      } catch(e){}
     }
+    if(inPrimary) { p1Amt += amt; p1Ct++; }
+    else { p2Amt += amt; p2Ct++; }
   });
 
   var remaining = balance - totalAlloc;
@@ -4305,9 +4335,11 @@ function updateBudgetSidebar() {
   setStyle('bsb-remain-bar', 'width', remainPct + '%');
   setStyle('bsb-remain-bar', 'background', remColor);
 
-  set('bsb-p1-amt', '$' + p1Amt.toLocaleString());
+  // Show committed amount + pot size so the sidebar parallels the
+  // Budget Plan card (e.g. "$0 of $21,600" for Phase 1).
+  set('bsb-p1-amt', '$' + p1Amt.toLocaleString() + ' / $' + primaryPot.toLocaleString());
   set('bsb-p1-ct', p1Ct);
-  set('bsb-p2-amt', '$' + p2Amt.toLocaleString());
+  set('bsb-p2-amt', '$' + p2Amt.toLocaleString() + ' / $' + generalPot.toLocaleString());
   set('bsb-p2-ct', p2Ct);
 
   set('bsb-approved', approved);
@@ -5372,19 +5404,24 @@ function renderVoteTable(){
     return (isNaN(na)?999:na)-(isNaN(nb)?999:nb);
   });
   var voteHtml='';
+  var _collState = (typeof loadCollapseState === 'function') ? loadCollapseState() : {};
   voteDists.forEach(function(dist){
     var distRows=voteByDist[dist];
     var isOdd=parseInt(dist)%2===1;
     var onBallotBadge=isOdd&&!isNaN(parseInt(dist))?'<span style="font-size:11px;font-weight:600;padding:1px 7px;border-radius:8px;background:var(--green-bg);color:var(--green-text);border:1px solid var(--green-border);margin-left:6px;">★ 2026 Ballot</span>':'';
     var covering=COMMITTEE_MEMBERS.filter(function(m){return m.districts.includes(parseInt(dist));}).map(function(m){return m.name;});
     var coverStr=covering.length?covering.join(', '):'';
+    var _distCollKey = 'vote_dist_' + dist;
+    var _distClosed = !!_collState[_distCollKey];
+    var _caret = _distClosed ? '▸' : '▾';
     if(dist&&dist!=='—'){
       var _totalCands = CANDIDATES.filter(function(c){return parseInt(c.dist)===parseInt(dist);}).length;
       var _candCountBadge = _totalCands ? '<span style="font-size:11px;font-weight:400;margin-left:8px;color:rgba(255,255,255,0.7);">'+_totalCands+' candidate'+(_totalCands>1?'s':'')+' filed</span>' : '';
-      voteHtml+='<div style="grid-column:1/-1;margin-top:16px;margin-bottom:4px;padding:8px 14px;background:var(--teal-dark);color:#fff;border-radius:6px;display:flex;align-items:center;justify-content:space-between;">'
-        +'<span style="font-family:var(--font-display);font-size:15px;font-weight:700;">District '+dist+onBallotBadge+distLeanBadge(dist)+_candCountBadge+'</span>'
+      voteHtml+='<div data-coll-id="'+_distCollKey+'" class="coll-head-cand'+(_distClosed?' coll-closed':'')+'" onclick="toggleCollapse(\''+_distCollKey+'\',this)" style="grid-column:1/-1;margin-top:16px;margin-bottom:4px;padding:8px 14px;background:var(--teal-dark);color:#fff;border-radius:6px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;">'
+        +'<span style="font-family:var(--font-display);font-size:15px;font-weight:700;"><span class="cand-caret" style="display:inline-block;margin-right:8px;">'+_caret+'</span>District '+dist+onBallotBadge+distLeanBadge(dist)+_candCountBadge+'</span>'
         +(coverStr?'<span style="font-size:11px;color:rgba(255,255,255,0.65);">📍 '+coverStr+'</span>':'')
         +'</div>';
+      voteHtml += '<div class="coll-body-cand'+(_distClosed?' coll-closed':'')+'" data-coll-body-for="'+_distCollKey+'" style="grid-column:1/-1;display:'+(_distClosed?'none':'contents')+';">';
     }
     voteHtml+=distRows.map(function(r){
     const isNotRunning = r.notRunning===true;
@@ -5421,6 +5458,9 @@ function renderVoteTable(){
       actionRead: actionRead
     });
     }).join('');
+    if(dist&&dist!=='—'){
+      voteHtml += '</div>'; // close coll-body-cand
+    }
   });
   tbody.innerHTML=voteHtml;
 }
@@ -7521,13 +7561,28 @@ function buildDistrictMap(){
 }
 
 
-buildProfiles();
-buildSbStatCards();
-renderVoteTable();
-renderFight();
-buildCandidates();
-buildCommitteeGeo();
-buildDistrictMap();
+// Defer the initial render so it runs after all HTML is parsed and
+// after any CSS has been applied. Also re-runs after a short delay
+// as a safety net so the Leadership tab never shows empty on first
+// paint (the issue where users had to click the tab to force render).
+function _initialRender() {
+  try { buildProfiles(); } catch(e){ console.warn('buildProfiles', e); }
+  try { buildSbStatCards(); } catch(e){ console.warn('buildSbStatCards', e); }
+  try { renderVoteTable(); } catch(e){ console.warn('renderVoteTable', e); }
+  try { renderFight(); } catch(e){ console.warn('renderFight', e); }
+  try { buildCandidates(); } catch(e){ console.warn('buildCandidates', e); }
+  try { buildCommitteeGeo(); } catch(e){ console.warn('buildCommitteeGeo', e); }
+  try { buildDistrictMap(); } catch(e){ console.warn('buildDistrictMap', e); }
+  try { if(typeof broadcastBudget==='function') broadcastBudget(); } catch(e){}
+  try { if(typeof calcBudget==='function' && document.getElementById('bgt-cash')) calcBudget(); } catch(e){}
+}
+if(document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', _initialRender);
+} else {
+  _initialRender();
+}
+// Safety re-render after 250ms in case any dependency was still loading
+setTimeout(function(){ try { buildProfiles(); } catch(e){} }, 250);
 
 </script>
 
