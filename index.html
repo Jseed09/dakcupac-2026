@@ -512,6 +512,8 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
   color:#fff;font-size:14px;font-weight:700;font-family:var(--font-display);
 }
 .pp-amt-input::placeholder{color:rgba(255,255,255,0.3);}
+.pp-amt-input.ghost::placeholder{color:rgba(90,200,160,0.75);opacity:1;font-weight:700;font-style:italic;}
+.pp-amt-input.ghost:focus::placeholder{opacity:.3;}
 .pp-notes-area{
   width:100%;margin-top:8px;padding:8px 10px;border-radius:8px;
   background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);
@@ -536,6 +538,35 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
 .quick-amt-btn.active{background:var(--teal);color:var(--white);border-color:var(--teal-dark)}
 .amt-input{font-family:var(--font-display);font-size:15px;font-weight:700;border:2px solid var(--border);border-radius:4px;padding:5px 8px;background:var(--white);outline:none;color:var(--text)}
 .amt-input:focus{border-color:var(--teal)}
+.amt-input.ghost::placeholder{color:var(--teal);opacity:.55;font-weight:700;font-style:italic}
+.amt-input.ghost:focus::placeholder{opacity:.25}
+/* ── BUDGET PLAN TIER PILLS & ROWS ── */
+.bp-pill{font-size:11px;font-weight:700;padding:5px 11px;border-radius:20px;background:var(--surface-2);color:var(--text);border:1px solid var(--border);cursor:pointer;transition:all .15s}
+.bp-pill:hover{background:var(--teal-light);border-color:var(--teal)}
+.bp-pill.bp-pill-active{background:var(--teal);color:#fff;border-color:var(--teal-dark)}
+.bp-tier-head{padding:10px 16px;font-weight:800;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:#fff;display:flex;justify-content:space-between;align-items:center}
+.bp-tier-head .bp-tier-sub{font-size:10px;font-weight:600;opacity:.85;text-transform:none;letter-spacing:0}
+.bp-row{display:grid;grid-template-columns:38px 1fr 34px 58px 100px 80px 80px 110px;gap:10px;align-items:center;padding:8px 14px;border-bottom:1px solid var(--surface-3);font-size:12px;cursor:pointer;transition:background .1s}
+.bp-row:hover{background:var(--surface-2)}
+.bp-row:last-child{border-bottom:none}
+.bp-row .bp-dist{font-weight:800;font-size:11px;color:var(--text-muted);text-align:center;background:var(--surface-3);border-radius:4px;padding:3px 5px}
+.bp-row .bp-name{font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bp-row .bp-sub{font-size:10px;color:var(--text-muted);font-weight:500}
+.bp-row .bp-party{font-weight:800;font-size:10px;text-align:center;padding:3px 4px;border-radius:8px}
+.bp-row .bp-party-R{background:#DAEAF5;color:#0D3B66}
+.bp-row .bp-party-D{background:#F5DAD8;color:#5C1010}
+.bp-row .bp-flag{font-size:9px;font-weight:700;padding:3px 6px;border-radius:8px;text-align:center;white-space:nowrap}
+.bp-row .bp-flag-contest{background:#FEF3C7;color:#B45309;border:1px solid #FCD34D}
+.bp-row .bp-flag-uncontest{background:var(--surface-3);color:var(--text-muted);border:1px solid var(--border)}
+.bp-row .bp-rec{font-weight:700;color:var(--teal);text-align:right;font-size:11px}
+.bp-row .bp-input{width:78px;font-size:13px;font-weight:700;border:1.5px solid var(--border);border-radius:4px;padding:4px 6px;background:var(--white);outline:none;text-align:right}
+.bp-row .bp-input:focus{border-color:var(--teal)}
+.bp-row .bp-input.ghost::placeholder{color:var(--teal);opacity:.55;font-weight:700;font-style:italic}
+.bp-row .bp-accept{font-size:10px;font-weight:700;padding:4px 8px;border-radius:6px;background:var(--teal);color:#fff;border:1px solid var(--teal-dark);cursor:pointer}
+.bp-row .bp-accept:hover{background:var(--teal-dark)}
+.bp-row .bp-accept.accepted{background:var(--green);border-color:var(--green)}
+.bp-tier-sub-row{padding:8px 16px;background:var(--surface-2);font-size:11px;color:var(--text-muted);display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}
+.bp-tier-empty{padding:12px 16px;font-size:11px;color:var(--text-muted);font-style:italic;text-align:center}
 /* ── TIMELINE ── */
 .timeline{display:flex;border-radius:6px;overflow:hidden;border:1px solid var(--border);box-shadow:0 2px 8px var(--shadow);margin:20px 0 28px}
 .timeline-step{flex:1;padding:16px;background:var(--white);border-right:1px solid var(--border)}
@@ -2245,52 +2276,88 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
 <div id="panel-strategy" class="panel">
   <div class="page-header">
     <h1>Strategy Room</h1>
-    <div class="subtitle">Automated allocation recommendations · Primary matchups · Legislator briefings · Meeting prep · ROI scorecard</div>
+    <div class="subtitle">Campaign budget · Tiered candidate allocation · Primary matchups · Legislator briefings · ROI scorecard</div>
   </div>
 
-  <!-- ── 2026 LIVE ALLOCATION TRACKER ── -->
+  <!-- ════ CAMPAIGN BUDGET PLAN — state PAC, $30k target, primary-weighted ════ -->
   <div style="margin-bottom:32px;">
-    <div class="section-title">2026 Live Allocation Tracker</div>
-    <div class="card-row" id="strat-live-cards" style="margin-bottom:8px;"></div>
-    <div style="font-size:11px;color:var(--text-muted);font-style:italic;">Updates in real-time as you make funding decisions on any tab.</div>
-  </div>
+    <div class="section-title">💰 Campaign Budget Plan — State PAC 2026</div>
 
-  <!-- ── PHASE 1 vs PHASE 2 BUDGET PLAN ── -->
-  <div style="margin-bottom:32px;">
-    <div class="section-title">2026 Allocation Plan — Tied to Election Calendar</div>
-    <!-- Mini calendar reference -->
-    <div style="display:flex;gap:0;margin-bottom:16px;border-radius:10px;overflow:hidden;border:1px solid var(--border);font-size:12px;">
-      <div style="flex:1;padding:8px 12px;background:var(--surface-3);text-align:center;"><span style="font-weight:700;color:var(--text-muted);">✓ Apr 6</span><br>Filing closed</div>
-      <div style="flex:1;padding:8px 12px;background:#FEF3C7;text-align:center;border-left:2px solid #B45309;border-right:2px solid #B45309;"><span style="font-weight:700;color:#B45309;">PHASE 1 → Jun 9</span><br>Primary — give NOW</div>
-      <div style="flex:1;padding:8px 12px;background:var(--teal-light);text-align:center;"><span style="font-weight:700;color:var(--teal);">PHASE 2 → Nov 3</span><br>General — give Oct</div>
-      <div style="flex:1;padding:8px 12px;background:var(--surface);text-align:center;"><span style="font-weight:700;color:var(--text-muted);">Dec 1</span><br>70th Assembly starts</div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
-      <!-- Phase 1 -->
-      <div style="background:var(--white);border:2px solid #B45309;border-radius:14px;overflow:hidden;box-shadow:var(--shadow-sm);">
-        <div style="background:#B45309;color:#fff;padding:12px 16px;font-weight:700;font-size:14px;">⚔ PHASE 1 — Primary (Now → Jun 9)</div>
-        <div style="padding:16px;" id="phase1-content">
-          <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">Contested primaries only — allies need money NOW to survive June 9. Deliver checks by May 15.</div>
-          <div id="phase1-cards" style="font-size:13px;"></div>
-          <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-weight:700;">
-            <span>Phase 1 Total:</span><span id="phase1-total" style="color:#B45309;">$0</span>
+    <!-- TOP SUMMARY CARD: cash / target / split slider / pots -->
+    <div style="background:var(--white);border:2px solid var(--teal);border-radius:14px;padding:20px;box-shadow:var(--shadow-md);margin-bottom:16px;">
+
+      <!-- Row 1: headline numbers -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px;">
+        <div><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:.5px;">Cash on Hand</div><div id="bp-cash" style="font-size:22px;font-weight:800;color:var(--ink);">$0</div></div>
+        <div><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:.5px;">Campaign Target <span onclick="bpEditTarget()" style="cursor:pointer;opacity:.55;font-size:11px;" title="Click to edit">✏️</span></div><div id="bp-target" style="font-size:22px;font-weight:800;color:var(--teal);">$0</div></div>
+        <div><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:.5px;">Reserve</div><div id="bp-reserve" style="font-size:22px;font-weight:800;color:var(--gold);">$0</div></div>
+        <div><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:.5px;">Unallocated</div><div id="bp-unalloc" style="font-size:22px;font-weight:800;color:var(--green);">$0</div></div>
+      </div>
+
+      <!-- Row 2: split slider -->
+      <div style="background:var(--surface-2);border-radius:10px;padding:12px 16px;margin-bottom:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:12px;">
+          <span style="font-weight:700;color:#B45309;">⚔ Primary · <span id="bp-split-p">67</span>%</span>
+          <span style="font-weight:700;color:var(--teal);"><span id="bp-split-g">33</span>% · General 🗳</span>
+        </div>
+        <input type="range" id="bp-split-slider" min="50" max="90" value="67" oninput="bpSetSplit(this.value)" style="width:100%;accent-color:var(--teal);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;font-size:10px;color:var(--text-muted);">
+          <span>50/50</span><span>Drag to adjust primary-vs-general split</span><span>90/10</span>
+        </div>
+      </div>
+
+      <!-- Row 3: Primary vs General pots -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+        <div style="background:#FEF3C7;border:2px solid #B45309;border-radius:10px;padding:14px;">
+          <div style="font-size:11px;font-weight:700;color:#B45309;text-transform:uppercase;letter-spacing:.5px;">⚔ Primary Pot — NOW → Jun 9</div>
+          <div id="bp-pot-p" style="font-size:26px;font-weight:800;color:#B45309;margin:4px 0;">$0</div>
+          <div style="font-size:11px;color:var(--text-muted);display:flex;justify-content:space-between;">
+            <span>Allocated: <strong id="bp-alloc-p" style="color:#B45309;">$0</strong></span>
+            <span>Remaining: <strong id="bp-rem-p">$0</strong></span>
+          </div>
+        </div>
+        <div style="background:var(--teal-light);border:2px solid var(--teal);border-radius:10px;padding:14px;">
+          <div style="font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.5px;">🗳 General Pot — Jun 10 → Nov 3</div>
+          <div id="bp-pot-g" style="font-size:26px;font-weight:800;color:var(--teal);margin:4px 0;">$0</div>
+          <div style="font-size:11px;color:var(--text-muted);display:flex;justify-content:space-between;">
+            <span>Allocated: <strong id="bp-alloc-g" style="color:var(--teal);">$0</strong></span>
+            <span>Remaining: <strong id="bp-rem-g">$0</strong></span>
           </div>
         </div>
       </div>
-      <!-- Phase 2 -->
-      <div style="background:var(--white);border:2px solid var(--teal);border-radius:14px;overflow:hidden;box-shadow:var(--shadow-sm);">
-        <div style="background:var(--teal);color:#fff;padding:12px 16px;font-weight:700;font-size:14px;">🗳 PHASE 2 — General (Jun 10 → Nov 3)</div>
-        <div style="padding:16px;" id="phase2-content">
-          <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">Uncontested allies + primary winners — deliver checks by Oct 1. Goal: secure 70th Assembly YEA votes on FOM legislation.</div>
-          <div id="phase2-cards" style="font-size:13px;"></div>
-          <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-weight:700;">
-            <span>Phase 2 Total:</span><span id="phase2-total" style="color:var(--teal);">$0</span>
-          </div>
-        </div>
+
+      <!-- Row 4: stacked progress bar -->
+      <div id="bp-progress-bar" style="height:28px;background:var(--surface-3);border-radius:8px;overflow:hidden;display:flex;"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;font-size:10px;color:var(--text-muted);">
+        <span>Primary spend</span><span>General spend</span><span>Reserve</span><span>Unallocated</span>
       </div>
     </div>
-    <!-- Budget summary bar -->
-    <div id="phase-budget-bar" style="background:var(--white);border:1px solid var(--border);border-radius:10px;padding:14px 18px;box-shadow:var(--shadow-sm);"></div>
+
+    <!-- TIER FILTER PILLS -->
+    <div id="bp-tier-filters" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;align-items:center;">
+      <span style="font-size:11px;color:var(--text-muted);font-weight:700;text-transform:uppercase;margin-right:6px;">Filter:</span>
+      <button class="bp-pill bp-pill-active" data-tier="all" onclick="bpFilterTier('all')">All</button>
+      <button class="bp-pill" data-tier="PROTECT" onclick="bpFilterTier('PROTECT')">🛡️ PROTECT</button>
+      <button class="bp-pill" data-tier="MAINTAIN" onclick="bpFilterTier('MAINTAIN')">✅ MAINTAIN</button>
+      <button class="bp-pill" data-tier="BUILD" onclick="bpFilterTier('BUILD')">🤝 BUILD</button>
+      <button class="bp-pill" data-tier="HEDGE" onclick="bpFilterTier('HEDGE')">🔀 HEDGE</button>
+      <button class="bp-pill" data-tier="EVALUATE" onclick="bpFilterTier('EVALUATE')">🔍 EVALUATE</button>
+      <button class="bp-pill" data-tier="HOLD" onclick="bpFilterTier('HOLD')">⚠️ HOLD</button>
+      <button class="bp-pill" data-tier="NOT" onclick="bpFilterTier('NOT')">🚫 NOT REC</button>
+      <label style="margin-left:auto;font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="checkbox" id="bp-contested-only" onchange="renderBudgetPlan()" checked>Contested primaries first</label>
+    </div>
+
+    <!-- LINE-BY-LINE TIERED CANDIDATE LIST -->
+    <div id="budget-plan-list" style="background:var(--white);border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:var(--shadow-sm);"></div>
+
+    <!-- Legacy live allocation tracker cards (kept, compact) -->
+    <div class="card-row" id="strat-live-cards" style="margin-top:16px;"></div>
+    <!-- Hidden elements kept for backward-compat with renderPhasePlan() -->
+    <div style="display:none;">
+      <div id="phase1-cards"></div><div id="phase1-total"></div>
+      <div id="phase2-cards"></div><div id="phase2-total"></div>
+      <div id="phase-budget-bar"></div>
+    </div>
   </div>
 
   <!-- ── ROI SCORECARD ── -->
@@ -2398,40 +2465,49 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
 const TRACKER_KEY = 'cupac_tracker_2026_v4';
 
 // ════ CENTRALIZED BUDGET — single source of truth ════
+// State PAC only — cash, campaign target, and primary/general split percentage.
 // Persists to localStorage. Every component reads from getBudget().
 const BUDGET_KEY = 'cupac_budget_2026';
 function getBudget() {
   try {
     var saved = JSON.parse(localStorage.getItem(BUDGET_KEY));
-    if(saved && saved.cash != null) return saved;
+    if(saved && saved.cash != null) {
+      // Backward-compat: ensure target/splitPct exist
+      if(saved.target == null) saved.target = 30000;
+      if(saved.splitPct == null) saved.splitPct = 67;
+      return saved;
+    }
   } catch(e){}
-  return {cash: 34029, raise: 12000, federal: 0}; // defaults
+  return {cash: 36222.12, target: 30000, splitPct: 67}; // defaults (state PAC only)
 }
-function saveBudget(cash, raise, federal) {
-  var b = {cash: cash||0, raise: raise||0, federal: federal||0};
-  b.total = b.cash + b.raise - b.federal;
+function saveBudget(cash, target, splitPct) {
+  var b = {
+    cash: cash!=null ? cash : 36222.12,
+    target: target!=null ? target : 30000,
+    splitPct: splitPct!=null ? splitPct : 67
+  };
+  b.total = b.cash; // state PAC: total available === cash on hand
   try { localStorage.setItem(BUDGET_KEY, JSON.stringify(b)); } catch(e){}
-  // Sync all displays
   broadcastBudget(b);
   return b;
 }
 function broadcastBudget(b) {
   if(!b) b = getBudget();
-  b.total = (b.cash||0) + (b.raise||0) - (b.federal||0);
+  b.total = b.cash||0;
   // Header badge
   var hdr = document.querySelector('.header-badge strong');
-  if(hdr) hdr.textContent = '$' + (b.cash||0).toLocaleString();
+  if(hdr) hdr.textContent = '$' + Math.round(b.cash||0).toLocaleString();
   // Sidebar
   var bsbBal = document.getElementById('bsb-balance');
-  if(bsbBal) bsbBal.textContent = '$' + (b.cash||0).toLocaleString();
-  // Strategy room title
-  var stratTitle = document.querySelector('#panel-strategy .section-title');
+  if(bsbBal) bsbBal.textContent = '$' + Math.round(b.cash||0).toLocaleString();
   // Update budget sidebar with new numbers
   if(typeof updateBudgetSidebar === 'function') updateBudgetSidebar();
   // Update phase plan if strategy room is loaded
   if(typeof renderPhasePlan === 'function' && document.getElementById('phase1-cards')) renderPhasePlan();
   // Update strategy totals
   if(typeof updateStrategyTotals === 'function') updateStrategyTotals();
+  // Re-render the budget plan card if loaded
+  if(typeof renderBudgetPlan === 'function' && document.getElementById('budget-plan-list')) renderBudgetPlan();
 }
 function loadTracker(){ try{return JSON.parse(localStorage.getItem(TRACKER_KEY)||'{}')}catch(e){return{}} }
 function saveTracker(d){
@@ -4421,6 +4497,12 @@ function personCard(cfg){
     var qkBtns=[200,300,400,500].map(function(amt){
       return '<button class="quick-amt-btn'+(saved.amt===amt?' active':'')+'" onclick="ppSetAmtCard(\''+ukey+'\','+amt+')">$'+amt+'</button>';
     }).join('');
+    // Ghost placeholder: suggested amount from getCupacRec
+    var _ghostRec = null;
+    try { _ghostRec = getCupacRec(name, parseInt(dist)||0, chamber, party, cfg.incumbent); } catch(e){}
+    var _ghostAmt = (_ghostRec && _ghostRec.amt) ? _ghostRec.amt : 0;
+    var _ghostPlaceholder = _ghostAmt ? ('$'+_ghostAmt+' rec') : '$';
+    var _ghostCls = (!saved.amt && _ghostAmt) ? ' ghost' : '';
     tracker='<div class="pcard-tracker">'
       +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">'
       +'<select class="tracker-select status-'+saved.status+'" onchange="saveDecision(this,\''+ukey+'\')" id="ts_'+ukey+'" style="font-size:12px;padding:4px 6px;flex:1;min-width:120px">'
@@ -4430,7 +4512,7 @@ function personCard(cfg){
       +'<option value="contributed"'+(saved.status==='contributed'?' selected':'')+'>Contributed</option>'
       +'<option value="pass"'+(saved.status==='pass'?' selected':'')+'>Pass</option>'
       +'</select>'
-      +'<input type="number" id="amt_'+ukey+'" value="'+(saved.amt||'')+'" min="0" step="50" placeholder="$" class="amt-input" style="width:68px;font-size:12px" onblur="ppSetAmtCard(\''+ukey+'\',parseInt(this.value)||0)">'
+      +'<input type="number" id="amt_'+ukey+'" value="'+(saved.amt||'')+'" min="0" step="50" placeholder="'+_ghostPlaceholder+'" class="amt-input'+_ghostCls+'" style="width:90px;font-size:12px" onblur="ppSetAmtCard(\''+ukey+'\',parseInt(this.value)||0)">'
       +'</div>'
       +'<div style="display:flex;gap:3px;flex-wrap:wrap">'+qkBtns+'</div>'
       +'<textarea class="notes-textarea" rows="2" onblur="saveNotes(this,\''+ukey+'\')" id="tn_'+ukey+'" style="font-size:12px;min-height:40px">'+(saved.notes||'')+'</textarea>'
@@ -5590,7 +5672,17 @@ function openPersonCard(name, dist){
 
   // Decision / amount / notes
   const sel=document.getElementById('pp-status-select'); sel.value=saved.status||'none'; sel.className='tracker-select status-'+(saved.status||'none');
-  document.getElementById('pp-amt-input').value=saved.amt||'';
+  var _ppAmtEl = document.getElementById('pp-amt-input');
+  _ppAmtEl.value = saved.amt || '';
+  // Ghost placeholder from getCupacRec
+  try {
+    var _ppRec = getCupacRec(name, parseInt(dist)||0, (ldr&&ldr.chamber)||(cand&&cand.ch)||'House', (ldr&&ldr.party)||(cand&&cand.party)||'R', (cand&&cand.incumbent)||false);
+    if(_ppRec && _ppRec.amt) {
+      _ppAmtEl.placeholder = '$'+_ppRec.amt+' rec';
+      if(!saved.amt) _ppAmtEl.classList.add('ghost');
+      else _ppAmtEl.classList.remove('ghost');
+    }
+  } catch(e){}
   document.getElementById('pp-notes').value=saved.notes||'';
   document.getElementById('pp-sync-indicator').classList.remove('show');
 
@@ -8628,6 +8720,232 @@ function renderWPTable() {
 // STRATEGY ROOM — All 5 features
 // ════════════════════════════════════════════════════════════════
 
+// ──────────────────────────────────────────────────────────────
+// CAMPAIGN BUDGET PLAN — tiered, line-by-line candidate allocation
+// ──────────────────────────────────────────────────────────────
+var _bpTierFilter = 'all';
+
+var BP_TIER_ORDER = ['PROTECT','MAINTAIN','BUILD','HEDGE','EVALUATE','HOLD','NOT RECOMMENDED','ALIGNED'];
+var BP_TIER_META = {
+  'PROTECT':         {icon:'🛡️', color:'#15803D', label:'PROTECT',          sub:'Proven YEA allies under banker attack — fund at max'},
+  'MAINTAIN':        {icon:'✅', color:'#0D7377', label:'MAINTAIN',         sub:'Consistent YEA supporters with prior CUPAC history'},
+  'BUILD':           {icon:'🤝', color:'#1A9B9B', label:'BUILD',            sub:'Supported FOM without prior CUPAC relationship'},
+  'HEDGE':           {icon:'🔀', color:'#7C3AED', label:'HEDGE',            sub:'New candidate in contested primary — no voting record yet'},
+  'EVALUATE':        {icon:'🔍', color:'#1D4ED8', label:'EVALUATE',         sub:'Experienced legislator — assess FOM position at P&P'},
+  'HOLD':            {icon:'⚠️', color:'#B45309', label:'HOLD',             sub:'Prior recipient who voted NAY — schedule P&P conversation'},
+  'NOT RECOMMENDED': {icon:'🚫', color:'#B91C1C', label:'NOT RECOMMENDED',  sub:'Voted NAY and banker-aligned — redirect resources'},
+  'ALIGNED':         {icon:'👍', color:'#6B7280', label:'ALIGNED',          sub:'Supported FOM but in unwinnable district — no funding'}
+};
+
+function bpBuildRows() {
+  // Only 2026 ballot candidates (odd-numbered districts this cycle)
+  var rows = [];
+  var _seen = {};
+  CANDIDATES.forEach(function(c) {
+    if(parseInt(c.dist) % 2 !== 1) return; // 2026 cycle = odd districts
+    var k = c.name + '_' + c.dist;
+    if(_seen[k]) return;
+    _seen[k] = 1;
+    var rec = getCupacRec(c.name, parseInt(c.dist), c.ch, c.party, c.incumbent);
+    rows.push({
+      name: c.name, ch: c.ch, dist: parseInt(c.dist), party: c.party,
+      incumbent: !!c.incumbent,
+      tier: rec.tier || 'EVALUATE',
+      recAmt: rec.amt || 0,
+      icon: rec.icon || '',
+      color: rec.color || '#6B7280',
+      inPrimary: !!rec.inPrimary,
+      reasons: rec.reasons || [],
+      action: rec.action || '',
+      timing: rec.timing || ''
+    });
+  });
+  return rows;
+}
+
+function bpCurrentAmt(name, dist) {
+  // Return user's saved decision amount (if any), else 0
+  var s = getSaved(name, parseInt(dist)||0);
+  return s && s.amt ? parseInt(s.amt) : 0;
+}
+
+function renderBudgetPlan() {
+  var listEl = document.getElementById('budget-plan-list');
+  if(!listEl) return;
+  var bgt = getBudget();
+  var cash = bgt.cash || 0;
+  var target = bgt.target || 30000;
+  var splitPct = bgt.splitPct || 67;
+  var primaryPot = Math.round(target * splitPct / 100);
+  var generalPot = target - primaryPot;
+  var reserve = cash - target;
+
+  // Build rows
+  var all = bpBuildRows();
+  var contestedOnly = document.getElementById('bp-contested-only');
+  var _contestedFirst = contestedOnly ? contestedOnly.checked : true;
+
+  // Filter by tier pill
+  var filtered = all.filter(function(r) {
+    if(_bpTierFilter === 'all') return true;
+    if(_bpTierFilter === 'NOT') return r.tier === 'NOT RECOMMENDED' || r.tier === 'ALIGNED';
+    return r.tier === _bpTierFilter;
+  });
+
+  // Group by tier
+  var byTier = {};
+  BP_TIER_ORDER.forEach(function(t) { byTier[t] = []; });
+  filtered.forEach(function(r) {
+    var t = r.tier;
+    if(!byTier[t]) byTier[t] = [];
+    byTier[t].push(r);
+  });
+
+  // Sort within each tier: contested primary first (if checked), then by recAmt desc, then party R first, then district asc
+  Object.keys(byTier).forEach(function(t) {
+    byTier[t].sort(function(a, b) {
+      if(_contestedFirst) {
+        if(a.inPrimary !== b.inPrimary) return a.inPrimary ? -1 : 1;
+      }
+      if(a.recAmt !== b.recAmt) return b.recAmt - a.recAmt;
+      if(a.party !== b.party) return a.party === 'R' ? -1 : 1;
+      return a.dist - b.dist;
+    });
+  });
+
+  // Track running totals
+  var allocPrimary = 0, allocGeneral = 0;
+  all.forEach(function(r) {
+    var curAmt = bpCurrentAmt(r.name, r.dist);
+    if(curAmt > 0) {
+      if(r.inPrimary) allocPrimary += curAmt;
+      else allocGeneral += curAmt;
+    }
+  });
+
+  // Build HTML for tiered list
+  var html = '';
+  BP_TIER_ORDER.forEach(function(t) {
+    var rows = byTier[t] || [];
+    if(!rows.length) return;
+    var meta = BP_TIER_META[t] || BP_TIER_META['EVALUATE'];
+    var tierAlloc = 0;
+    rows.forEach(function(r) { tierAlloc += bpCurrentAmt(r.name, r.dist); });
+    var tierRec = 0;
+    rows.forEach(function(r) { tierRec += r.recAmt; });
+
+    html += '<div class="bp-tier-head" style="background:'+meta.color+';">'
+      + '<span>'+meta.icon+' '+meta.label+' <span class="bp-tier-sub">· '+meta.sub+'</span></span>'
+      + '<span>'+rows.length+' candidate'+(rows.length===1?'':'s')+' · rec $'+tierRec.toLocaleString()+' · allocated $'+tierAlloc.toLocaleString()+'</span>'
+      + '</div>';
+
+    rows.forEach(function(r) {
+      var safeName = r.name.replace(/'/g,'&#39;').replace(/"/g,'&quot;');
+      var saved = getSaved(r.name, r.dist);
+      var curVal = saved && saved.amt ? saved.amt : '';
+      var ghostClass = !curVal ? ' ghost' : '';
+      var ukey = personKey(r.name, r.dist);
+      var partyCls = r.party === 'R' ? 'bp-party-R' : r.party === 'D' ? 'bp-party-D' : '';
+      var chamberLabel = r.ch === 'Senate' ? 'S' : 'H';
+      var distLabel = chamberLabel + r.dist;
+      var incSub = r.incumbent ? 'Incumbent' : 'New Candidate';
+      var contestFlag = r.inPrimary
+        ? '<span class="bp-flag bp-flag-contest">⚔ Primary</span>'
+        : '<span class="bp-flag bp-flag-uncontest">General</span>';
+
+      html += '<div class="bp-row" onclick="openPersonCard(\''+safeName+'\','+r.dist+')">'
+        + '<div class="bp-dist">'+distLabel+'</div>'
+        + '<div style="min-width:0;"><div class="bp-name">'+r.name+'</div><div class="bp-sub">'+incSub+' · '+(r.reasons[0]||'')+'</div></div>'
+        + '<div class="bp-party '+partyCls+'">'+r.party+'</div>'
+        + '<div>'+contestFlag+'</div>'
+        + '<div class="bp-rec">rec $'+r.recAmt+'</div>'
+        + '<div onclick="event.stopPropagation()"><input type="number" class="bp-input'+ghostClass+'" id="bp_amt_'+ukey+'" value="'+curVal+'" placeholder="$'+(r.recAmt||0)+'" min="0" step="50" onblur="bpSetAmt(\''+safeName+'\','+r.dist+',this.value)" onclick="event.stopPropagation()"></div>'
+        + '<div style="text-align:right;">'+(curVal?'<span style="color:var(--green);font-weight:700;font-size:11px;">✓ set</span>':'')+'</div>'
+        + '<div onclick="event.stopPropagation()"><button class="bp-accept'+(curVal==r.recAmt?' accepted':'')+'" onclick="bpAcceptRec(\''+safeName+'\','+r.dist+','+r.recAmt+')">Accept rec</button></div>'
+        + '</div>';
+    });
+  });
+
+  if(!html) html = '<div class="bp-tier-empty">No candidates match this filter.</div>';
+  listEl.innerHTML = html;
+
+  // Update summary numbers
+  var totalAlloc = allocPrimary + allocGeneral;
+  var unalloc = target - totalAlloc;
+  var setText = function(id, val) { var el = document.getElementById(id); if(el) el.textContent = val; };
+  setText('bp-cash', '$' + cash.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}));
+  setText('bp-target', '$' + target.toLocaleString());
+  setText('bp-reserve', '$' + (reserve>0?reserve:0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}));
+  setText('bp-unalloc', '$' + unalloc.toLocaleString());
+  setText('bp-split-p', splitPct);
+  setText('bp-split-g', 100 - splitPct);
+  setText('bp-pot-p', '$' + primaryPot.toLocaleString());
+  setText('bp-pot-g', '$' + generalPot.toLocaleString());
+  setText('bp-alloc-p', '$' + allocPrimary.toLocaleString());
+  setText('bp-alloc-g', '$' + allocGeneral.toLocaleString());
+  setText('bp-rem-p', '$' + (primaryPot - allocPrimary).toLocaleString());
+  setText('bp-rem-g', '$' + (generalPot - allocGeneral).toLocaleString());
+
+  var slider = document.getElementById('bp-split-slider');
+  if(slider && slider.value != splitPct) slider.value = splitPct;
+
+  // Stacked progress bar
+  var bar = document.getElementById('bp-progress-bar');
+  if(bar) {
+    var total = cash;
+    var pPct = total > 0 ? (allocPrimary / total * 100) : 0;
+    var gPct = total > 0 ? (allocGeneral / total * 100) : 0;
+    var rPct = total > 0 && reserve > 0 ? (reserve / total * 100) : 0;
+    var uPct = Math.max(0, 100 - pPct - gPct - rPct);
+    bar.innerHTML = ''
+      + (pPct>0 ? '<div style="width:'+pPct+'%;background:#B45309;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;">⚔ $'+allocPrimary.toLocaleString()+'</div>' : '')
+      + (gPct>0 ? '<div style="width:'+gPct+'%;background:var(--teal);display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;">🗳 $'+allocGeneral.toLocaleString()+'</div>' : '')
+      + (rPct>0 ? '<div style="width:'+rPct+'%;background:var(--gold);display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;">Reserve</div>' : '')
+      + (uPct>0 ? '<div style="width:'+uPct+'%;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:10px;font-weight:700;">Unallocated</div>' : '');
+  }
+}
+
+function bpSetSplit(val) {
+  var b = getBudget();
+  b.splitPct = parseInt(val) || 67;
+  try { localStorage.setItem(BUDGET_KEY, JSON.stringify(b)); } catch(e){}
+  renderBudgetPlan();
+}
+
+function bpEditTarget() {
+  var b = getBudget();
+  var cur = b.target || 30000;
+  var inp = prompt('Set campaign target ($):', cur);
+  if(inp == null) return;
+  var newTarget = parseInt(inp.toString().replace(/[$,]/g,'')) || cur;
+  b.target = newTarget;
+  try { localStorage.setItem(BUDGET_KEY, JSON.stringify(b)); } catch(e){}
+  renderBudgetPlan();
+}
+
+function bpFilterTier(tier) {
+  _bpTierFilter = tier;
+  // Toggle pill active state
+  document.querySelectorAll('.bp-pill').forEach(function(p) {
+    p.classList.toggle('bp-pill-active', p.getAttribute('data-tier') === tier);
+  });
+  renderBudgetPlan();
+}
+
+function bpSetAmt(name, dist, val) {
+  var amt = parseInt(val) || 0;
+  var key = personKey(name, dist);
+  var tracker = loadTracker();
+  if(!tracker[key]) tracker[key] = {status:'none', notes:'', amt:0};
+  tracker[key].amt = amt;
+  saveTracker(tracker);
+  renderBudgetPlan();
+}
+
+function bpAcceptRec(name, dist, recAmt) {
+  bpSetAmt(name, dist, recAmt);
+}
+
 var _strategyInited = false;
 function initStrategyRoom() {
   if(_strategyInited) return;
@@ -8640,6 +8958,7 @@ function initStrategyRoom() {
   } else {
     renderROI();
   }
+  renderBudgetPlan();
   updateStrategyTotals();
   renderPhasePlan();
   renderBankerGap();
