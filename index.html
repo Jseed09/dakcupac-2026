@@ -1778,7 +1778,7 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
 
 <!-- ── BUDGET SIDEBAR (pull tab + collapsible) ── -->
 <!-- Global Recommendation Tier Filters -->
-<div id="tier-filter-bar" style="display:none;position:fixed;top:128px;left:50%;transform:translateX(-50%);z-index:185;background:var(--white);border:1px solid var(--border);border-radius:0 0 12px 12px;padding:6px 12px;box-shadow:var(--shadow-md);display:flex;gap:4px;flex-wrap:wrap;">
+<div id="tier-filter-bar" hidden style="position:fixed;top:128px;left:50%;transform:translateX(-50%);z-index:185;background:var(--white);border:1px solid var(--border);border-radius:0 0 12px 12px;padding:6px 12px;box-shadow:var(--shadow-md);gap:4px;flex-wrap:wrap;">
   <span style="font-size:10px;font-weight:700;color:var(--text-muted);margin-right:4px;align-self:center;">FILTER:</span>
   <button onclick="toggleTierFilter('all')" class="tier-btn" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid var(--teal);background:var(--teal);color:#fff;cursor:pointer;">Show All</button>
   <button onclick="toggleTierFilter('PROTECT')" class="tier-btn" data-tier="PROTECT" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid #15803D;background:#fff;color:#15803D;cursor:pointer;">🛡️ Protect</button>
@@ -2425,7 +2425,7 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
           </div>
         </div>
         <div style="flex-shrink:0;background:#FEF3C7;border:1.5px dashed #B45309;border-radius:10px;padding:10px 14px;min-width:140px;text-align:center;">
-          <div style="font-size:9px;font-weight:700;color:#92400E;text-transform:uppercase;letter-spacing:.4px;">🏦 Reserve Buffer</div>
+          <div style="font-size:9px;font-weight:700;color:#92400E;text-transform:uppercase;letter-spacing:.4px;">🧀 Reserve Cheddar</div>
           <div id="bp-bar-reserve" style="font-size:18px;font-weight:800;color:#B45309;margin-top:2px;">$0</div>
           <div style="font-size:9px;color:#92400E;font-style:italic;">above target</div>
         </div>
@@ -4761,7 +4761,14 @@ function applyTierFilter(){
 // Show/hide the tier filter bar
 function toggleTierBar() {
   var bar = document.getElementById('tier-filter-bar');
-  bar.style.display = bar.style.display === 'none' ? 'flex' : 'none';
+  if(!bar) return;
+  if(bar.hasAttribute('hidden')) {
+    bar.removeAttribute('hidden');
+    bar.style.display = 'flex';
+  } else {
+    bar.setAttribute('hidden','');
+    bar.style.display = '';
+  }
 }
 
 function toggleBudgetSidebar() {
@@ -9459,7 +9466,9 @@ function _computeScaleFactors() {
 
 // getScaledRec — wraps getCupacRec, returns a new object with `amt`
 // scaled and `baseAmt` preserved for display. Rounds to nearest $50.
-// CU Champions are floored at $500 even when the slider scales down.
+// CU Champions and double pro-CU incumbents are floored at $500 even
+// when the slider scales down — the committee never wants these
+// dragged below the top tier.
 function getScaledRec(name, dist, chamber, party, incumbent) {
   var rec = getCupacRec(name, parseInt(dist)||0, chamber, party, incumbent);
   if(!rec || !rec.amt) return rec;
@@ -9471,6 +9480,16 @@ function getScaledRec(name, dist, chamber, party, incumbent) {
   if(typeof CU_CHAMPIONS !== 'undefined' && CU_CHAMPIONS[name] && scaled < 500) {
     scaled = 500;
   }
+  // Double pro-CU voters — hard floor at $500 (incumbents) / $400 (new)
+  // Detected via the SB 2266 YEA + SB 2217 NAY voting pattern.
+  try {
+    var _sbFom = getSB2266Vote(name, chamber) || getSB2266Vote(name, null);
+    var _sbIc  = (typeof getSB2217Vote === 'function') ? getSB2217Vote(name, chamber) : null;
+    if(_sbFom === 'YEA' && _sbIc === 'NAY') {
+      var _floor = incumbent ? 500 : 400;
+      if(scaled < _floor) scaled = _floor;
+    }
+  } catch(e){}
   // Return a shallow clone so callers don't mutate the cache
   var out = {};
   for(var k in rec) out[k] = rec[k];
