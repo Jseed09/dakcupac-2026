@@ -1885,21 +1885,30 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
     </div>
   </div>
   <div class="card-row" id="sb-stat-cards"></div>
-  <div class="chip-bar" id="sb-chip-bar">
-    <div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-right:4px;align-self:center;">SB 2266 (FOM):</div>
-    <button class="qchip" id="chip-yea"  onclick="toggleChip('yea')">✓ YEA <span class="chip-count" id="chip-yea-ct">—</span></button>
-    <button class="qchip" id="chip-nay"  onclick="toggleChip('nay')">✗ NAY <span class="chip-count" id="chip-nay-ct">—</span></button>
-    <button class="qchip" id="chip-new"  onclick="toggleChip('new')">— New / No Vote <span class="chip-count" id="chip-new-ct">—</span></button>
-    <div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-right:4px;align-self:center;margin-left:8px;">SB 2217 (Interchange):</div>
-    <button class="qchip" id="chip-2217-pro"  onclick="toggleChip('2217-pro')">✓ NAY (pro-CU) <span class="chip-count" id="chip-2217-pro-ct">—</span></button>
-    <button class="qchip" id="chip-2217-anti" onclick="toggleChip('2217-anti')">✗ YEA (anti-CU) <span class="chip-count" id="chip-2217-anti-ct">—</span></button>
-    <button class="qchip" id="chip-cont" onclick="toggleChip('cont')">⚔ Contested Primary <span class="chip-count" id="chip-cont-ct">—</span></button>
+  <div class="chip-bar" id="sb-chip-bar" style="display:flex;flex-direction:column;gap:10px;align-items:stretch;">
+    <!-- SB 2266 (FOM) — TEAL themed -->
+    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:8px 12px;background:rgba(13,115,119,0.08);border:2px solid var(--teal);border-radius:10px;">
+      <div style="font-size:11px;font-weight:800;color:var(--teal-dark);text-transform:uppercase;letter-spacing:.5px;margin-right:6px;white-space:nowrap;">📜 SB 2266 · FOM</div>
+      <button class="qchip bill-chip-2266" id="chip-yea"  onclick="toggleChip('yea')">✓ YEA <span class="chip-count" id="chip-yea-ct">—</span></button>
+      <button class="qchip bill-chip-2266" id="chip-nay"  onclick="toggleChip('nay')">✗ NAY <span class="chip-count" id="chip-nay-ct">—</span></button>
+      <button class="qchip bill-chip-2266" id="chip-new"  onclick="toggleChip('new')">— New / No Vote <span class="chip-count" id="chip-new-ct">—</span></button>
+    </div>
+    <!-- SB 2217 (Interchange) — AMBER themed -->
+    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:8px 12px;background:rgba(180,83,9,0.08);border:2px solid #B45309;border-radius:10px;">
+      <div style="font-size:11px;font-weight:800;color:#92400E;text-transform:uppercase;letter-spacing:.5px;margin-right:6px;white-space:nowrap;">💳 SB 2217 · Interchange</div>
+      <button class="qchip bill-chip-2217" id="chip-2217-pro"  onclick="toggleChip('2217-pro')">✓ NAY (pro-CU) <span class="chip-count" id="chip-2217-pro-ct">—</span></button>
+      <button class="qchip bill-chip-2217" id="chip-2217-anti" onclick="toggleChip('2217-anti')">✗ YEA (anti-CU) <span class="chip-count" id="chip-2217-anti-ct">—</span></button>
+    </div>
+    <!-- Shared -->
+    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+      <button class="qchip" id="chip-cont" onclick="toggleChip('cont')">⚔ Contested Primary <span class="chip-count" id="chip-cont-ct">—</span></button>
+    </div>
   </div>
   <div class="controls">
-    <label>SB 2266:</label>
-    <select id="vote-result" onchange="renderVoteTable()"><option value="ALL">All Votes</option><option value="YEA">✓ YEA</option><option value="NAY">✕ NAY</option><option value="ABSENT">Absent</option></select>
-    <label>SB 2217:</label>
-    <select id="vote-2217" onchange="renderVoteTable()"><option value="ALL">All Votes</option><option value="NAY">✓ NAY (pro-CU)</option><option value="YEA">✕ YEA (anti-CU)</option><option value="ABSENT">Absent</option></select>
+    <span style="display:inline-block;padding:4px 10px;border-radius:8px;background:rgba(13,115,119,0.12);border:1.5px solid var(--teal);color:var(--teal-dark);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;">📜 SB 2266 FOM</span>
+    <select id="vote-result" onchange="renderVoteTable()" style="border:1.5px solid var(--teal);background:rgba(13,115,119,0.04);font-weight:700;"><option value="ALL">All Votes</option><option value="YEA">✓ YEA</option><option value="NAY">✕ NAY</option><option value="ABSENT">Absent</option></select>
+    <span style="display:inline-block;padding:4px 10px;border-radius:8px;background:rgba(180,83,9,0.12);border:1.5px solid #B45309;color:#92400E;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;">💳 SB 2217 Interchange</span>
+    <select id="vote-2217" onchange="renderVoteTable()" style="border:1.5px solid #B45309;background:rgba(180,83,9,0.04);font-weight:700;"><option value="ALL">All Votes</option><option value="NAY">✓ NAY (pro-CU)</option><option value="YEA">✕ YEA (anti-CU)</option><option value="ABSENT">Absent</option></select>
     <select id="vote-chamber" onchange="renderVoteTable()"><option value="ALL">Both Chambers</option><option value="Senate">Senate</option><option value="House">House</option></select>
     <select id="vote-ballot" onchange="renderVoteTable()"><option value="ALL">All Legislators</option><option value="yes">★ 2026 Ballot Only</option></select>
     <label style="margin-left:8px">Money:</label>
@@ -2068,8 +2077,10 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
     <input type="text" id="cand-search" placeholder="Search name…" oninput="filterCandidates()" style="min-width:160px">
     <select id="cand-chamber" onchange="filterCandidates()"><option value="ALL">All Chambers</option><option value="Senate">Senate</option><option value="House">House</option></select>
     <select id="cand-cupac-f" onchange="filterCandidates()"><option value="ALL">All Candidates</option><option value="YES">History Only</option><option value="NO">No History</option></select>
-    <select id="cand-sb2266-f" onchange="filterCandidates()"><option value="ALL">All SB 2266</option><option value="YEA">YEA — Supported CUs</option><option value="NAY">NAY — Opposed CUs</option><option value="NONE">No prior vote</option></select>
-    <select id="cand-sb2217-f" onchange="filterCandidates()"><option value="ALL">All SB 2217</option><option value="NAY">NAY — Pro-CU (opposed cap)</option><option value="YEA">YEA — Anti-CU (supported cap)</option><option value="NONE">No prior vote</option></select>
+    <span style="display:inline-block;padding:4px 10px;border-radius:8px;background:rgba(13,115,119,0.12);border:1.5px solid var(--teal);color:var(--teal-dark);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;">📜 SB 2266 FOM</span>
+    <select id="cand-sb2266-f" onchange="filterCandidates()" style="border:1.5px solid var(--teal);background:rgba(13,115,119,0.04);font-weight:700;"><option value="ALL">All Votes</option><option value="YEA">✓ YEA — Supported CUs</option><option value="NAY">✕ NAY — Opposed CUs</option><option value="NONE">No prior vote</option></select>
+    <span style="display:inline-block;padding:4px 10px;border-radius:8px;background:rgba(180,83,9,0.12);border:1.5px solid #B45309;color:#92400E;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;">💳 SB 2217 Interchange</span>
+    <select id="cand-sb2217-f" onchange="filterCandidates()" style="border:1.5px solid #B45309;background:rgba(180,83,9,0.04);font-weight:700;"><option value="ALL">All Votes</option><option value="NAY">✓ NAY — Pro-CU (opposed cap)</option><option value="YEA">✕ YEA — Anti-CU (supported cap)</option><option value="NONE">No prior vote</option></select>
     <button class="btn" onclick="resetCandidates()">Reset</button>
     <span class="result-count" id="cand-count"></span>
   </div>
