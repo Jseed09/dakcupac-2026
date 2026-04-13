@@ -573,6 +573,40 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
 .bp-bulk:hover{background:var(--teal-dark)}
 .bp-bulk.bp-bulk-danger{background:#fff;color:#B91C1C;border-color:#FCA5A5}
 .bp-bulk.bp-bulk-danger:hover{background:#FEE2E2}
+/* ── TOAST NOTIFICATIONS ── */
+#toast-container{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;align-items:flex-end;pointer-events:none}
+.toast{pointer-events:auto;background:var(--ink);color:#fff;padding:12px 18px;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.25);font-size:13px;font-weight:600;display:flex;align-items:center;gap:10px;min-width:240px;max-width:420px;border-left:4px solid var(--teal);animation:toast-in .25s ease;transition:opacity .3s,transform .3s}
+.toast.toast-out{opacity:0;transform:translateX(40px)}
+.toast-success{border-left-color:#15803D}
+.toast-info{border-left-color:#1D4ED8}
+.toast-warning{border-left-color:#B45309}
+.toast-danger{border-left-color:#B91C1C}
+.toast-icon{font-size:18px;line-height:1;flex-shrink:0}
+.toast-body{flex:1;min-width:0}
+.toast-title{font-weight:800;font-size:13px;margin-bottom:2px}
+.toast-msg{font-size:11px;font-weight:500;color:rgba(255,255,255,0.75);line-height:1.3}
+.toast-action{background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;margin-left:8px;flex-shrink:0}
+.toast-action:hover{background:rgba(255,255,255,0.25)}
+@keyframes toast-in{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+/* ── ONBOARDING BANNER ── */
+.onboarding-banner{background:linear-gradient(135deg,#0D7377,#15803D);color:#fff;padding:16px 24px;border-radius:14px;margin:16px 24px 0;box-shadow:0 4px 16px rgba(13,115,119,0.3);position:relative}
+.onboarding-banner h3{font-family:var(--font-display);font-size:18px;margin:0 0 8px;display:flex;align-items:center;gap:8px}
+.onboarding-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:12px}
+.onboarding-step{background:rgba(255,255,255,0.15);padding:10px 12px;border-radius:10px;font-size:12px;line-height:1.4}
+.onboarding-step strong{display:block;font-family:var(--font-display);font-size:13px;margin-bottom:4px}
+.onboarding-close{position:absolute;top:12px;right:14px;background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:5px 14px;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.5px}
+.onboarding-close:hover{background:rgba(255,255,255,0.25)}
+@media (max-width:900px){.onboarding-steps{grid-template-columns:1fr 1fr}}
+/* ── TIER LEGEND ── */
+.tier-legend{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:16px;box-shadow:var(--shadow-sm)}
+.tier-legend-head{display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none}
+.tier-legend-title{font-family:var(--font-display);font-size:14px;font-weight:800;color:var(--ink);display:flex;align-items:center;gap:8px}
+.tier-legend-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-top:12px}
+.tier-legend-card{padding:10px 12px;border-radius:8px;border-left:4px solid}
+.tier-legend-card .tl-head{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.4px}
+.tier-legend-card .tl-sub{font-size:10px;color:var(--text-muted);margin-top:3px;line-height:1.3}
+.tier-legend-card .tl-amt{font-size:11px;font-weight:700;color:var(--teal-dark);margin-top:4px}
+.tier-legend.tl-collapsed .tier-legend-grid{display:none}
 /* ── COLLAPSIBLE SECTIONS ── */
 .coll-head{cursor:pointer;user-select:none;position:relative}
 .coll-head::before{content:'▾';display:inline-block;margin-right:8px;font-size:14px;transition:transform .18s ease;color:var(--teal);font-weight:700}
@@ -2361,6 +2395,19 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
   <div style="margin-bottom:32px;">
     <div class="section-title coll-head" data-coll-id="budget-plan" onclick="toggleCollapse('budget-plan',this)">💰 Campaign Budget Plan — State PAC 2026</div>
     <div class="coll-body">
+
+    <!-- Color vocabulary key -->
+    <div style="background:linear-gradient(90deg,rgba(13,115,119,0.08),rgba(180,83,9,0.08));border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:14px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;font-size:11px;">
+      <strong style="color:var(--ink);font-size:11px;letter-spacing:.5px;text-transform:uppercase;">🎨 Color key:</strong>
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--teal);margin-right:5px;vertical-align:middle;"></span>SB 2266 (FOM)</span>
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#B45309;margin-right:5px;vertical-align:middle;"></span>SB 2217 (Interchange)</span>
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#15803D;margin-right:5px;vertical-align:middle;"></span>Pro-CU vote</span>
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#B91C1C;margin-right:5px;vertical-align:middle;"></span>Anti-CU vote</span>
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#CA8A04;margin-right:5px;vertical-align:middle;"></span>CU Champion</span>
+    </div>
+
+    <!-- Tier Legend (collapsible) -->
+    <div id="tier-legend-container"></div>
 
     <!-- TOP SUMMARY CARD: cash / target / split slider / pots -->
     <div style="background:var(--white);border:2px solid var(--teal);border-radius:14px;padding:20px;box-shadow:var(--shadow-md);margin-bottom:16px;">
@@ -7642,6 +7689,8 @@ try { renderFight(); } catch(e){ console.error('renderFight failed', e); }
 try { buildCandidates(); } catch(e){ console.error('buildCandidates failed', e); }
 try { buildCommitteeGeo(); } catch(e){ console.error('buildCommitteeGeo failed', e); }
 try { buildDistrictMap(); } catch(e){ console.error('buildDistrictMap failed', e); }
+// Show onboarding banner for first-time visitors
+try { _showOnboardingIfNew(); } catch(e){ console.warn('onboarding', e); }
 
 </script>
 
@@ -9419,6 +9468,18 @@ function renderWPTable() {
   var html='';
   var lastDist = null;
   var _wpCollState = (typeof loadCollapseState === 'function') ? loadCollapseState() : {};
+  // Precompute which districts have ANY contested primary (either party).
+  // Senate = 1 seat → 2+ same party is contested. House = 2 seats → 3+ same
+  // party is contested. Independent of how the current candidate's OWN
+  // party falls, so the district badge surfaces correctly.
+  var _contestedDistricts = {};
+  Object.keys(primaryMap).forEach(function(key){
+    var parts = key.split('-'); // "Senate-1" or "House-1"
+    var ch = parts[0], dist = parseInt(parts[1]);
+    var seats = ch === 'Senate' ? 1 : 2;
+    var pm = primaryMap[key];
+    if(pm.R > seats || pm.D > seats) _contestedDistricts[dist] = true;
+  });
   filtered.forEach(function(r){
     var c=r.c;
     var prob=r.prob;
@@ -9435,13 +9496,14 @@ function renderWPTable() {
       var distColor = distLean>5 ? '#1D4ED8' : distLean<-5 ? '#DC2626' : '#B45309';
       var distCands = filtered.filter(function(x){return x.c.dist===c.dist;}).length;
       var _totalCandsS = CANDIDATES.filter(function(x){return parseInt(x.dist)===parseInt(c.dist);}).length;
+      var _distHasContested = !!_contestedDistricts[c.dist];
       var _wpCollKey = 'wp_dist_' + c.dist;
       var _wpClosed = !!_wpCollState[_wpCollKey];
       var _wpCaret = _wpClosed ? '▸' : '▾';
       html += '<div data-coll-id="'+_wpCollKey+'" class="coll-head-cand'+(_wpClosed?' coll-closed':'')+'" onclick="toggleCollapse(\''+_wpCollKey+'\',this)" style="grid-column:1/-1;background:var(--ink);color:var(--white);padding:10px 16px;border-radius:10px;margin-top:8px;font-weight:700;font-size:14px;cursor:pointer;user-select:none;display:flex;align-items:center;">'
         +'<span class="cand-caret" style="display:inline-block;font-size:22px;line-height:1;margin-right:12px;min-width:18px;color:#86EFAC;">'+_wpCaret+'</span>'
         +'District '+c.dist+distLeanBadge(c.dist)+' <span style="font-weight:400;font-size:12px;margin-left:8px;color:rgba(255,255,255,0.7);">'+_totalCandsS+' candidate'+(_totalCandsS>1?'s':'')+' filed</span>'
-        +(r.hasPrimary ? ' <span style="font-size:10px;background:#FEF3C7;color:#92400E;border-radius:4px;padding:1px 6px;margin-left:6px;">⚔ Contested Primary</span>' : '')
+        +(_distHasContested ? ' <span style="font-size:10px;background:#FEF3C7;color:#92400E;border-radius:4px;padding:1px 6px;margin-left:6px;font-weight:800;">⚔ CONTESTED PRIMARY</span>' : '')
         +'</div>';
       html += '<div class="coll-body-cand'+(_wpClosed?' coll-closed':'')+'" data-coll-body-for="'+_wpCollKey+'" style="grid-column:1/-1;'+(_wpClosed?'display:none;':'')+'"><div class="person-card-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;">';
     }
@@ -9516,6 +9578,135 @@ function renderWPTable() {
 // ──────────────────────────────────────────────────────────────
 const COLLAPSE_KEY = 'cupac_collapse_2026';
 function loadCollapseState(){ try{return JSON.parse(localStorage.getItem(COLLAPSE_KEY)||'{}')}catch(e){return{}} }
+
+// ──────────────────────────────────────────────────────────────
+// TOAST NOTIFICATIONS — lightweight feedback for user actions
+// ──────────────────────────────────────────────────────────────
+function _ensureToastContainer() {
+  var c = document.getElementById('toast-container');
+  if(!c) {
+    c = document.createElement('div');
+    c.id = 'toast-container';
+    document.body.appendChild(c);
+  }
+  return c;
+}
+// showToast({title, msg, type, actionLabel, actionFn, duration})
+function showToast(opts) {
+  opts = opts || {};
+  var c = _ensureToastContainer();
+  var t = document.createElement('div');
+  t.className = 'toast toast-' + (opts.type || 'success');
+  var icon = opts.icon || (
+    opts.type==='success' ? '✓' :
+    opts.type==='info' ? 'ℹ' :
+    opts.type==='warning' ? '⚠' :
+    opts.type==='danger' ? '✕' : '✓'
+  );
+  var html = '<div class="toast-icon">'+icon+'</div>'
+    +'<div class="toast-body">'
+      +(opts.title ? '<div class="toast-title">'+opts.title+'</div>' : '')
+      +(opts.msg ? '<div class="toast-msg">'+opts.msg+'</div>' : '')
+    +'</div>';
+  if(opts.actionLabel && opts.actionFn) {
+    html += '<button class="toast-action">'+opts.actionLabel+'</button>';
+  }
+  t.innerHTML = html;
+  if(opts.actionLabel && opts.actionFn) {
+    t.querySelector('.toast-action').addEventListener('click', function(){
+      try { opts.actionFn(); } catch(e){}
+      _dismissToast(t);
+    });
+  }
+  c.appendChild(t);
+  var duration = opts.duration != null ? opts.duration : 3500;
+  setTimeout(function(){ _dismissToast(t); }, duration);
+  return t;
+}
+function _dismissToast(t) {
+  if(!t || !t.parentNode) return;
+  t.classList.add('toast-out');
+  setTimeout(function(){ if(t.parentNode) t.parentNode.removeChild(t); }, 320);
+}
+
+// ──────────────────────────────────────────────────────────────
+// ONBOARDING — first-visit welcome banner with 4 steps
+// ──────────────────────────────────────────────────────────────
+function _showOnboardingIfNew() {
+  try {
+    if(localStorage.getItem('cupac_onboarded_v1') === '1') return;
+  } catch(e){}
+  var banner = document.createElement('div');
+  banner.className = 'onboarding-banner';
+  banner.id = 'onboarding-banner';
+  banner.innerHTML = ''
+    + '<button class="onboarding-close" onclick="_dismissOnboarding()">✕ Got it</button>'
+    + '<h3>👋 Welcome to the DakCUPAC 2026 Dashboard</h3>'
+    + '<div style="font-size:12px;opacity:.85;">Four steps to run your committee allocation cycle end-to-end.</div>'
+    + '<div class="onboarding-steps">'
+    +   '<div class="onboarding-step"><strong>1 · Strategy Room</strong>Open 🎯 Strategy Room, confirm your $30k target + 67/33 split.</div>'
+    +   '<div class="onboarding-step"><strong>2 · Apply All Recs</strong>Click ⚡ Apply All Recs to accept the algorithm\'s starting point.</div>'
+    +   '<div class="onboarding-step"><strong>3 · Review & Override</strong>Click any candidate to open their card. Edit $ or dismiss recs you disagree with.</div>'
+    +   '<div class="onboarding-step"><strong>4 · Export</strong>When the committee signs off, click 📊 I Like Excel Sheets at the bottom.</div>'
+    + '</div>';
+  var header = document.querySelector('header.site-header');
+  if(header && header.parentNode) {
+    header.parentNode.insertBefore(banner, header.nextSibling);
+  } else {
+    document.body.insertBefore(banner, document.body.firstChild);
+  }
+}
+function _dismissOnboarding() {
+  try { localStorage.setItem('cupac_onboarded_v1', '1'); } catch(e){}
+  var b = document.getElementById('onboarding-banner');
+  if(b) { b.style.transition='opacity .3s,max-height .3s,padding .3s,margin .3s'; b.style.opacity='0'; b.style.maxHeight='0'; b.style.padding='0'; b.style.margin='0'; setTimeout(function(){ if(b.parentNode) b.parentNode.removeChild(b); }, 320); }
+}
+
+// ──────────────────────────────────────────────────────────────
+// TIER LEGEND — one-line definitions of every tier in the app
+// ──────────────────────────────────────────────────────────────
+function renderTierLegend() {
+  var container = document.getElementById('tier-legend-container');
+  if(!container) return;
+  var tiers = [
+    {icon:'⭐',  label:'CU CHAMPION',     color:'#15803D', sub:'Committee-designated top ally', amt:'$500 floor'},
+    {icon:'⭐⚠', label:'CHAMPION · WATCH', color:'#CA8A04', sub:'Champion with SB 2217 contradiction — P&P needed', amt:'$500 floor'},
+    {icon:'🛡️', label:'PROTECT',          color:'#15803D', sub:'Double pro-CU (YEA 2266 + NAY 2217)', amt:'$500 incumbent / $400 new'},
+    {icon:'✅',  label:'MAINTAIN',         color:'#0D7377', sub:'IBL / Leadership / chamber transfers', amt:'$400 primary / $300 general'},
+    {icon:'🤝',  label:'BUILD',            color:'#1A9B9B', sub:'Supported FOM, no prior CUPAC history', amt:'$300-400'},
+    {icon:'🔀',  label:'HEDGE',            color:'#7C3AED', sub:'Contested primary, no vote record yet', amt:'$200 or $0'},
+    {icon:'🔍',  label:'EVALUATE',         color:'#1D4ED8', sub:'Experienced legislator — assess at P&P', amt:'$200-300'},
+    {icon:'⚠️', label:'HOLD',              color:'#B45309', sub:'Prior recipient who voted NAY — needs conversation', amt:'$200 (incumbent floor)'},
+    {icon:'🚫',  label:'NOT RECOMMENDED', color:'#B91C1C', sub:'Double anti-CU or banker-aligned', amt:'$200 (incumbent only)'}
+  ];
+  var collapsed = loadCollapseState()['tier-legend'] ? ' tl-collapsed' : '';
+  var caret = loadCollapseState()['tier-legend'] ? '▸' : '▾';
+  var html = '<div class="tier-legend'+collapsed+'" id="tier-legend-card">'
+    + '<div class="tier-legend-head" onclick="toggleTierLegend()">'
+      + '<div class="tier-legend-title"><span id="tl-caret">'+caret+'</span>📖 Tier Legend — what every badge means</div>'
+      + '<div style="font-size:10px;color:var(--text-muted);">Click to '+(collapsed?'expand':'collapse')+'</div>'
+    + '</div>'
+    + '<div class="tier-legend-grid">';
+  tiers.forEach(function(t){
+    var bg = 'rgba('+(t.color==='#15803D'?'21,128,61':t.color==='#0D7377'?'13,115,119':t.color==='#1A9B9B'?'26,155,155':t.color==='#7C3AED'?'124,58,237':t.color==='#1D4ED8'?'29,78,216':t.color==='#B45309'?'180,83,9':t.color==='#B91C1C'?'185,28,28':'202,138,4')+',0.06)';
+    html += '<div class="tier-legend-card" style="border-left-color:'+t.color+';background:'+bg+';">'
+      + '<div class="tl-head" style="color:'+t.color+';">'+t.icon+' '+t.label+'</div>'
+      + '<div class="tl-sub">'+t.sub+'</div>'
+      + '<div class="tl-amt">'+t.amt+'</div>'
+      + '</div>';
+  });
+  html += '</div></div>';
+  container.innerHTML = html;
+}
+function toggleTierLegend() {
+  var state = loadCollapseState();
+  state['tier-legend'] = !state['tier-legend'];
+  saveCollapseState(state);
+  var card = document.getElementById('tier-legend-card');
+  if(card) card.classList.toggle('tl-collapsed', !!state['tier-legend']);
+  var caret = document.getElementById('tl-caret');
+  if(caret) caret.textContent = state['tier-legend'] ? '▸' : '▾';
+}
 function saveCollapseState(s){ try{localStorage.setItem(COLLAPSE_KEY,JSON.stringify(s))}catch(e){} }
 function toggleCollapse(id, headEl){
   var state = loadCollapseState();
@@ -9941,6 +10132,11 @@ function bpSetAmt(name, dist, val) {
 
 function bpAcceptRec(name, dist, recAmt) {
   bpSetAmt(name, dist, recAmt);
+  if(typeof showToast === 'function') showToast({
+    type:'success', icon:'✓',
+    title:'Accepted $'+recAmt+' for '+name,
+    msg:'Saved to your decision tracker'
+  });
 }
 
 // Apply All — commits every scaled recommendation as the user's
@@ -9948,8 +10144,10 @@ function bpAcceptRec(name, dist, recAmt) {
 function bpApplyAll() {
   if(!confirm('Fill every empty $ input with the current recommended amount? This will not overwrite rows where you\'ve already entered a value.')) return;
   var tracker = loadTracker();
+  // Snapshot previous amounts so we can undo
+  var _prev = JSON.parse(JSON.stringify(tracker));
   var rows = bpBuildRows();
-  var count = 0;
+  var count = 0, totalDollars = 0;
   rows.forEach(function(r) {
     if(!r.recAmt || r.recAmt <= 0) return;
     var key = personKey(r.name, r.dist);
@@ -9958,26 +10156,41 @@ function bpApplyAll() {
     if(!tracker[key]) tracker[key] = {status:'none', notes:'', amt:0};
     tracker[key].amt = r.recAmt;
     count++;
+    totalDollars += r.recAmt;
   });
   saveTracker(tracker);
   refreshAllocations();
-  setTimeout(function(){ alert('Applied recommended amounts to '+count+' candidate'+(count===1?'':'s')+'.'); }, 50);
+  if(typeof showToast === 'function') showToast({
+    type:'success', icon:'⚡',
+    title:'Applied '+count+' recommendations',
+    msg:'$'+totalDollars.toLocaleString()+' allocated',
+    actionLabel:'Undo', actionFn:function(){ saveTracker(_prev); refreshAllocations(); showToast({type:'info',icon:'↺',title:'Undone',msg:'Restored previous allocations'}); },
+    duration: 8000
+  });
 }
 
 // Clear All — zeros every tracker.amt (keeps status and notes).
 function bpClearAll() {
   if(!confirm('Clear every $ amount in the tracker? Status and notes are preserved. This cannot be undone.')) return;
   var tracker = loadTracker();
-  var count = 0;
+  var _prev = JSON.parse(JSON.stringify(tracker));
+  var count = 0, totalCleared = 0;
   Object.keys(tracker).forEach(function(k) {
     if(tracker[k] && tracker[k].amt) {
+      totalCleared += parseInt(tracker[k].amt) || 0;
       tracker[k].amt = 0;
       count++;
     }
   });
   saveTracker(tracker);
   refreshAllocations();
-  setTimeout(function(){ alert('Cleared $ amounts for '+count+' candidate'+(count===1?'':'s')+'.'); }, 50);
+  if(typeof showToast === 'function') showToast({
+    type:'warning', icon:'✕',
+    title:'Cleared '+count+' allocations',
+    msg:'$'+totalCleared.toLocaleString()+' removed',
+    actionLabel:'Undo', actionFn:function(){ saveTracker(_prev); refreshAllocations(); showToast({type:'info',icon:'↺',title:'Undone',msg:'Restored '+count+' allocations'}); },
+    duration: 8000
+  });
 }
 
 var _strategyInited = false;
@@ -9992,6 +10205,7 @@ function initStrategyRoom() {
   } else {
     renderROI();
   }
+  if(typeof renderTierLegend === 'function') renderTierLegend();
   renderBudgetPlan();
   updateStrategyTotals();
   renderPhasePlan();
