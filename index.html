@@ -5436,11 +5436,13 @@ function renderVoteTable(){
     if(dist&&dist!=='—'){
       var _totalCands = CANDIDATES.filter(function(c){return parseInt(c.dist)===parseInt(dist);}).length;
       var _candCountBadge = _totalCands ? '<span style="font-size:11px;font-weight:400;margin-left:8px;color:rgba(255,255,255,0.7);">'+_totalCands+' candidate'+(_totalCands>1?'s':'')+' filed</span>' : '';
-      voteHtml+='<div data-coll-id="'+_distCollKey+'" class="coll-head-cand'+(_distClosed?' coll-closed':'')+'" onclick="toggleCollapse(\''+_distCollKey+'\',this)" style="grid-column:1/-1;margin-top:16px;margin-bottom:4px;padding:8px 14px;background:var(--teal-dark);color:#fff;border-radius:6px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;">'
-        +'<span style="font-family:var(--font-display);font-size:15px;font-weight:700;"><span class="cand-caret" style="display:inline-block;margin-right:8px;">'+_caret+'</span>District '+dist+onBallotBadge+distLeanBadge(dist)+_candCountBadge+'</span>'
+      voteHtml+='<div data-coll-id="'+_distCollKey+'" class="coll-head-cand'+(_distClosed?' coll-closed':'')+'" onclick="toggleCollapse(\''+_distCollKey+'\',this)" style="grid-column:1/-1;margin-top:16px;margin-bottom:4px;padding:10px 16px;background:var(--teal-dark);color:#fff;border-radius:6px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;">'
+        +'<span style="font-family:var(--font-display);font-size:15px;font-weight:700;display:flex;align-items:center;"><span class="cand-caret" style="display:inline-block;font-size:22px;line-height:1;margin-right:12px;min-width:18px;color:#86EFAC;">'+_caret+'</span>District '+dist+onBallotBadge+distLeanBadge(dist)+_candCountBadge+'</span>'
         +(coverStr?'<span style="font-size:11px;color:rgba(255,255,255,0.65);">📍 '+coverStr+'</span>':'')
         +'</div>';
-      voteHtml += '<div class="coll-body-cand'+(_distClosed?' coll-closed':'')+'" data-coll-body-for="'+_distCollKey+'" style="grid-column:1/-1;display:'+(_distClosed?'none':'contents')+';">';
+      // Wrap the district's candidate cards in a full-width div that
+      // contains its OWN grid, so display:none actually hides it.
+      voteHtml += '<div class="coll-body-cand'+(_distClosed?' coll-closed':'')+'" data-coll-body-for="'+_distCollKey+'" style="grid-column:1/-1;'+(_distClosed?'display:none;':'')+'"><div class="person-card-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;">';
     }
     voteHtml+=distRows.map(function(r){
     const isNotRunning = r.notRunning===true;
@@ -5478,7 +5480,7 @@ function renderVoteTable(){
     });
     }).join('');
     if(dist&&dist!=='—'){
-      voteHtml += '</div>'; // close coll-body-cand
+      voteHtml += '</div></div>'; // close inner grid + coll-body-cand
     }
   });
   tbody.innerHTML=voteHtml;
@@ -5652,12 +5654,12 @@ function renderCandidates(list){
     var distCollKey = 'cand_dist_' + dist;
     var distClosed = !!_collState[distCollKey];
     var caret = distClosed ? '▸' : '▾';
-    html += '<div data-coll-id="'+distCollKey+'" class="coll-head-cand'+(distClosed?' coll-closed':'')+'" onclick="toggleCollapse(\''+distCollKey+'\',this)" style="grid-column:1/-1;margin-top:16px;margin-bottom:4px;padding:8px 14px;background:var(--teal-dark);color:#fff;border-radius:6px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;">'
-      +'<span style="font-family:var(--font-display);font-size:15px;font-weight:700;"><span class="cand-caret" style="display:inline-block;margin-right:8px;">'+caret+'</span>District '+dist+onBallot+distLeanBadge(dist)+_candCountD+'</span>'
+    html += '<div data-coll-id="'+distCollKey+'" class="coll-head-cand'+(distClosed?' coll-closed':'')+'" onclick="toggleCollapse(\''+distCollKey+'\',this)" style="grid-column:1/-1;margin-top:16px;margin-bottom:4px;padding:10px 16px;background:var(--teal-dark);color:#fff;border-radius:6px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;">'
+      +'<span style="font-family:var(--font-display);font-size:15px;font-weight:700;display:flex;align-items:center;"><span class="cand-caret" style="display:inline-block;font-size:22px;line-height:1;margin-right:12px;min-width:18px;color:#86EFAC;">'+caret+'</span>District '+dist+onBallot+distLeanBadge(dist)+_candCountD+'</span>'
       +(coverStr?'<span style="font-size:11px;color:rgba(255,255,255,0.65);">📍 '+coverStr+'</span>':'')
       +'</div>';
-    // Open the body wrapper for the collapsible group
-    html += '<div class="coll-body-cand'+(distClosed?' coll-closed':'')+'" data-coll-body-for="'+distCollKey+'" style="grid-column:1/-1;display:'+(distClosed?'none':'contents')+';">';
+    // Open the body wrapper — contains its own inner grid so display:none cleanly hides it
+    html += '<div class="coll-body-cand'+(distClosed?' coll-closed':'')+'" data-coll-body-for="'+distCollKey+'" style="grid-column:1/-1;'+(distClosed?'display:none;':'')+'"><div class="person-card-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;">';
     // Sub-group by chamber: Senate first, then House
     var senCands = cands.filter(c=>c.ch==='Senate');
     var houCands = cands.filter(c=>c.ch==='House');
@@ -5689,7 +5691,7 @@ function renderCandidates(list){
         });
       }).join('');
     });
-    html += '</div>'; // close coll-body-cand
+    html += '</div></div>'; // close inner grid + coll-body-cand
   });
   tbody.innerHTML = html;
   document.getElementById('cand-count').textContent = list.length+' of '+CANDIDATES.length+' candidates · '+sortedDists.length+' districts';
@@ -9474,16 +9476,18 @@ function toggleCollapse(id, headEl){
   if(headEl){
     headEl.classList.toggle('coll-closed', !!state[id]);
     // For Candidates-tab + Voting History district headers, also toggle
-    // the matching body div AND clear the inline display style (the
-    // initial render sets display:none/contents inline, which would
-    // otherwise override the class toggle).
+    // the matching body wrapper. Use block/none so it cleanly shows/hides
+    // regardless of whether the body contains its own grid.
     if(headEl.classList.contains('coll-head-cand')){
       var body = document.querySelector('[data-coll-body-for="'+id+'"]');
       if(body) {
         body.classList.toggle('coll-closed', !!state[id]);
-        body.style.display = state[id] ? 'none' : 'contents';
+        body.style.display = state[id] ? 'none' : '';
       }
     }
+    // Update the caret character inside the head
+    var caretEl = headEl.querySelector('.cand-caret');
+    if(caretEl) caretEl.textContent = state[id] ? '▸' : '▾';
   }
 }
 // Apply saved state on page load / re-render
