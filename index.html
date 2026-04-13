@@ -4269,25 +4269,44 @@ function updateBudgetSidebar() {
   var tracker = JSON.parse(localStorage.getItem(TRACKER_KEY) || '{}');
   var bgt = getBudget();
   var balance = bgt.cash || 36222;
+  var target = bgt.target || 30000;
+  var splitPct = bgt.splitPct != null ? bgt.splitPct : 67;
+  var primaryPot = Math.round(target * splitPct / 100);
+  var generalPot = target - primaryPot;
+
   var totalAlloc = 0, approved = 0, review = 0, contributed = 0, pass = 0;
   var p1Amt = 0, p1Ct = 0, p2Amt = 0, p2Ct = 0;
 
+  // Build a tracker-key → candidate map so phase classification uses the
+  // same inPrimary flag getScaledRec uses (fixes the old _recCache lookup
+  // which had the wrong key format and mis-classified every decision).
+  var _trackerByKey = {};
+  CANDIDATES.forEach(function(c) {
+    if(parseInt(c.dist) % 2 !== 1) return;
+    var pkey = personKey(c.name, c.dist);
+    _trackerByKey[pkey] = c;
+  });
+
   Object.keys(tracker).forEach(function(k) {
     var t = tracker[k];
-    var amt = t.amt || 0;
-    if(amt > 0 || (t.status && t.status !== 'none')) {
-      totalAlloc += amt;
-      if(t.status === 'approved') approved++;
-      if(t.status === 'review') review++;
-      if(t.status === 'contributed') contributed++;
-      if(t.status === 'pass') pass++;
+    var amt = parseInt(t && t.amt) || 0;
+    if(amt <= 0 && (!t || !t.status || t.status === 'none')) return;
+    totalAlloc += amt;
+    if(t.status === 'approved') approved++;
+    if(t.status === 'review') review++;
+    if(t.status === 'contributed') contributed++;
+    if(t.status === 'pass') pass++;
 
-      // Determine phase from rec cache or candidate data
-      var namePart = k.replace(/_\d+$/, '');
-      var rec = _recCache[k] || null;
-      if(rec && rec.inPrimary) { p1Amt += amt; p1Ct++; }
-      else { p2Amt += amt; p2Ct++; }
+    var c = _trackerByKey[k];
+    var inPrimary = false;
+    if(c) {
+      try {
+        var rec = getScaledRec(c.name, c.dist, c.ch, c.party, c.incumbent);
+        inPrimary = !!(rec && rec.inPrimary);
+      } catch(e){}
     }
+    if(inPrimary) { p1Amt += amt; p1Ct++; }
+    else { p2Amt += amt; p2Ct++; }
   });
 
   var remaining = balance - totalAlloc;
@@ -4305,9 +4324,11 @@ function updateBudgetSidebar() {
   setStyle('bsb-remain-bar', 'width', remainPct + '%');
   setStyle('bsb-remain-bar', 'background', remColor);
 
-  set('bsb-p1-amt', '$' + p1Amt.toLocaleString());
+  // Show committed amount + pot size so the sidebar parallels the
+  // Budget Plan card (e.g. "$0 of $21,600" for Phase 1).
+  set('bsb-p1-amt', '$' + p1Amt.toLocaleString() + ' / $' + primaryPot.toLocaleString());
   set('bsb-p1-ct', p1Ct);
-  set('bsb-p2-amt', '$' + p2Amt.toLocaleString());
+  set('bsb-p2-amt', '$' + p2Amt.toLocaleString() + ' / $' + generalPot.toLocaleString());
   set('bsb-p2-ct', p2Ct);
 
   set('bsb-approved', approved);
