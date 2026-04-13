@@ -557,6 +557,7 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
 .bp-row .bp-party-D{background:#F5DAD8;color:#5C1010}
 .bp-row .bp-flag{font-size:12px;font-weight:900;padding:6px 12px;border-radius:10px;text-align:center;white-space:nowrap;letter-spacing:.06em;text-transform:uppercase}
 .bp-row .bp-flag-contest{background:#B45309;color:#fff;border:2px solid #92400E;box-shadow:0 2px 6px rgba(180,83,9,0.4);animation:contest-pulse 2.5s ease-in-out infinite}
+.dist-primary-badge{display:inline-block;background:#B45309;color:#fff;font-size:12px;font-weight:900;letter-spacing:.08em;padding:5px 12px;border-radius:10px;border:2px solid #FDE68A;box-shadow:0 2px 10px rgba(180,83,9,0.55);margin-left:10px;text-transform:uppercase;animation:contest-pulse 2.5s ease-in-out infinite;vertical-align:middle}
 .bp-row .bp-flag-uncontest{background:var(--surface-3);color:var(--text-muted);border:1px solid var(--border);font-size:10px;font-weight:700;padding:4px 10px}
 @keyframes contest-pulse{0%,100%{box-shadow:0 2px 6px rgba(180,83,9,0.4)}50%{box-shadow:0 2px 14px rgba(180,83,9,0.7)}}
 .bp-row .bp-rec{font-weight:700;color:var(--teal);text-align:right;font-size:11px}
@@ -633,6 +634,20 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
 .empty-state-icon{font-size:36px;margin-bottom:12px;opacity:.5}
 .empty-state-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;font-style:normal}
 .empty-state-hint{font-size:12px;opacity:.7;margin-top:8px}
+/* ── KEYBOARD HELP MODAL ── */
+#keyboard-help-overlay{position:fixed;inset:0;background:rgba(10,20,25,0.75);backdrop-filter:blur(4px);z-index:10000;display:none;align-items:center;justify-content:center;padding:20px}
+#keyboard-help-overlay.open{display:flex}
+.keyboard-help-modal{background:var(--white);border-radius:14px;box-shadow:0 30px 80px rgba(0,0,0,0.5);max-width:520px;width:100%;padding:28px 32px;animation:search-in .2s ease}
+.keyboard-help-modal h3{font-family:var(--font-display);font-size:20px;color:var(--ink);margin:0 0 6px;display:flex;align-items:center;gap:10px}
+.keyboard-help-modal .kh-sub{font-size:12px;color:var(--text-muted);margin-bottom:18px}
+.keyboard-help-modal .kh-group{margin-bottom:14px}
+.keyboard-help-modal .kh-group-title{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--teal-dark);margin-bottom:6px}
+.keyboard-help-modal .kh-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--border);font-size:13px}
+.keyboard-help-modal .kh-row:last-child{border-bottom:none}
+.keyboard-help-modal .kh-keys{display:flex;gap:4px}
+.keyboard-help-modal .kh-key{display:inline-block;min-width:20px;padding:3px 8px;background:var(--surface-2);border:1px solid var(--border);border-radius:5px;font-family:monospace;font-size:11px;font-weight:700;color:var(--ink);text-align:center;box-shadow:0 1px 0 var(--border)}
+.keyboard-help-close{position:absolute;top:16px;right:18px;background:none;border:none;font-size:18px;cursor:pointer;color:var(--text-muted)}
+.keyboard-help-close:hover{color:var(--ink)}
 /* ── COLLAPSIBLE SECTIONS ── */
 .coll-head{cursor:pointer;user-select:none;position:relative}
 .coll-head::before{content:'▾';display:inline-block;margin-right:8px;font-size:14px;transition:transform .18s ease;color:var(--teal);font-weight:700}
@@ -1575,6 +1590,63 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
   .nav-tab { padding: 10px 10px; font-size: 11px; }
 }
 
+/* ════════════════════════════════════════════════
+   CHIP BAR + PROFILE GRID + MODALS — MOBILE TUNING
+   (Budget Plan keeps desktop 8-col grid — horizontal scroll
+    inside its wrapper handles small screens without squishing.)
+   ════════════════════════════════════════════════ */
+@media (max-width: 640px) {
+  /* Chip bar — horizontal scroll with bigger touch targets */
+  .chip-bar {
+    gap: 6px;
+    padding: 10px 0 6px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap;
+    scrollbar-width: none;
+  }
+  .chip-bar::-webkit-scrollbar { display: none; }
+  .qchip {
+    font-size: 12px;
+    padding: 8px 12px;
+    min-height: 34px;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  /* Profile slide-over tiles — single column */
+  .bento-grid { grid-template-columns: 1fr !important; gap: 8px; }
+  .bento-tile { padding: 12px 14px; }
+  .bento-tile.accent[style*="span 2"] { grid-column: 1 !important; }
+
+  /* Slide-over panel — tighter padding on phone */
+  .person-panel-body { padding: 12px !important; gap: 8px !important; }
+  .person-panel-header { padding: 14px 16px !important; }
+  .person-panel-header h2 { font-size: 17px !important; }
+
+  /* Keyboard help modal — scale down on phone */
+  .keyboard-help-modal {
+    padding: 20px 18px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .keyboard-help-modal h3 { font-size: 17px; }
+  .keyboard-help-modal .kh-row { font-size: 12px; padding: 5px 0; }
+
+  /* Committee agenda buttons — stack and widen */
+  #agenda-copy-btn { width: 100%; }
+
+  /* Budget Plan: keep the 8-column grid intact but allow the whole
+     block to scroll horizontally as a unit so district+name stay visible. */
+  #budget-plan-list {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .bp-row, .bp-tier-head {
+    min-width: 720px;
+  }
+}
+
 
 /* ── QUICK-FILTER CHIPS ── */
 .chip-bar { display:flex; gap:8px; flex-wrap:wrap; padding:12px 0 4px; }
@@ -1685,15 +1757,25 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
       </div>
     </div>
 
-    <!-- ROW 1: Links + Vote -->
-    <div class="bento-grid">
-      <div class="bento-tile bento-full">
-        <div class="bt-label">Quick Links</div>
-        <div class="pp-links-row" id="pp-links"></div>
+    <!-- ROW A: CUPAC recommendation — FIRST THING YOU SEE after name/district -->
+    <div class="bento-tile bento-full" id="pp-rec-tile" style="border:1px solid rgba(90,200,160,0.3);background:linear-gradient(135deg,rgba(13,115,119,0.18),rgba(21,128,61,0.12));">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div id="pp-rec-icon" style="font-size:28px;">⭐</div>
+          <div>
+            <div class="bt-label">CUPAC Recommendation · <span id="pp-rec-tier" style="font-weight:800;">—</span></div>
+            <div id="pp-rec-category" style="font-size:11px;color:rgba(255,255,255,0.55);margin-top:2px;"></div>
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <div id="pp-rec-amt" style="font-size:22px;font-weight:800;color:#86EFAC;">$0</div>
+          <div id="pp-rec-timing" style="font-size:10px;color:rgba(255,255,255,0.5);font-style:italic;"></div>
+        </div>
       </div>
+      <div id="pp-rec-reasons" style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:4px;"></div>
     </div>
 
-    <!-- ROW 2: Voting History + Relationship + Ballot -->
+    <!-- ROW B: Voting History — the evidence behind the recommendation -->
     <div class="bento-grid">
       <div class="bento-tile accent" id="pp-vote-tile" style="grid-column:span 2;">
         <div class="bt-label">Voting History</div>
@@ -1722,67 +1804,7 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
       </div>
     </div>
 
-    <!-- ROW 2.5: CUPAC recommendation — tier, suggested amount, and WHY -->
-    <div class="bento-tile bento-full" id="pp-rec-tile" style="border:1px solid rgba(90,200,160,0.3);background:linear-gradient(135deg,rgba(13,115,119,0.18),rgba(21,128,61,0.12));">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
-        <div style="display:flex;align-items:center;gap:10px;">
-          <div id="pp-rec-icon" style="font-size:28px;">⭐</div>
-          <div>
-            <div class="bt-label">CUPAC Recommendation · <span id="pp-rec-tier" style="font-weight:800;">—</span></div>
-            <div id="pp-rec-category" style="font-size:11px;color:rgba(255,255,255,0.55);margin-top:2px;"></div>
-          </div>
-        </div>
-        <div style="text-align:right;">
-          <div id="pp-rec-amt" style="font-size:22px;font-weight:800;color:#86EFAC;">$0</div>
-          <div id="pp-rec-timing" style="font-size:10px;color:rgba(255,255,255,0.5);font-style:italic;"></div>
-        </div>
-      </div>
-      <div id="pp-rec-reasons" style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:4px;"></div>
-    </div>
-
-    <!-- ROW 3: Giving history — full width bento with spark bars -->
-    <div class="bento-tile bento-full">
-      <div class="bt-label">CUPAC Giving History — 2016 · 2018 · 2020 · 2022 · 2024</div>
-      <div id="pp-cupac-bento" style="margin-top:6px;"></div>
-    </div>
-
-    <!-- ROW 4: 2022 Campaign Finance -->
-    <div class="bento-tile bento-full">
-      <div class="bt-label">2022 Campaign Finance (ND SOS)</div>
-      <div id="pp-warChest" style="margin-top:4px;"></div>
-    </div>
-
-    <!-- ROW 5: Latest News (conditional) -->
-
-    <!-- Election History — Ballotpedia style -->
-    <div class="bento-tile bento-full" id="pp-race-history-section">
-      <div class="bt-label" style="color:rgba(90,200,160,0.9);">🗳 Election History</div>
-      <div id="pp-race-bio" style="font-size:11px;color:rgba(255,255,255,0.55);line-height:1.6;margin:4px 0 8px;font-style:italic;"></div>
-      <div id="pp-race-table"></div>
-      <div style="font-size:9px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">Sources: results.sos.nd.gov (official ND SoS) · ndlegis.gov · InForum · ND Monitor</div>
-    </div>
-    <div class="bento-tile news-tile bento-full" id="pp-news-section" style="display:none;">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-        <div class="bt-label" style="color:rgba(196,154,0,0.9);">📰 Latest News</div>
-        <button id="pp-news-refresh" onclick="ppRefreshNews()" style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.75);border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:3px 10px;font-size:10px;font-weight:700;cursor:pointer;">↻ Refresh</button>
-      </div>
-      <div id="pp-news-text" style="font-size:12px;color:rgba(255,255,255,0.75);line-height:1.6;margin-top:4px;"></div>
-      <div id="pp-news-live" style="margin-top:8px;display:flex;flex-direction:column;gap:6px;"></div>
-    </div>
-
-    <!-- ROW 6: Others in This District (conditional) -->
-    <div class="bento-tile bento-full" id="pp-challengers-section" style="display:none;">
-      <div class="bt-label">Others in This District</div>
-      <div id="pp-challengers" style="margin-top:6px;"></div>
-    </div>
-
-    <!-- ROW 7: Staff note (conditional) -->
-    <div class="bento-tile bento-full" id="pp-staff-note-section" style="display:none;border-left:3px solid rgba(196,154,0,0.5);">
-      <div class="bt-label" style="color:rgba(196,154,0,0.8);">Staff Background Note</div>
-      <div id="pp-staff-note" style="font-size:12px;color:rgba(255,255,255,0.65);font-style:italic;margin-top:4px;line-height:1.6;"></div>
-    </div>
-
-    <!-- ROW 8: 2026 Decision -->
+    <!-- ROW C: 2026 Funding Decision — actionable form, pulled up so committee can act immediately -->
     <div class="bento-tile decision-tile bento-full">
       <div class="bt-label">💰 2026 Funding Decision</div>
       <select id="pp-status-select" class="pp-tracker-select" onchange="ppSaveStatus()">
@@ -1803,6 +1825,56 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
       <div class="pp-sync" id="pp-sync-indicator">✓ Saved &amp; synced</div>
     </div>
 
+    <!-- ROW D: Quick Links -->
+    <div class="bento-grid">
+      <div class="bento-tile bento-full">
+        <div class="bt-label">Quick Links</div>
+        <div class="pp-links-row" id="pp-links"></div>
+      </div>
+    </div>
+
+    <!-- ROW E: Giving history — full width bento with spark bars -->
+    <div class="bento-tile bento-full">
+      <div class="bt-label">CUPAC Giving History — 2016 · 2018 · 2020 · 2022 · 2024</div>
+      <div id="pp-cupac-bento" style="margin-top:6px;"></div>
+    </div>
+
+    <!-- ROW F: 2022 Campaign Finance -->
+    <div class="bento-tile bento-full">
+      <div class="bt-label">2022 Campaign Finance (ND SOS)</div>
+      <div id="pp-warChest" style="margin-top:4px;"></div>
+    </div>
+
+    <!-- ROW G: Election History — Ballotpedia style -->
+    <div class="bento-tile bento-full" id="pp-race-history-section">
+      <div class="bt-label" style="color:rgba(90,200,160,0.9);">🗳 Election History</div>
+      <div id="pp-race-bio" style="font-size:11px;color:rgba(255,255,255,0.55);line-height:1.6;margin:4px 0 8px;font-style:italic;"></div>
+      <div id="pp-race-table"></div>
+      <div style="font-size:9px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">Sources: results.sos.nd.gov (official ND SoS) · ndlegis.gov · InForum · ND Monitor</div>
+    </div>
+
+    <!-- ROW H: Latest News -->
+    <div class="bento-tile news-tile bento-full" id="pp-news-section" style="display:none;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+        <div class="bt-label" style="color:rgba(196,154,0,0.9);">📰 Latest News</div>
+        <button id="pp-news-refresh" onclick="ppRefreshNews()" style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.75);border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:3px 10px;font-size:10px;font-weight:700;cursor:pointer;">↻ Refresh</button>
+      </div>
+      <div id="pp-news-text" style="font-size:12px;color:rgba(255,255,255,0.75);line-height:1.6;margin-top:4px;"></div>
+      <div id="pp-news-live" style="margin-top:8px;display:flex;flex-direction:column;gap:6px;"></div>
+    </div>
+
+    <!-- ROW I: Others in This District (conditional) -->
+    <div class="bento-tile bento-full" id="pp-challengers-section" style="display:none;">
+      <div class="bt-label">Others in This District</div>
+      <div id="pp-challengers" style="margin-top:6px;"></div>
+    </div>
+
+    <!-- ROW J: Staff note (conditional) -->
+    <div class="bento-tile bento-full" id="pp-staff-note-section" style="display:none;border-left:3px solid rgba(196,154,0,0.5);">
+      <div class="bt-label" style="color:rgba(196,154,0,0.8);">Staff Background Note</div>
+      <div id="pp-staff-note" style="font-size:12px;color:rgba(255,255,255,0.65);font-style:italic;margin-top:4px;line-height:1.6;"></div>
+    </div>
+
     <!-- Hidden legacy compatibility placeholders (used by JS but not shown) -->
     <div style="display:none" id="pp-cupac"></div>
 
@@ -1816,7 +1888,38 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
     <div id="gs-results"></div>
     <div class="gs-footer">
       <span><span class="gs-kbd">↑↓</span> navigate <span class="gs-kbd">↵</span> open <span class="gs-kbd">esc</span> close</span>
-      <span>Press <span class="gs-kbd">⌘K</span> or <span class="gs-kbd">/</span> to open anywhere</span>
+      <span>Press <span class="gs-kbd">⌘K</span> or <span class="gs-kbd">/</span> to open anywhere · <span class="gs-kbd">?</span> for all shortcuts</span>
+    </div>
+  </div>
+</div>
+
+<!-- Keyboard Help Modal -->
+<div id="keyboard-help-overlay" onclick="if(event.target===this) closeKeyboardHelp()">
+  <div class="keyboard-help-modal" style="position:relative">
+    <button class="keyboard-help-close" onclick="closeKeyboardHelp()" aria-label="Close">✕</button>
+    <h3>⌨️ Keyboard Shortcuts</h3>
+    <div class="kh-sub">Speed-run the dashboard without touching your mouse.</div>
+    <div class="kh-group">
+      <div class="kh-group-title">Navigation</div>
+      <div class="kh-row"><span>Leadership tab</span><span class="kh-keys"><span class="kh-key">1</span></span></div>
+      <div class="kh-row"><span>SB 2266 / SB 2217 Votes</span><span class="kh-keys"><span class="kh-key">2</span></span></div>
+      <div class="kh-row"><span>Voting History</span><span class="kh-keys"><span class="kh-key">3</span></span></div>
+      <div class="kh-row"><span>Candidates</span><span class="kh-keys"><span class="kh-key">4</span></span></div>
+      <div class="kh-row"><span>Committee Agenda</span><span class="kh-keys"><span class="kh-key">5</span></span></div>
+      <div class="kh-row"><span>Win Probability</span><span class="kh-keys"><span class="kh-key">6</span></span></div>
+      <div class="kh-row"><span>Strategy / Budget Plan</span><span class="kh-keys"><span class="kh-key">7</span></span></div>
+    </div>
+    <div class="kh-group">
+      <div class="kh-group-title">Search &amp; Find</div>
+      <div class="kh-row"><span>Open global search</span><span class="kh-keys"><span class="kh-key">⌘</span><span class="kh-key">K</span></span></div>
+      <div class="kh-row"><span>Open global search (alt)</span><span class="kh-keys"><span class="kh-key">/</span></span></div>
+      <div class="kh-row"><span>Navigate results</span><span class="kh-keys"><span class="kh-key">↑</span><span class="kh-key">↓</span></span></div>
+      <div class="kh-row"><span>Open selected result</span><span class="kh-keys"><span class="kh-key">↵</span></span></div>
+    </div>
+    <div class="kh-group">
+      <div class="kh-group-title">Modals &amp; Panels</div>
+      <div class="kh-row"><span>Show this help</span><span class="kh-keys"><span class="kh-key">?</span></span></div>
+      <div class="kh-row"><span>Close slide-over / modal</span><span class="kh-keys"><span class="kh-key">esc</span></span></div>
     </div>
   </div>
 </div>
@@ -1837,6 +1940,7 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
   <div style="display:flex;align-items:center;gap:10px">
     <button onclick="openGACModal()" class="header-badge" style="cursor:pointer;color:#90EE90;border:1px solid rgba(144,238,144,0.4);background:rgba(255,255,255,0.15);font-family:inherit;transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,.25)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">Balance: <strong style="font-size:14px">$36,222</strong></button>
     <button onclick="toggleTierBar()" class="header-badge" style="cursor:pointer;border:1px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.15);font-family:inherit;">🎯 Filter Recs</button>
+    <button onclick="showKeyboardHelp()" class="header-badge" style="cursor:pointer;border:1px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.15);font-family:inherit;" title="Keyboard shortcuts (press ?)">⌨️ ?</button>
     <div class="header-badge">⚑ Filing Deadline Apr 6</div>
   </div>
 </header>
@@ -2640,9 +2744,10 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
   <div style="margin-bottom:32px;">
     <div class="section-title coll-head" data-coll-id="agenda" onclick="toggleCollapse('agenda',this)">Committee Meeting Dashboard</div>
     <div class="coll-body">
-      <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;">
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
         <button onclick="generateAgenda()" style="padding:8px 16px;border-radius:8px;background:var(--teal);color:#fff;border:1px solid var(--teal);cursor:pointer;font-weight:600;font-size:13px;">Generate Agenda</button>
         <button onclick="printAgenda()" style="padding:8px 16px;border-radius:8px;background:var(--ink);color:#fff;border:1px solid var(--ink);cursor:pointer;font-weight:600;font-size:13px;">🖨 Print</button>
+        <button onclick="copyAgenda()" id="agenda-copy-btn" style="padding:8px 16px;border-radius:8px;background:var(--white);color:var(--teal-dark);border:1px solid var(--teal);cursor:pointer;font-weight:600;font-size:13px;">📋 Copy to Clipboard</button>
       </div>
       <div id="agenda-output" style="display:none;background:var(--white);border:1px solid var(--border);border-radius:14px;padding:32px;box-shadow:var(--shadow-md);"></div>
     </div>
@@ -2831,6 +2936,34 @@ function distLeanBadge(dist){
     badge += ' <span style="font-size:10px;font-weight:700;padding:1px 7px;border-radius:8px;background:rgba(0,0,0,0.25);color:'+gClr+';margin-left:4px;">💰 CU $'+cuTot.toLocaleString()+' vs BK $'+bkTot.toLocaleString()+' · '+gLbl+'</span>';
   }
   return badge;
+}
+
+// Big, loud "CONTESTED PRIMARY" badge — shown on district header rows when any
+// chamber/party has more filings than seats available (Senate: 2+, House: 3+).
+// Designed to be impossible to miss — amber pulse, large font, uppercase.
+function distPrimaryBadge(dist){
+  var d = parseInt(dist);
+  if(!d || isNaN(d) || d%2!==1) return ''; // only odd districts on 2026 ballot
+  if(typeof CANDIDATES === 'undefined') return '';
+  // Count filings per chamber+party
+  var counts = {};
+  CANDIDATES.forEach(function(c){
+    if(parseInt(c.dist) !== d) return;
+    var k = c.ch + '-' + c.party;
+    counts[k] = (counts[k] || 0) + 1;
+  });
+  var contested = [];
+  Object.keys(counts).forEach(function(k){
+    var parts = k.split('-');
+    var ch = parts[0], party = parts[1];
+    var seats = ch === 'Senate' ? 1 : 2;
+    if(counts[k] > seats) {
+      var partyLbl = party === 'R' ? 'GOP' : party === 'D' ? 'Dem' : party;
+      contested.push(ch === 'Senate' ? ('S·' + partyLbl) : ('H·' + partyLbl));
+    }
+  });
+  if(!contested.length) return '';
+  return '<span class="dist-primary-badge">⚔ PRIMARY · ' + contested.join(' + ') + '</span>';
 }
 
 function personKey(name, dist){
@@ -5630,8 +5763,8 @@ function renderVoteTable(){
     if(dist&&dist!=='—'){
       var _totalCands = CANDIDATES.filter(function(c){return parseInt(c.dist)===parseInt(dist);}).length;
       var _candCountBadge = _totalCands ? '<span style="font-size:11px;font-weight:400;margin-left:8px;color:rgba(255,255,255,0.7);">'+_totalCands+' candidate'+(_totalCands>1?'s':'')+' filed</span>' : '';
-      voteHtml+='<div data-coll-id="'+_distCollKey+'" class="coll-head-cand'+(_distClosed?' coll-closed':'')+'" onclick="toggleCollapse(\''+_distCollKey+'\',this)" style="grid-column:1/-1;margin-top:16px;margin-bottom:4px;padding:10px 16px;background:var(--teal-dark);color:#fff;border-radius:6px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;">'
-        +'<span style="font-family:var(--font-display);font-size:15px;font-weight:700;display:flex;align-items:center;"><span class="cand-caret" style="display:inline-block;font-size:22px;line-height:1;margin-right:12px;min-width:18px;color:#86EFAC;">'+_caret+'</span>District '+dist+onBallotBadge+distLeanBadge(dist)+_candCountBadge+'</span>'
+      voteHtml+='<div data-coll-id="'+_distCollKey+'" class="coll-head-cand'+(_distClosed?' coll-closed':'')+'" onclick="toggleCollapse(\''+_distCollKey+'\',this)" style="grid-column:1/-1;margin-top:16px;margin-bottom:4px;padding:10px 16px;background:var(--teal-dark);color:#fff;border-radius:6px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;flex-wrap:wrap;gap:8px;">'
+        +'<span style="font-family:var(--font-display);font-size:15px;font-weight:700;display:flex;align-items:center;flex-wrap:wrap;"><span class="cand-caret" style="display:inline-block;font-size:22px;line-height:1;margin-right:12px;min-width:18px;color:#86EFAC;">'+_caret+'</span>District '+dist+onBallotBadge+distLeanBadge(dist)+distPrimaryBadge(dist)+_candCountBadge+'</span>'
         +(coverStr?'<span style="font-size:11px;color:rgba(255,255,255,0.65);">📍 '+coverStr+'</span>':'')
         +'</div>';
       // Wrap the district's candidate cards in a full-width div that
@@ -5870,8 +6003,8 @@ function renderCandidates(list){
     var distCollKey = 'cand_dist_' + dist;
     var distClosed = !!_collState[distCollKey];
     var caret = distClosed ? '▸' : '▾';
-    html += '<div data-coll-id="'+distCollKey+'" class="coll-head-cand'+(distClosed?' coll-closed':'')+'" onclick="toggleCollapse(\''+distCollKey+'\',this)" style="grid-column:1/-1;margin-top:16px;margin-bottom:4px;padding:10px 16px;background:var(--teal-dark);color:#fff;border-radius:6px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;">'
-      +'<span style="font-family:var(--font-display);font-size:15px;font-weight:700;display:flex;align-items:center;"><span class="cand-caret" style="display:inline-block;font-size:22px;line-height:1;margin-right:12px;min-width:18px;color:#86EFAC;">'+caret+'</span>District '+dist+onBallot+distLeanBadge(dist)+_candCountD+'</span>'
+    html += '<div data-coll-id="'+distCollKey+'" class="coll-head-cand'+(distClosed?' coll-closed':'')+'" onclick="toggleCollapse(\''+distCollKey+'\',this)" style="grid-column:1/-1;margin-top:16px;margin-bottom:4px;padding:10px 16px;background:var(--teal-dark);color:#fff;border-radius:6px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;flex-wrap:wrap;gap:8px;">'
+      +'<span style="font-family:var(--font-display);font-size:15px;font-weight:700;display:flex;align-items:center;flex-wrap:wrap;"><span class="cand-caret" style="display:inline-block;font-size:22px;line-height:1;margin-right:12px;min-width:18px;color:#86EFAC;">'+caret+'</span>District '+dist+onBallot+distLeanBadge(dist)+distPrimaryBadge(dist)+_candCountD+'</span>'
       +(coverStr?'<span style="font-size:11px;color:rgba(255,255,255,0.65);">📍 '+coverStr+'</span>':'')
       +'</div>';
     // Open the body wrapper — contains its own inner grid so display:none cleanly hides it
@@ -9856,6 +9989,14 @@ function closeGlobalSearch() {
   var overlay = document.getElementById('global-search-overlay');
   if(overlay) overlay.classList.remove('open');
 }
+function showKeyboardHelp() {
+  var overlay = document.getElementById('keyboard-help-overlay');
+  if(overlay) overlay.classList.add('open');
+}
+function closeKeyboardHelp() {
+  var overlay = document.getElementById('keyboard-help-overlay');
+  if(overlay) overlay.classList.remove('open');
+}
 function renderGlobalSearch(q) {
   var box = document.getElementById('gs-results');
   if(!box) return;
@@ -9954,6 +10095,14 @@ document.addEventListener('keydown', function(e){
   var isTyping = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
   var modalOpen = document.getElementById('global-search-overlay');
   var isSearchOpen = modalOpen && modalOpen.classList.contains('open');
+  var khOverlay = document.getElementById('keyboard-help-overlay');
+  var isHelpOpen = khOverlay && khOverlay.classList.contains('open');
+
+  // Keyboard help modal — esc closes
+  if(isHelpOpen) {
+    if(e.key === 'Escape') { e.preventDefault(); closeKeyboardHelp(); return; }
+    return;
+  }
 
   // Search modal hotkeys
   if(isSearchOpen) {
@@ -9971,6 +10120,9 @@ document.addEventListener('keydown', function(e){
 
   // Don't hijack shortcuts while user is typing in a field
   if(isTyping) return;
+
+  // ? → show keyboard help
+  if(e.key === '?') { e.preventDefault(); showKeyboardHelp(); return; }
 
   // / → open search
   if(e.key === '/') { e.preventDefault(); openGlobalSearch(); return; }
@@ -11596,6 +11748,71 @@ function printAgenda() {
   w.document.write('<html><head><title>CUPAC Committee Meeting Agenda</title><style>body{font-family:sans-serif;padding:24px;font-size:12px;max-width:800px;margin:0 auto}*{box-sizing:border-box}h2,h3{margin:0 0 8px 0}</style></head><body>'+content+'</body></html>');
   w.document.close();
   w.print();
+}
+
+function copyAgenda() {
+  var out = document.getElementById('agenda-output');
+  if(!out || !out.innerHTML.trim() || out.style.display === 'none') {
+    if(typeof showToast === 'function') {
+      showToast({type:'warning', icon:'⚠️', title:'No agenda yet', msg:'Click "Generate Agenda" first, then copy.'});
+    } else {
+      alert('Click "Generate Agenda" first, then copy.');
+    }
+    return;
+  }
+  // Build a plain-text version from the DOM so it pastes cleanly into email/Slack
+  function nodeToText(el, depth) {
+    depth = depth || 0;
+    var out = '';
+    for(var i=0;i<el.childNodes.length;i++) {
+      var n = el.childNodes[i];
+      if(n.nodeType === 3) { // text
+        out += n.textContent.replace(/\s+/g,' ');
+      } else if(n.nodeType === 1) {
+        var tag = n.tagName;
+        if(tag === 'H1' || tag === 'H2') out += '\n\n=== ' + nodeToText(n, depth+1).trim().toUpperCase() + ' ===\n';
+        else if(tag === 'H3') out += '\n\n--- ' + nodeToText(n, depth+1).trim() + ' ---\n';
+        else if(tag === 'H4') out += '\n' + nodeToText(n, depth+1).trim() + '\n';
+        else if(tag === 'LI') out += '\n  • ' + nodeToText(n, depth+1).trim();
+        else if(tag === 'TR') out += '\n' + nodeToText(n, depth+1).trim();
+        else if(tag === 'TD' || tag === 'TH') out += nodeToText(n, depth+1).trim() + '  |  ';
+        else if(tag === 'BR') out += '\n';
+        else if(tag === 'P' || tag === 'DIV') out += '\n' + nodeToText(n, depth+1);
+        else out += nodeToText(n, depth+1);
+      }
+    }
+    return out;
+  }
+  var plain = nodeToText(out).replace(/\n{3,}/g,'\n\n').replace(/ \| *\n/g,'\n').trim();
+  var btn = document.getElementById('agenda-copy-btn');
+  var origHtml = btn ? btn.innerHTML : '';
+  function markCopied() {
+    if(btn) { btn.innerHTML = '✓ Copied!'; btn.style.background = '#16A34A'; btn.style.color = '#fff'; btn.style.borderColor = '#16A34A'; }
+    if(typeof showToast === 'function') {
+      showToast({type:'success', icon:'📋', title:'Agenda copied', msg:'Paste it into your email or Slack.'});
+    }
+    setTimeout(function(){
+      if(btn) { btn.innerHTML = origHtml; btn.style.background = ''; btn.style.color = ''; btn.style.borderColor = ''; }
+    }, 2200);
+  }
+  function fallback() {
+    try {
+      var ta = document.createElement('textarea');
+      ta.value = plain;
+      ta.style.position = 'fixed'; ta.style.left = '-9999px';
+      document.body.appendChild(ta); ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      markCopied();
+    } catch(e) {
+      alert('Copy failed — select the agenda text manually.');
+    }
+  }
+  if(navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(plain).then(markCopied, fallback);
+  } else {
+    fallback();
+  }
 }
 
 // ══════════════════════════════════════════════════
