@@ -2072,17 +2072,24 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
     <button class="qchip" id="cchip-r"    onclick="toggleCandChip('r')">&#11044; Republican <span class="chip-count" id="cchip-r-ct">&#8212;</span></button>
     <button class="qchip" id="cchip-d"    onclick="toggleCandChip('d')">&#11044; Dem-NPL <span class="chip-count" id="cchip-d-ct">&#8212;</span></button>
   </div>
-  <div class="controls">
-    <label>Filter:</label>
-    <input type="text" id="cand-search" placeholder="Search name…" oninput="filterCandidates()" style="min-width:160px">
-    <select id="cand-chamber" onchange="filterCandidates()"><option value="ALL">All Chambers</option><option value="Senate">Senate</option><option value="House">House</option></select>
-    <select id="cand-cupac-f" onchange="filterCandidates()"><option value="ALL">All Candidates</option><option value="YES">History Only</option><option value="NO">No History</option></select>
-    <span style="display:inline-block;padding:4px 10px;border-radius:8px;background:rgba(13,115,119,0.12);border:1.5px solid var(--teal);color:var(--teal-dark);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;">📜 SB 2266 FOM</span>
-    <select id="cand-sb2266-f" onchange="filterCandidates()" style="border:1.5px solid var(--teal);background:rgba(13,115,119,0.04);font-weight:700;"><option value="ALL">All Votes</option><option value="YEA">✓ YEA — Supported CUs</option><option value="NAY">✕ NAY — Opposed CUs</option><option value="NONE">No prior vote</option></select>
-    <span style="display:inline-block;padding:4px 10px;border-radius:8px;background:rgba(180,83,9,0.12);border:1.5px solid #B45309;color:#92400E;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;">💳 SB 2217 Interchange</span>
-    <select id="cand-sb2217-f" onchange="filterCandidates()" style="border:1.5px solid #B45309;background:rgba(180,83,9,0.04);font-weight:700;"><option value="ALL">All Votes</option><option value="NAY">✓ NAY — Pro-CU (opposed cap)</option><option value="YEA">✕ YEA — Anti-CU (supported cap)</option><option value="NONE">No prior vote</option></select>
-    <button class="btn" onclick="resetCandidates()">Reset</button>
-    <span class="result-count" id="cand-count"></span>
+  <div class="controls" style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:12px 14px;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;">
+    <!-- Row 1: text search + baseline filters -->
+    <input type="text" id="cand-search" placeholder="🔍 Search name…" oninput="filterCandidates()" style="flex:1;min-width:180px;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;">
+    <select id="cand-chamber" onchange="filterCandidates()" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--white);"><option value="ALL">All Chambers</option><option value="Senate">Senate</option><option value="House">House</option></select>
+    <select id="cand-cupac-f" onchange="filterCandidates()" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--white);"><option value="ALL">All Candidates</option><option value="YES">History Only</option><option value="NO">No History</option></select>
+    <!-- Row 2: color-coded bill filters (grouped) -->
+    <div style="display:flex;flex-direction:column;gap:2px;">
+      <div style="font-size:9px;font-weight:800;color:var(--teal-dark);text-transform:uppercase;letter-spacing:.5px;padding-left:2px;">📜 SB 2266 · FOM</div>
+      <select id="cand-sb2266-f" onchange="filterCandidates()" style="border:1.5px solid var(--teal);background:rgba(13,115,119,0.06);font-weight:700;padding:6px 10px;border-radius:8px;font-size:12px;min-width:140px;"><option value="ALL">All Votes</option><option value="YEA">✓ YEA — Supported CUs</option><option value="NAY">✕ NAY — Opposed CUs</option><option value="NONE">No prior vote</option></select>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:2px;">
+      <div style="font-size:9px;font-weight:800;color:#92400E;text-transform:uppercase;letter-spacing:.5px;padding-left:2px;">💳 SB 2217 · Interchange</div>
+      <select id="cand-sb2217-f" onchange="filterCandidates()" style="border:1.5px solid #B45309;background:rgba(180,83,9,0.06);font-weight:700;padding:6px 10px;border-radius:8px;font-size:12px;min-width:140px;"><option value="ALL">All Votes</option><option value="NAY">✓ NAY — Pro-CU (opposed cap)</option><option value="YEA">✕ YEA — Anti-CU (supported cap)</option><option value="NONE">No prior vote</option></select>
+    </div>
+    <div style="margin-left:auto;display:flex;gap:10px;align-items:center;">
+      <button class="btn" onclick="resetCandidates()" style="padding:8px 16px;">Reset</button>
+      <span class="result-count" id="cand-count" style="font-size:12px;color:var(--text-muted);font-style:italic;"></span>
+    </div>
   </div>
   <div class="person-card-grid" id="cand-tbody"></div>
 
