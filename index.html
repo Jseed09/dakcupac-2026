@@ -9369,6 +9369,7 @@ function renderWPTable() {
 
   var html='';
   var lastDist = null;
+  var _wpCollState = (typeof loadCollapseState === 'function') ? loadCollapseState() : {};
   filtered.forEach(function(r){
     var c=r.c;
     var prob=r.prob;
@@ -9377,16 +9378,23 @@ function renderWPTable() {
 
     // District group header
     if(c.dist !== lastDist){
+      // Close previous district's body wrapper
+      if(lastDist !== null) html += '</div></div>';
       lastDist = c.dist;
       var distLean = lean.d - lean.t;
       var distLabel = Math.abs(distLean)<2 ? 'Even' : distLean>0 ? 'D+'+Math.round(distLean) : 'R+'+Math.round(-distLean);
       var distColor = distLean>5 ? '#1D4ED8' : distLean<-5 ? '#DC2626' : '#B45309';
       var distCands = filtered.filter(function(x){return x.c.dist===c.dist;}).length;
       var _totalCandsS = CANDIDATES.filter(function(x){return parseInt(x.dist)===parseInt(c.dist);}).length;
-      html += '<div style="grid-column:1/-1;background:var(--ink);color:var(--white);padding:10px 16px;border-radius:10px;margin-top:8px;font-weight:700;font-size:14px;">'
+      var _wpCollKey = 'wp_dist_' + c.dist;
+      var _wpClosed = !!_wpCollState[_wpCollKey];
+      var _wpCaret = _wpClosed ? '▸' : '▾';
+      html += '<div data-coll-id="'+_wpCollKey+'" class="coll-head-cand'+(_wpClosed?' coll-closed':'')+'" onclick="toggleCollapse(\''+_wpCollKey+'\',this)" style="grid-column:1/-1;background:var(--ink);color:var(--white);padding:10px 16px;border-radius:10px;margin-top:8px;font-weight:700;font-size:14px;cursor:pointer;user-select:none;display:flex;align-items:center;">'
+        +'<span class="cand-caret" style="display:inline-block;font-size:22px;line-height:1;margin-right:12px;min-width:18px;color:#86EFAC;">'+_wpCaret+'</span>'
         +'District '+c.dist+distLeanBadge(c.dist)+' <span style="font-weight:400;font-size:12px;margin-left:8px;color:rgba(255,255,255,0.7);">'+_totalCandsS+' candidate'+(_totalCandsS>1?'s':'')+' filed</span>'
         +(r.hasPrimary ? ' <span style="font-size:10px;background:#FEF3C7;color:#92400E;border-radius:4px;padding:1px 6px;margin-left:6px;">⚔ Contested Primary</span>' : '')
         +'</div>';
+      html += '<div class="coll-body-cand'+(_wpClosed?' coll-closed':'')+'" data-coll-body-for="'+_wpCollKey+'" style="grid-column:1/-1;'+(_wpClosed?'display:none;':'')+'"><div class="person-card-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;">';
     }
 
     // Rating
@@ -9441,6 +9449,8 @@ function renderWPTable() {
     var cardWithWP = card.replace(/<\/div>$/, wpStrip + '</div>');
     html += cardWithWP;
   });
+  // Close the final district's body wrapper if any district was opened
+  if(lastDist !== null) html += '</div></div>';
 
   if(!filtered.length) html='<div style="text-align:center;padding:24px;color:var(--text-muted);">No races match filters.</div>';
   grid.innerHTML=html;
