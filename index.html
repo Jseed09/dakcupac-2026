@@ -2130,6 +2130,19 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
     <h1>2026 Candidates &amp; Funding Decisions</h1>
     <div class="subtitle">144 official filings · ND SOS April 6, 2026 · Filing deadline closed · Gold = leadership · Yellow = prior DakCUPAC history · Click any name for full person card</div>
   </div>
+
+  <!-- LOUD news fetch banner — top of Candidates tab -->
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;background:linear-gradient(135deg,#B45309,#92400E);color:#fff;padding:14px 20px;border-radius:14px;margin-bottom:18px;box-shadow:0 4px 16px rgba(180,83,9,0.3);">
+    <div style="display:flex;align-items:center;gap:14px;min-width:0;flex:1;">
+      <div style="font-size:32px;line-height:1;">📰</div>
+      <div style="min-width:0;">
+        <div style="font-family:var(--font-display);font-size:17px;font-weight:800;letter-spacing:.01em;">Fetch Recent News for All Candidates</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.85);margin-top:2px;">Hit Google News for every on-ballot candidate and refresh every profile. Takes ~90 seconds.</div>
+      </div>
+    </div>
+    <button onclick="refreshAllNews()" style="flex-shrink:0;background:#fff;color:#92400E;border:none;padding:12px 22px;border-radius:10px;font-family:var(--font-display);font-size:15px;font-weight:800;cursor:pointer;letter-spacing:.02em;box-shadow:0 2px 8px rgba(0,0,0,0.2);transition:transform .1s;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform=''">📰 FETCH NEWS NOW →</button>
+  </div>
+
   <div class="card-row" style="margin-bottom:20px">
     <div class="stat-card clickable" id="scard-all"    onclick="statCardFilter('all','all')"  ><div class="label">Total Filed</div><div class="value" id="cand-total">—</div><div class="sub">as of Apr 6 · Final</div></div>
     <div class="stat-card clickable" id="scard-senate" onclick="statCardFilter('Senate','all')"><div class="label">Senate</div><div class="value" id="cand-senate">—</div><div class="sub">Click to filter</div></div>
