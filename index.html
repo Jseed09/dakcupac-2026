@@ -1658,10 +1658,10 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
     <h2 id="pp-name">—</h2>
     <div class="pp-sub" id="pp-role">—</div>
   </div>
-  <!-- Compare hint bar -->
-  <div id="pp-compare-hint" style="background:linear-gradient(90deg,#0D7377,#085155);padding:8px 16px;display:flex;align-items:center;gap:8px;cursor:default;">
-    <span style="font-size:12px;color:rgba(255,255,255,0.9);">Click any other name to compare side-by-side</span>
-    <span style="font-size:10px;color:rgba(255,255,255,0.5);margin-left:auto;">or scroll down to "Others in This District"</span>
+  <!-- Compare hint bar + explicit compare button -->
+  <div id="pp-compare-hint" style="background:linear-gradient(90deg,#0D7377,#085155);padding:8px 16px;display:flex;align-items:center;gap:8px;">
+    <span style="font-size:12px;color:rgba(255,255,255,0.9);">⚖️ Compare side-by-side with another legislator</span>
+    <button onclick="ppOpenCompare()" style="margin-left:auto;background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:5px 14px;font-size:11px;font-weight:700;cursor:pointer;">🔍 Pick someone to compare</button>
   </div>
   <div class="person-panel-body">
 
@@ -1761,8 +1761,12 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
       <div style="font-size:9px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">Sources: results.sos.nd.gov (official ND SoS) · ndlegis.gov · InForum · ND Monitor</div>
     </div>
     <div class="bento-tile news-tile bento-full" id="pp-news-section" style="display:none;">
-      <div class="bt-label" style="color:rgba(196,154,0,0.9);">📰 Latest News</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+        <div class="bt-label" style="color:rgba(196,154,0,0.9);">📰 Latest News</div>
+        <button id="pp-news-refresh" onclick="ppRefreshNews()" style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.75);border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:3px 10px;font-size:10px;font-weight:700;cursor:pointer;">↻ Refresh</button>
+      </div>
       <div id="pp-news-text" style="font-size:12px;color:rgba(255,255,255,0.75);line-height:1.6;margin-top:4px;"></div>
+      <div id="pp-news-live" style="margin-top:8px;display:flex;flex-direction:column;gap:6px;"></div>
     </div>
 
     <!-- ROW 6: Others in This District (conditional) -->
@@ -2475,6 +2479,7 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
           <button class="bp-preset" onclick="bpPreset(75)">75/25</button>
           <button class="bp-preset" onclick="bpPreset(90)">90/10</button>
           <span style="flex:1;"></span>
+          <button class="bp-bulk" onclick="refreshAllNews()" title="Fetch latest Google News headlines for every on-ballot candidate" style="background:#CA8A04;border-color:#92400E;">📰 Refresh News</button>
           <button class="bp-bulk" onclick="bpApplyAll()" title="Fill every empty row with the recommended amount">⚡ Apply All Recs</button>
           <button class="bp-bulk bp-bulk-danger" onclick="bpClearAll()" title="Zero every tracker amount">✕ Clear All</button>
         </div>
@@ -5008,15 +5013,36 @@ function personCard(cfg){
     ? '<span style="font-size:10px;font-weight:600;padding:1px 6px;border-radius:8px;background:#FEE2E2;color:#991B1B;border:1px solid #FCA5A5">'+(_pcStatusLabel||'Not on 2026 Ballot')+'</span>'
     : '';
 
-  // Spark bars
-  var bars = hist.map(function(v,i){
-    var pct = Math.max(3, Math.round((v/maxH)*26));
-    var url = 'https://cf.sos.nd.gov/search/showcommittee.aspx?cid=281&yr='+yrs[i];
-    return '<div class="pcard-bar-wrap">'
-      +'<div class="pcard-bar'+(v>0?' filled':'')+'" style="height:'+pct+'px"'+(v>0?' onclick="window.open(\''+url+'\',\'_blank\')" title="$'+v+' · '+yrs[i]+' ↗"':'')+' ></div>'
-      +'<div class="pcard-barlabel">\''+yrs[i].slice(2)+'</div>'
-      +'</div>';
-  }).join('');
+  // Sparkline — compact SVG line chart of CUPAC giving across cycles.
+  // Replaces the old bar chart for a cleaner at-a-glance trend.
+  var sparkW = 140, sparkH = 34, sparkPad = 4;
+  var bars;
+  if(hist.reduce(function(s,v){return s+v;},0) > 0) {
+    var maxV = Math.max.apply(null, hist.concat([1]));
+    var stepX = (sparkW - 2*sparkPad) / (hist.length - 1);
+    var points = hist.map(function(v, i){
+      var x = sparkPad + i * stepX;
+      var y = sparkH - sparkPad - ((v / maxV) * (sparkH - 2*sparkPad));
+      return [x, y, v];
+    });
+    var lineD = points.map(function(p, i){ return (i===0?'M':'L')+p[0]+','+p[1]; }).join(' ');
+    var areaD = lineD + ' L' + points[points.length-1][0] + ',' + (sparkH - sparkPad) + ' L' + points[0][0] + ',' + (sparkH - sparkPad) + ' Z';
+    var dots = points.map(function(p, i){
+      if(p[2] <= 0) return '';
+      var url = 'https://cf.sos.nd.gov/search/showcommittee.aspx?cid=281&yr='+yrs[i];
+      return '<circle cx="'+p[0]+'" cy="'+p[1]+'" r="2.5" fill="var(--teal)" stroke="#fff" stroke-width="1" style="cursor:pointer" onclick="window.open(\''+url+'\',\'_blank\')"><title>$'+p[2]+' · '+yrs[i]+'</title></circle>';
+    }).join('');
+    var labels = yrs.map(function(y, i){
+      return '<text x="'+(sparkPad + i * stepX)+'" y="'+(sparkH-0)+'" font-size="7" fill="var(--text-muted)" text-anchor="middle">\''+y.slice(2)+'</text>';
+    }).join('');
+    bars = '<svg viewBox="0 0 '+sparkW+' '+(sparkH+8)+'" width="100%" height="'+(sparkH+8)+'" style="display:block;">'
+      + '<path d="'+areaD+'" fill="rgba(13,115,119,0.15)" stroke="none"/>'
+      + '<path d="'+lineD+'" fill="none" stroke="var(--teal)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>'
+      + dots + labels
+      + '</svg>';
+  } else {
+    bars = '<div style="font-size:11px;color:var(--text-muted);font-style:italic;padding:10px 0;">No prior CUPAC giving</div>';
+  }
 
   // Decision status dot
   var dotColors={none:'#ccc',review:'var(--gold-border)',approved:'var(--green-border)',contributed:'var(--teal)',pass:'var(--red-border)'};
@@ -5307,9 +5333,7 @@ function personCard(cfg){
 
       +'<div class="pcard-section">'
         +'<div class="pcard-gridlabel">CUPAC History — '+(cupacTotal?'<strong style="color:var(--teal-dark)">'+cupacTotal+'</strong>':'<span style="color:var(--text-muted)">$0</span>')+'</div>'
-        +(hist.reduce(function(s,v){return s+v;},0)>0
-          ?'<div class="pcard-bars">'+bars+'</div>'
-          :'<div style="font-size:11px;color:var(--text-muted);font-style:italic;margin-top:4px">No prior CUPAC giving</div>')
+        +'<div style="margin-top:4px;">'+bars+'</div>'
       +'</div>'
 
       +(bankingAlert?'<div class="pcard-section">'+bankingAlert+'</div>':'')
@@ -6367,9 +6391,22 @@ function openPersonCard(name, dist){
 
     const ppNewsEl = document.getElementById('pp-news-section');
   const ppNewsText = document.getElementById('pp-news-text');
+  const ppNewsLive = document.getElementById('pp-news-live');
   if(ppNewsEl && ppNewsText){
     ppNewsText.textContent = newsNote || '';
-    ppNewsEl.style.display = newsNote ? 'block' : 'none';
+    // Always show the section so the refresh button is available
+    ppNewsEl.style.display = 'block';
+  }
+  // Save the current person for the refresh button
+  window._ppCurrentNews = { name: name, dist: dist||0 };
+  // Render any cached live news (non-blocking, async fetch if stale)
+  if(ppNewsLive) {
+    ppNewsLive.innerHTML = '<div style="font-size:11px;color:rgba(255,255,255,0.4);font-style:italic;">Loading latest news…</div>';
+    if(typeof fetchCandidateNews === 'function') {
+      fetchCandidateNews(name, dist||0).then(function(headlines){
+        _renderLiveNews(headlines);
+      }).catch(function(){ _renderLiveNews([]); });
+    }
   }
 
   // CUPAC history — bento spark bar version with all 5 cycles including 2020
@@ -9819,6 +9856,17 @@ function gsSelect(idx) {
   var r = _gsResults[idx];
   if(!r) return;
   closeGlobalSearch();
+  // Compare mode: open the side-by-side compare view instead of replacing
+  if(_gsCompareMode && r.type !== 'district') {
+    _gsCompareMode = false;
+    var input = document.getElementById('gs-input');
+    if(input) input.placeholder = '🔍 Search legislators, candidates, or districts…';
+    if(typeof openCompareView === 'function' && window._comparePersonA) {
+      openCompareView(window._comparePersonA, r.name);
+      return;
+    }
+  }
+  _gsCompareMode = false;
   if(r.type === 'district') {
     // Jump to committee tab and populate district lookup
     showPanel('committee', document.querySelectorAll('.nav-tab')[3]);
@@ -9894,6 +9942,157 @@ setTimeout(function(){
   var input = document.getElementById('gs-input');
   if(input) input.addEventListener('input', function(){ renderGlobalSearch(input.value); });
 }, 100);
+
+// ──────────────────────────────────────────────────────────────
+// AUTOMATIC NEWS FETCH — Google News RSS via public CORS proxy
+// Cached to localStorage so we don't re-fetch on every page load.
+// ──────────────────────────────────────────────────────────────
+const NEWS_CACHE_KEY = 'cupac_news_cache_v1';
+const NEWS_CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
+function _loadNewsCache() {
+  try { return JSON.parse(localStorage.getItem(NEWS_CACHE_KEY) || '{}'); } catch(e){ return {}; }
+}
+function _saveNewsCache(c) {
+  try { localStorage.setItem(NEWS_CACHE_KEY, JSON.stringify(c)); } catch(e){}
+}
+function _newsKey(name, dist) {
+  return (name || '').toLowerCase().replace(/[^a-z]/g,'') + '_' + (dist || 0);
+}
+// Fetch Google News RSS for a candidate via allorigins.win (free public
+// CORS proxy). Returns a Promise that resolves to an array of headline
+// objects. Falls back to an empty array on any error.
+function fetchCandidateNews(name, dist, opts) {
+  opts = opts || {};
+  var key = _newsKey(name, dist);
+  var cache = _loadNewsCache();
+  var now = Date.now();
+  // Return cached if fresh and not forced
+  if(!opts.force && cache[key] && (now - cache[key].ts) < NEWS_CACHE_TTL_MS) {
+    return Promise.resolve(cache[key].headlines || []);
+  }
+  // Build Google News RSS URL with candidate name + "North Dakota"
+  var q = encodeURIComponent('"' + name + '" "North Dakota"');
+  var rssUrl = 'https://news.google.com/rss/search?q=' + q + '&hl=en-US&gl=US&ceid=US:en';
+  var proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(rssUrl);
+  return fetch(proxyUrl)
+    .then(function(r){
+      if(!r.ok) throw new Error('proxy '+r.status);
+      return r.text();
+    })
+    .then(function(xml){
+      var parser = new DOMParser();
+      var doc = parser.parseFromString(xml, 'text/xml');
+      var items = Array.from(doc.querySelectorAll('item')).slice(0, 5);
+      var headlines = items.map(function(it){
+        var title = (it.querySelector('title') || {}).textContent || '';
+        var link = (it.querySelector('link') || {}).textContent || '';
+        var pubDate = (it.querySelector('pubDate') || {}).textContent || '';
+        var sourceEl = it.querySelector('source');
+        var source = sourceEl ? (sourceEl.textContent || '') : '';
+        // Google News titles are usually "Headline - Source Name"
+        // Split out the source if the headline contains it.
+        var m = title.match(/^(.*?)\s*-\s*([^-]+)$/);
+        var cleanTitle = m ? m[1] : title;
+        var derivedSource = m ? m[2] : source;
+        return {
+          title: cleanTitle.trim(),
+          link: link.trim(),
+          source: (derivedSource || '').trim(),
+          date: pubDate ? new Date(pubDate).toLocaleDateString() : ''
+        };
+      });
+      cache[key] = { headlines: headlines, ts: now };
+      _saveNewsCache(cache);
+      return headlines;
+    })
+    .catch(function(err){
+      console.warn('news fetch failed for '+name, err);
+      // Cache the empty result briefly so we don't hammer the proxy
+      cache[key] = { headlines: [], ts: now, error: true };
+      _saveNewsCache(cache);
+      return [];
+    });
+}
+// Render the live-news block in the slide-over panel.
+function _renderLiveNews(headlines) {
+  var el = document.getElementById('pp-news-live');
+  if(!el) return;
+  if(!headlines || !headlines.length) {
+    el.innerHTML = '<div style="font-size:11px;color:rgba(255,255,255,0.35);font-style:italic;">No recent news found. Click ↻ Refresh to try again.</div>';
+    return;
+  }
+  el.innerHTML = headlines.map(function(h){
+    var dateStr = h.date ? '<span style="color:rgba(255,255,255,0.35);">· '+h.date+'</span>' : '';
+    var srcStr  = h.source ? '<span style="color:rgba(196,154,0,0.8);font-weight:700;">'+h.source+'</span> ' : '';
+    return '<a href="'+h.link+'" target="_blank" rel="noopener noreferrer" style="display:block;padding:6px 8px;background:rgba(255,255,255,0.04);border-left:2px solid rgba(196,154,0,0.4);border-radius:4px;text-decoration:none;color:rgba(255,255,255,0.85);font-size:11px;line-height:1.4;">'
+      + srcStr + h.title + ' ' + dateStr + '</a>';
+  }).join('');
+}
+// Open global search in "compare mode" — picking a result opens the
+// side-by-side compare view instead of replacing the current slide-over.
+var _gsCompareMode = false;
+function ppOpenCompare() {
+  _gsCompareMode = true;
+  if(typeof openGlobalSearch === 'function') openGlobalSearch();
+  var input = document.getElementById('gs-input');
+  if(input) input.placeholder = '⚖️ Search for the second person to compare…';
+}
+// Per-profile refresh button handler
+function ppRefreshNews() {
+  var cur = window._ppCurrentNews;
+  if(!cur || !cur.name) return;
+  var el = document.getElementById('pp-news-live');
+  if(el) el.innerHTML = '<div style="font-size:11px;color:rgba(255,255,255,0.4);font-style:italic;">Fetching fresh news…</div>';
+  if(typeof showToast === 'function') showToast({type:'info', icon:'📰', title:'Fetching news', msg:'Searching Google News for '+cur.name, duration: 2000});
+  fetchCandidateNews(cur.name, cur.dist, {force:true})
+    .then(function(hl){
+      _renderLiveNews(hl);
+      if(typeof showToast === 'function') showToast({
+        type: hl.length ? 'success' : 'warning',
+        icon: '📰',
+        title: hl.length ? hl.length+' headlines found' : 'No news found',
+        msg: hl.length ? 'Latest coverage for '+cur.name : 'No recent coverage — try a different search',
+        duration: 3500
+      });
+    });
+}
+// Bulk refresh — iterate on-ballot candidates with rate limiting.
+// Fires progress toasts and a final summary toast.
+function refreshAllNews() {
+  if(typeof CANDIDATES === 'undefined') return;
+  var targets = CANDIDATES.filter(function(c){ return parseInt(c.dist) % 2 === 1; });
+  if(!targets.length) return;
+  if(typeof showToast === 'function') showToast({
+    type:'info', icon:'📰', title:'Fetching news for '+targets.length+' candidates',
+    msg:'This takes about '+Math.ceil(targets.length*0.6)+' seconds. Stay on this page.',
+    duration: 4000
+  });
+  var idx = 0, ok = 0, fail = 0;
+  function next() {
+    if(idx >= targets.length) {
+      if(typeof showToast === 'function') showToast({
+        type: ok > 0 ? 'success' : 'warning', icon:'📰',
+        title: 'News refresh complete',
+        msg: ok+' fetched · '+fail+' unavailable',
+        duration: 5000
+      });
+      // Re-render the slide-over if open
+      try {
+        var pp = document.getElementById('person-panel');
+        if(pp && pp.classList.contains('open') && window._comparePersonA && typeof openPersonCard === 'function') {
+          openPersonCard(window._comparePersonA, 0);
+        }
+      } catch(e){}
+      return;
+    }
+    var c = targets[idx++];
+    fetchCandidateNews(c.name, c.dist, {force:true})
+      .then(function(hl){ if(hl && hl.length) ok++; else fail++; })
+      .catch(function(){ fail++; })
+      .then(function(){ setTimeout(next, 500); }); // 500ms delay between requests
+  }
+  next();
+}
 
 // ──────────────────────────────────────────────────────────────
 // TOAST NOTIFICATIONS — lightweight feedback for user actions
