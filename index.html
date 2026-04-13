@@ -2050,7 +2050,7 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
     <div class="stat-card clickable" id="scard-all"    onclick="statCardFilter('all','all')"  ><div class="label">Total Filed</div><div class="value" id="cand-total">—</div><div class="sub">as of Apr 6 · Final</div></div>
     <div class="stat-card clickable" id="scard-senate" onclick="statCardFilter('Senate','all')"><div class="label">Senate</div><div class="value" id="cand-senate">—</div><div class="sub">Click to filter</div></div>
     <div class="stat-card clickable" id="scard-house"  onclick="statCardFilter('House','all')" ><div class="label">House</div><div class="value" id="cand-house">—</div><div class="sub">Click to filter</div></div>
-    <div class="stat-card green clickable" id="scard-cupac" onclick="statCardFilter('all','cupac')"><div class="label">Prior DakCUPAC</div><div class="value" id="cand-cupac">—</div><div class="sub">2016–2022 · Click to filter</div></div>
+    <div class="stat-card green clickable" id="scard-cupac" onclick="statCardFilter('all','cupac')"><div class="label">Prior DakCUPAC</div><div class="value" id="cand-cupac">—</div><div class="sub">2016–2024 · Click to filter</div></div>
     <div class="stat-card red clickable"   id="scard-r"     onclick="statCardFilter('all','R')">   <div class="label">Republican</div><div class="value" id="cand-r">—</div><div class="sub">Click to filter</div></div>
     <div class="stat-card gold clickable"  id="scard-d"     onclick="statCardFilter('all','D')">   <div class="label">Dem-NPL</div><div class="value" id="cand-d">—</div><div class="sub">Click to filter</div></div>
   </div>
@@ -2126,7 +2126,7 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
 
   <div class="section-title"><span class="icon">📌</span> Key Numbers at a Glance</div>
   <div class="card-row">
-    <div class="stat-card green"><div class="label">Cash Balance (Feb 2026)</div><div class="value">$36,222</div><div class="sub">February 2026 financials</div></div>
+    <div class="stat-card green"><div class="label">Cash Balance (Apr 2026)</div><div class="value">$36,222</div><div class="sub">April 2026 financials</div></div>
     <div class="stat-card"><div class="label">Seats on 2026 Ballot</div><div class="value">~72</div><div class="sub">24 Senate + ~48 House (odd districts)</div></div>
     <div class="stat-card"><div class="label">Senate Balance (69th)</div><div class="value">42–5</div><div class="sub">R 42, Dem-NPL 5</div></div>
     <div class="stat-card"><div class="label">House Balance (69th)</div><div class="value">83–11</div><div class="sub">R 83, Dem-NPL 11</div></div>
@@ -5626,12 +5626,20 @@ function renderCandidates(list){
   document.getElementById('cand-count').textContent = list.length+' of '+CANDIDATES.length+' candidates · '+sortedDists.length+' districts';
 }
 
-// Candidate tab active chip
+// Candidate tab chip filters — MULTI-SELECT.
+// Holds a Set of active chip IDs; click toggles membership.
+var activeCandChips = new Set();
 function toggleCandChip(chip){
-  activeCandChip = (activeCandChip === chip) ? null : chip;
+  if(activeCandChips.has(chip)) activeCandChips.delete(chip);
+  else activeCandChips.add(chip);
+  // Sync legacy single-chip var for any callers that still read it
+  activeCandChip = activeCandChips.size === 1 ? Array.from(activeCandChips)[0] : null;
+  // Update visual state on each chip button
   ['yea','nay','new','cont','cupac','r','d'].forEach(c=>{
     const el = document.getElementById('cchip-'+c);
-    if(el) el.className = 'qchip' + (activeCandChip===c ? ' active-'+(c==='yea'?'yea':c==='nay'?'nay':c==='new'?'new':c==='cont'?'cont':c==='cupac'?'yea':c==='r'?'nay':'new') : '');
+    if(!el) return;
+    var activeCls = c==='yea'?'active-yea':c==='nay'?'active-nay':c==='new'?'active-new':c==='cont'?'active-cont':c==='cupac'?'active-yea':c==='r'?'active-nay':'active-new';
+    el.className = 'qchip' + (activeCandChips.has(c) ? ' ' + activeCls : '');
   });
   // Clear party override
   window._candPartyFilter = null;
@@ -5694,19 +5702,24 @@ function filterCandidates(){
   // Party quick-filter from stat card click
   if(window._candPartyFilter){ f = f.filter(c=>c.party===window._candPartyFilter); }
 
-  // Active chip filter
-  if(activeCandChip){
-    if(activeCandChip==='yea')   f = f.filter(c=>getSB2266Vote(c.name,c.ch)==='YEA');
-    if(activeCandChip==='nay')   f = f.filter(c=>getSB2266Vote(c.name,c.ch)==='NAY');
-    if(activeCandChip==='new')   f = f.filter(c=>!getSB2266Vote(c.name,c.ch));
-    if(activeCandChip==='cupac') f = f.filter(c=>CUPAC_HIST[c.name]);
-    if(activeCandChip==='r')     f = f.filter(c=>c.party==='R');
-    if(activeCandChip==='d')     f = f.filter(c=>c.party==='D');
-    if(activeCandChip==='cont'){
-      const ck={}; CANDIDATES.forEach(c=>{ if(parseInt(c.dist)%2===1){ const k=c.ch+'_'+c.dist+'_'+c.party; ck[k]=(ck[k]||0)+1; } });
-      const contested=new Set(Object.entries(ck).filter(([k,v])=>{ const ch=k.split('_')[0]; return v>=(ch==='Senate'?2:3); }).map(([k])=>k));
-      f = f.filter(c=>contested.has(c.ch+'_'+c.dist+'_'+c.party));
+  // Active chip filters — MULTI-SELECT (AND logic)
+  if(typeof activeCandChips !== 'undefined' && activeCandChips.size > 0) {
+    // Precompute the contested set once if needed
+    var _contestedSet = null;
+    if(activeCandChips.has('cont')) {
+      var ck={}; CANDIDATES.forEach(c=>{ if(parseInt(c.dist)%2===1){ const k=c.ch+'_'+c.dist+'_'+c.party; ck[k]=(ck[k]||0)+1; } });
+      _contestedSet=new Set(Object.entries(ck).filter(([k,v])=>{ const ch=k.split('_')[0]; return v>=(ch==='Senate'?2:3); }).map(([k])=>k));
     }
+    f = f.filter(function(c){
+      if(activeCandChips.has('yea')   && getSB2266Vote(c.name,c.ch) !== 'YEA') return false;
+      if(activeCandChips.has('nay')   && getSB2266Vote(c.name,c.ch) !== 'NAY') return false;
+      if(activeCandChips.has('new')   && getSB2266Vote(c.name,c.ch)) return false;
+      if(activeCandChips.has('cupac') && !CUPAC_HIST[c.name]) return false;
+      if(activeCandChips.has('r')     && c.party !== 'R') return false;
+      if(activeCandChips.has('d')     && c.party !== 'D') return false;
+      if(activeCandChips.has('cont')  && !_contestedSet.has(c.ch+'_'+c.dist+'_'+c.party)) return false;
+      return true;
+    });
   }
 
   updateCandChipCounts(CANDIDATES);
@@ -5714,6 +5727,7 @@ function filterCandidates(){
 }
 function resetCandidates(){
   activeCandChip=null;
+  if(typeof activeCandChips !== 'undefined') activeCandChips.clear();
   ['yea','nay','new','cont','cupac','r','d'].forEach(c=>{ const el=document.getElementById('cchip-'+c); if(el) el.className='qchip'; });
   activeStatCard=null;
   ['all','senate','house','cupac','r','d'].forEach(id=>{ const el=document.getElementById('scard-'+id); if(el) el.classList.remove('active-filter'); });
