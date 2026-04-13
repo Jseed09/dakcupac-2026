@@ -2647,7 +2647,11 @@ function saveBudget(cashOrObj, target, splitPct) {
   broadcastBudget(b);
   return b;
 }
+var _broadcastingBudget = false;
 function broadcastBudget(b) {
+  if(_broadcastingBudget) return; // prevent re-entry / infinite loops
+  _broadcastingBudget = true;
+  try {
   if(!b) b = getBudget();
   b.total = b.cash||0;
   // Compute total allocated from tracker so the header/sidebar shows
@@ -2675,6 +2679,9 @@ function broadcastBudget(b) {
   // Legacy Browser-Persistent budget panel on Candidates tab — update if present
   if(typeof calcBudget === 'function' && document.getElementById('bgt-cash')) {
     try { calcBudget(); } catch(e){}
+  }
+  } finally {
+    _broadcastingBudget = false;
   }
 }
 function loadTracker(){ try{return JSON.parse(localStorage.getItem(TRACKER_KEY)||'{}')}catch(e){return{}} }
@@ -5822,6 +5829,8 @@ function savePoolVal(id,val){ const d=loadBudget(); d['pool_'+id]=parseInt(val)|
 function calcBudget(){
   // Always pull cash from the centralized budget so this legacy panel
   // stays in sync with the Budget Plan card / header badge / sidebar.
+  // IMPORTANT: do NOT call saveBudget here — broadcastBudget calls
+  // calcBudget, and saveBudget calls broadcastBudget → infinite loop.
   var _centralBgt = getBudget();
   var _cashInput = document.getElementById('bgt-cash');
   if(_cashInput && Math.round(parseInt(_cashInput.value)||0) !== Math.round(_centralBgt.cash||0)) {
@@ -5835,8 +5844,6 @@ function calcBudget(){
   var trackerCommitted = 0;
   Object.keys(_trk).forEach(function(k){ trackerCommitted += parseInt(_trk[k] && _trk[k].amt) || 0; });
   const total = cash + raise - fed;
-  // Persist only cash to the centralized budget (preserves target/splitPct)
-  saveBudget({cash: cash});
   const te=document.getElementById('bgt-total'); te.textContent='$'+total.toLocaleString(); te.style.color=total<0?'var(--red-text)':'var(--teal-dark)';
   const d=loadBudget(); let committed=trackerCommitted; const poolUsed={};
   POOLS.forEach(p=>poolUsed[p.id]=0);
