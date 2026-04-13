@@ -2355,10 +2355,25 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
         </div>
       </div>
 
-      <!-- Row 4: stacked progress bar -->
-      <div id="bp-progress-bar" style="height:28px;background:var(--surface-3);border-radius:8px;overflow:hidden;display:flex;"></div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;font-size:10px;color:var(--text-muted);">
-        <span>Primary spend</span><span>General spend</span><span>Reserve</span><span>Unallocated</span>
+      <!-- Row 4: $30k campaign target stacked bar (Reserve sits outside as a chip) -->
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;">
+            <span style="font-size:10px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:.4px;">Campaign Target · <span id="bp-bar-target-lbl">$30,000</span></span>
+            <span style="font-size:10px;color:var(--text-muted);"><span id="bp-bar-used-pct">0%</span> of target committed</span>
+          </div>
+          <div id="bp-progress-bar" style="height:28px;background:var(--surface-3);border-radius:8px;overflow:hidden;display:flex;border:1px solid var(--border);"></div>
+          <div style="display:flex;gap:14px;margin-top:6px;font-size:10px;color:var(--text-muted);flex-wrap:wrap;">
+            <span style="display:inline-flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#B45309;display:inline-block;"></span>⚔ Primary <strong id="bp-bar-p">$0</strong></span>
+            <span style="display:inline-flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:var(--teal);display:inline-block;"></span>🗳 General <strong id="bp-bar-g">$0</strong></span>
+            <span style="display:inline-flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:var(--surface-3);border:1px solid var(--border);display:inline-block;"></span>Unallocated <strong id="bp-bar-u">$0</strong></span>
+          </div>
+        </div>
+        <div style="flex-shrink:0;background:#FEF3C7;border:1.5px dashed #B45309;border-radius:10px;padding:10px 14px;min-width:140px;text-align:center;">
+          <div style="font-size:9px;font-weight:700;color:#92400E;text-transform:uppercase;letter-spacing:.4px;">🏦 Reserve Buffer</div>
+          <div id="bp-bar-reserve" style="font-size:18px;font-weight:800;color:#B45309;margin-top:2px;">$0</div>
+          <div style="font-size:9px;color:#92400E;font-style:italic;">above target</div>
+        </div>
       </div>
     </div>
 
@@ -9136,20 +9151,30 @@ function renderBudgetPlan() {
   var slider = document.getElementById('bp-split-slider');
   if(slider && slider.value != splitPct) slider.value = splitPct;
 
-  // Stacked progress bar
+  // Stacked progress bar — denominator is the CAMPAIGN TARGET ($30k default),
+  // not cash. Reserve sits outside the bar as its own chip so it never
+  // competes visually with the allocation segments.
   var bar = document.getElementById('bp-progress-bar');
   if(bar) {
-    var total = cash;
-    var pPct = total > 0 ? (allocPrimary / total * 100) : 0;
-    var gPct = total > 0 ? (allocGeneral / total * 100) : 0;
-    var rPct = total > 0 && reserve > 0 ? (reserve / total * 100) : 0;
-    var uPct = Math.max(0, 100 - pPct - gPct - rPct);
+    var denom = target > 0 ? target : 1;
+    var committed = allocPrimary + allocGeneral;
+    // Clamp percentages to 100 in case allocations exceed target
+    var pPct = Math.min(100, (allocPrimary / denom) * 100);
+    var gPct = Math.min(100 - pPct, (allocGeneral / denom) * 100);
+    var uPct = Math.max(0, 100 - pPct - gPct);
     bar.innerHTML = ''
-      + (pPct>0 ? '<div style="width:'+pPct+'%;background:#B45309;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;">⚔ $'+allocPrimary.toLocaleString()+'</div>' : '')
-      + (gPct>0 ? '<div style="width:'+gPct+'%;background:var(--teal);display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;">🗳 $'+allocGeneral.toLocaleString()+'</div>' : '')
-      + (rPct>0 ? '<div style="width:'+rPct+'%;background:var(--gold);display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;">Reserve</div>' : '')
-      + (uPct>0 ? '<div style="width:'+uPct+'%;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:10px;font-weight:700;">Unallocated</div>' : '');
+      + (pPct > 0.5 ? '<div style="width:'+pPct+'%;background:#B45309;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;overflow:hidden;white-space:nowrap;">⚔ $'+allocPrimary.toLocaleString()+'</div>' : '')
+      + (gPct > 0.5 ? '<div style="width:'+gPct+'%;background:var(--teal);display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;overflow:hidden;white-space:nowrap;">🗳 $'+allocGeneral.toLocaleString()+'</div>' : '')
+      + (uPct > 0.5 ? '<div style="width:'+uPct+'%;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:10px;font-weight:700;overflow:hidden;white-space:nowrap;">Unallocated $'+(target - committed).toLocaleString()+'</div>' : '');
   }
+  // Bar legend values
+  var usedPct = target > 0 ? Math.round(committed / target * 100) : 0;
+  setText('bp-bar-target-lbl', '$' + target.toLocaleString());
+  setText('bp-bar-used-pct', usedPct + '%');
+  setText('bp-bar-p', '$' + allocPrimary.toLocaleString());
+  setText('bp-bar-g', '$' + allocGeneral.toLocaleString());
+  setText('bp-bar-u', '$' + Math.max(0, target - committed).toLocaleString());
+  setText('bp-bar-reserve', '$' + (reserve > 0 ? reserve : 0).toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:0}));
 }
 
 function bpSetSplit(val) {
