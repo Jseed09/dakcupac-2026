@@ -5298,11 +5298,19 @@ function personCard(cfg){
   var _covMembers = COMMITTEE_MEMBERS.filter(function(m){return m.districts.includes(parseInt(dist));}).map(function(m){return m.name;});
   var _covTxt = _covMembers.length ? _covMembers.join(', ') : '<span style="color:#aaa;font-style:italic">None assigned</span>';
 
+  // Compact card title prefix — Sen./Rep. for sitting legislators
+  var _pcTitle = '';
+  var _pcIsSitting = !!cfg.incumbent || !!_ldr || (_candForLeg && (_candForLeg.currentHouseMember || _candForLeg.currentSenateMember));
+  if(_pcIsSitting) {
+    var _pcCh = chamber || (_ldr && _ldr.chamber) || (_candForLeg && _candForLeg.ch) || '';
+    if(_pcCh === 'Senate' || _pcCh === 'S') _pcTitle = 'Sen. ';
+    else if(_pcCh === 'House' || _pcCh === 'H') _pcTitle = 'Rep. ';
+  }
   return '<div class="'+cardClass+'" '+clickHandler+'>'
     +'<div class="pcard-hdr">'
       +'<div>'
         +'<div class="pcard-name" onclick="openPersonCard(\''+safeName+'\','+(parseInt(dist)||0)+')" title="Open full profile">'
-          +name+(_pcStatusLabel?' <span style="font-size:11px;font-weight:600;opacity:.85">('+_pcStatusLabel+')</span>':'')
+          +_pcTitle+name+(_pcStatusLabel?' <span style="font-size:11px;font-weight:600;opacity:.85">('+_pcStatusLabel+')</span>':'')
           +iblBadge+pins+' <span style="font-size:12px;opacity:.6">▸</span>'
         +'</div>'
         +'<div class="pcard-badges">'+ballot+'</div>'
@@ -6196,7 +6204,17 @@ function openPersonCard(name, dist){
   _ppKey = ukey;
   const saved = getSaved(name, dist||0);
 
-  document.getElementById('pp-name').textContent = name;
+  // Prefix with a formal title for sitting legislators so the header
+  // reads "Sen. Bob Paulson" / "Rep. Craig Headland". Non-incumbents
+  // get no prefix (they're not a Rep./Sen. yet).
+  var _ppTitle = '';
+  var _ppIsSitting = !!(ldr || (cand && cand.incumbent) || (cand && cand.currentHouseMember) || (cand && cand.currentSenateMember));
+  if(_ppIsSitting) {
+    var _ppCh = (ldr && ldr.chamber) || (cand && cand.ch) || '';
+    if(_ppCh === 'Senate' || _ppCh === 'S') _ppTitle = 'Sen. ';
+    else if(_ppCh === 'House' || _ppCh === 'H') _ppTitle = 'Rep. ';
+  }
+  document.getElementById('pp-name').textContent = _ppTitle + name;
   let role='';
   if(ldr)       role=ldr.role+' · '+ldr.chamber+' · District '+ldr.dist;
   else if(cand) role=cand.ch+' · District '+cand.dist+' · '+(cand.party==='R'?'Republican':'Dem-NPL')+(cand.formerHouse?' · Fmr. House Member':'');
@@ -9958,6 +9976,57 @@ function _saveNewsCache(c) {
 function _newsKey(name, dist) {
   return (name || '').toLowerCase().replace(/[^a-z]/g,'') + '_' + (dist || 0);
 }
+// Strip middle initials and periods so "Eric J Murphy" → "Eric Murphy".
+// Produces both forms when a middle initial is present.
+function _nameVariants(name) {
+  var cleaned = (name || '').trim();
+  var variants = [cleaned];
+  // Match "First I. Last" or "First I Last" or "First M. Last"
+  var stripped = cleaned.replace(/\s+[A-Z]\.?\s+/g, ' ').replace(/\s+/g,' ').trim();
+  if(stripped && stripped !== cleaned) variants.push(stripped);
+  // Also handle "LaurieBeth" etc. — no variant to add, just keep the original
+  return variants;
+}
+// Build a smart Google News query based on the legislator's chamber,
+// incumbent status, and district. Incumbents get their title prefixed
+// (Sen./Rep./Senator/Representative) with OR alternates so we catch
+// both formal and informal press coverage. Non-incumbent candidates
+// get the "District N candidate" framing. Former legislators get
+// "Former Rep./Sen." prefixes. Leadership gets their role included.
+function _buildNewsQuery(name, dist, chamber, isIncumbent, extras) {
+  extras = extras || {};
+  var nd = '"North Dakota"';
+  var distStr = dist ? ' "District ' + dist + '"' : '';
+  var isSenate = chamber === 'Senate' || chamber === 'S';
+  var shortTitle = isSenate ? 'Sen.' : 'Rep.';
+  var longTitle  = isSenate ? 'Senator' : 'Representative';
+  var variants = _nameVariants(name);
+  var parts = [];
+  variants.forEach(function(v){
+    if(isIncumbent) {
+      parts.push('"' + shortTitle + ' ' + v + '"');
+      parts.push('"' + longTitle + ' ' + v + '"');
+    }
+    if(extras.formerLegislator && !isIncumbent) {
+      parts.push('"Former ' + shortTitle + ' ' + v + '"');
+      parts.push('"Former ' + longTitle + ' ' + v + '"');
+    }
+    if(extras.leadershipRole) {
+      // e.g. "Majority Leader Mike Lefor" — strip trailing qualifier
+      var role = String(extras.leadershipRole).replace(/\s*[—\-].*$/, '').trim();
+      if(role) parts.push('"' + role + ' ' + v + '"');
+    }
+    parts.push('"' + v + '"');
+  });
+  // Dedupe
+  var seen = {};
+  parts = parts.filter(function(p){ if(seen[p]) return false; seen[p] = 1; return true; });
+  var orBlock = '(' + parts.join(' OR ') + ')';
+  var tail = isIncumbent || extras.formerLegislator
+    ? (nd + distStr)
+    : (nd + distStr + ' candidate');
+  return orBlock + ' ' + tail;
+}
 // Fetch Google News RSS for a candidate via allorigins.win (free public
 // CORS proxy). Returns a Promise that resolves to an array of headline
 // objects. Falls back to an empty array on any error.
@@ -9970,8 +10039,32 @@ function fetchCandidateNews(name, dist, opts) {
   if(!opts.force && cache[key] && (now - cache[key].ts) < NEWS_CACHE_TTL_MS) {
     return Promise.resolve(cache[key].headlines || []);
   }
-  // Build Google News RSS URL with candidate name + "North Dakota"
-  var q = encodeURIComponent('"' + name + '" "North Dakota"');
+  // Resolve chamber + incumbent status + extras (former legislator,
+  // leadership role) from CANDIDATES / LEADERS so the query is tuned
+  // to the right role. Caller can override via opts.
+  var chamber = opts.chamber || null;
+  var isIncumbent = opts.isIncumbent;
+  var extras = { formerLegislator: false, leadershipRole: null };
+  var _cand = null, _ldr = null;
+  if(typeof CANDIDATES !== 'undefined') {
+    _cand = CANDIDATES.find(function(c){ return c.name === name; });
+    if(_cand) {
+      if(chamber == null) chamber = _cand.ch;
+      if(isIncumbent == null) isIncumbent = !!_cand.incumbent;
+      if(_cand.formerLegislator || _cand.formerHouse || _cand.formerSenate) extras.formerLegislator = true;
+    }
+  }
+  if(typeof LEADERS !== 'undefined') {
+    _ldr = LEADERS.find(function(l){ return l.name === name; });
+    if(_ldr) {
+      if(chamber == null) chamber = _ldr.chamber;
+      if(isIncumbent == null) isIncumbent = true;
+      if(_ldr.role) extras.leadershipRole = _ldr.role;
+    }
+  }
+  // Build Google News RSS URL with the tuned query
+  var queryStr = _buildNewsQuery(name, dist, chamber, !!isIncumbent, extras);
+  var q = encodeURIComponent(queryStr);
   var rssUrl = 'https://news.google.com/rss/search?q=' + q + '&hl=en-US&gl=US&ceid=US:en';
   var proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(rssUrl);
   return fetch(proxyUrl)
