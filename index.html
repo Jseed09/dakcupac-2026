@@ -4732,7 +4732,7 @@ function personCard(cfg){
 
   // Incumbent badge
   var incBadge = cfg.incumbent
-    ? '<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:8px;background:var(--teal);color:#fff;margin-right:4px;">★ INCUMBENT</span>'
+    ? '<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:8px;background:var(--teal);color:#fff;white-space:nowrap;">★ INC</span>'
     : '';
 
   // Ballot badge
@@ -4984,9 +4984,9 @@ function personCard(cfg){
   var partyClr = party==='R' ? '#0D3B66' : party==='D' ? '#5C1010' : '#666';
   var partyPill = party ? '<span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;background:'+partyBg+';color:'+partyClr+';flex-shrink:0">'+party+'</span>' : '';
 
-  // Ballot badge for data grid
+  // Ballot badge for data grid — flex row so INC pill + district pill flow inline
   var ballotGridBadge = cfg.onBallot
-    ? incBadge+'<span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;background:rgba(46,139,87,0.12);color:var(--green-text);border:1px solid var(--green-border)">✓ Dist. '+(parseInt(dist)||'')+'</span>'
+    ? '<div style="display:flex;flex-wrap:wrap;gap:4px;align-items:center;">'+incBadge+'<span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;background:rgba(46,139,87,0.12);color:var(--green-text);border:1px solid var(--green-border);white-space:nowrap;">✓ Dist. '+(parseInt(dist)||'')+'</span></div>'
     : _isNotRunningCard
     ? '<span style="font-size:11px;color:var(--text-muted);font-style:italic">'+(_pcStatusLabel||'Not on 2026 ballot')+'</span>'
     : '<span style="font-size:11px;color:var(--text-muted)">—</span>';
