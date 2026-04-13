@@ -580,6 +580,10 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
 .coll-head:hover::before{color:var(--teal-dark)}
 .coll-body{overflow:hidden;transition:max-height .2s ease}
 .coll-head.coll-closed + .coll-body{display:none}
+/* Candidate-tab district-group collapsible (cand-tbody is a CSS grid) */
+.coll-head-cand .cand-caret{transition:transform .18s ease}
+.coll-head-cand.coll-closed .cand-caret{transform:rotate(-90deg)}
+.coll-body-cand.coll-closed{display:none !important}
 /* Tier group collapsible (inside Budget Plan list) */
 .bp-tier-head{cursor:pointer;user-select:none}
 .bp-tier-head::after{content:' ▾';font-size:14px;transition:transform .18s ease;display:inline-block;margin-left:6px}
@@ -1755,7 +1759,7 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
     <div class="header-title">DakCUPAC Legislative Intelligence <span>Confidential — Committee Use Only</span></div>
   </div>
   <div style="display:flex;align-items:center;gap:10px">
-    <button onclick="openGACModal()" class="header-badge" style="cursor:pointer;color:#90EE90;border:1px solid rgba(144,238,144,0.4);background:rgba(255,255,255,0.15);font-family:inherit;transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,.25)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">Balance: <strong style="font-size:14px">$34,029</strong></button>
+    <button onclick="openGACModal()" class="header-badge" style="cursor:pointer;color:#90EE90;border:1px solid rgba(144,238,144,0.4);background:rgba(255,255,255,0.15);font-family:inherit;transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,.25)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">Balance: <strong style="font-size:14px">$36,222</strong></button>
     <button onclick="toggleTierBar()" class="header-badge" style="cursor:pointer;border:1px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.15);font-family:inherit;">🎯 Filter Recs</button>
     <div class="header-badge">⚑ Filing Deadline Apr 6</div>
   </div>
@@ -1794,7 +1798,7 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
     <div class="bsb-title">2026 CUPAC Budget</div>
     <div style="display:flex;align-items:baseline;gap:2px;margin-top:4px;">
       <span style="font-size:14px;color:rgba(255,255,255,0.4);">$</span>
-      <input type="number" id="bsb-cash-input" value="34029" min="0" style="font-family:var(--font-display);font-size:22px;font-weight:700;color:#fff;background:transparent;border:none;border-bottom:1px dashed rgba(255,255,255,0.2);width:100px;outline:none;" onchange="onSidebarBudgetChange()">
+      <input type="number" id="bsb-cash-input" value="36222" min="0" style="font-family:var(--font-display);font-size:22px;font-weight:700;color:#fff;background:transparent;border:none;border-bottom:1px dashed rgba(255,255,255,0.2);width:100px;outline:none;" onchange="onSidebarBudgetChange()">
     </div>
     <div class="bsb-sub">Current balance — click to edit</div>
     <div style="display:flex;align-items:baseline;gap:2px;margin-top:6px;">
@@ -1809,7 +1813,7 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
     <div class="bsb-bar"><div class="bsb-bar-fill" id="bsb-alloc-bar" style="width:0%;background:rgba(13,190,195,0.8);"></div></div>
   </div>
   <div>
-    <div class="bsb-row"><span>Remaining</span><strong id="bsb-remaining" style="color:#4ADE80;">$34,029</strong></div>
+    <div class="bsb-row"><span>Remaining</span><strong id="bsb-remaining" style="color:#4ADE80;">$36,222</strong></div>
     <div class="bsb-bar"><div class="bsb-bar-fill" id="bsb-remain-bar" style="width:100%;background:#4ADE80;"></div></div>
   </div>
   <div class="bsb-divider"></div>
@@ -1882,14 +1886,20 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
   </div>
   <div class="card-row" id="sb-stat-cards"></div>
   <div class="chip-bar" id="sb-chip-bar">
+    <div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-right:4px;align-self:center;">SB 2266 (FOM):</div>
     <button class="qchip" id="chip-yea"  onclick="toggleChip('yea')">✓ YEA <span class="chip-count" id="chip-yea-ct">—</span></button>
     <button class="qchip" id="chip-nay"  onclick="toggleChip('nay')">✗ NAY <span class="chip-count" id="chip-nay-ct">—</span></button>
     <button class="qchip" id="chip-new"  onclick="toggleChip('new')">— New / No Vote <span class="chip-count" id="chip-new-ct">—</span></button>
+    <div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-right:4px;align-self:center;margin-left:8px;">SB 2217 (Interchange):</div>
+    <button class="qchip" id="chip-2217-pro"  onclick="toggleChip('2217-pro')">✓ NAY (pro-CU) <span class="chip-count" id="chip-2217-pro-ct">—</span></button>
+    <button class="qchip" id="chip-2217-anti" onclick="toggleChip('2217-anti')">✗ YEA (anti-CU) <span class="chip-count" id="chip-2217-anti-ct">—</span></button>
     <button class="qchip" id="chip-cont" onclick="toggleChip('cont')">⚔ Contested Primary <span class="chip-count" id="chip-cont-ct">—</span></button>
   </div>
   <div class="controls">
-    <label>Vote:</label>
+    <label>SB 2266:</label>
     <select id="vote-result" onchange="renderVoteTable()"><option value="ALL">All Votes</option><option value="YEA">✓ YEA</option><option value="NAY">✕ NAY</option><option value="ABSENT">Absent</option></select>
+    <label>SB 2217:</label>
+    <select id="vote-2217" onchange="renderVoteTable()"><option value="ALL">All Votes</option><option value="NAY">✓ NAY (pro-CU)</option><option value="YEA">✕ YEA (anti-CU)</option><option value="ABSENT">Absent</option></select>
     <select id="vote-chamber" onchange="renderVoteTable()"><option value="ALL">Both Chambers</option><option value="Senate">Senate</option><option value="House">House</option></select>
     <select id="vote-ballot" onchange="renderVoteTable()"><option value="ALL">All Legislators</option><option value="yes">★ 2026 Ballot Only</option></select>
     <label style="margin-left:8px">Money:</label>
@@ -1938,7 +1948,7 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
     </div>
     <div class="stat-card green" style="cursor:pointer" onclick="showPanel('candidates',document.querySelectorAll('.nav-tab')[3])" title="Go to 2026 Candidates & Funding ↓">
       <div class="label">2026 Opening Balance</div>
-      <div class="value">$34,029</div>
+      <div class="value">$36,222</div>
       <div class="sub">Highest year-end balance <span style="font-size:10px">↓ Allocate</span></div>
     </div>
   </div>
@@ -1987,7 +1997,7 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
       <tr class="total-row"><td>TOTAL 2016–2024</td><td class="amt">—</td><td class="amt">$76,182</td><td class="amt">$134,821</td><td>—</td><td><a href="https://cf.sos.nd.gov/search/showcommittee.aspx?cid=281" target="_blank" rel="noopener noreferrer" class="contact-chip web" style="font-size:12px">📄 All Filings</a></td></tr>
     </tbody>
   </table></div>
-  <div class="source">Source: Credit_union_pac_history_20162024.xlsx — Year End Statement rows. SOS: cf.sos.nd.gov. Feb 2026 balance $34,029.32.</div>
+  <div class="source">Source: Credit_union_pac_history_20162024.xlsx — Year End Statement rows. SOS: cf.sos.nd.gov. Feb 2026 balance $36,222.32.</div>
 
   <div class="section-title"><span class="icon">📊</span> Banker PAC Comparison — Background Context Only</div>
 
@@ -2073,7 +2083,7 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
       <div class="label">Current Cash Balance</div>
       <div style="display:flex;align-items:center;gap:4px;margin-top:4px">
         <span style="font-size:18px;color:var(--text-muted)">$</span>
-        <input type="number" id="bgt-cash" value="34029" min="0" onchange="calcBudget()" style="font-family:var(--font-display);font-size:26px;font-weight:700;color:var(--teal-dark);border:none;background:transparent;width:130px;outline:none">
+        <input type="number" id="bgt-cash" value="36222" min="0" onchange="calcBudget()" style="font-family:var(--font-display);font-size:26px;font-weight:700;color:var(--teal-dark);border:none;background:transparent;width:130px;outline:none">
       </div>
       <div class="sub">February 2026 financials</div>
     </div>
@@ -2103,7 +2113,7 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
     <button class="btn" onclick="exportBudgetCSV()">⬇ Export CSV</button>
     <button class="btn" onclick="clearBudget()" style="background:#8B1A1A">🗑 Reset Budget</button>
   </div>
-  <div class="source" style="margin-top:12px">Cash balance $34,029.32 from February 2026 financials (Feb 28, 2026). Karen Rohr (House Dist. 31): $500 contributed — confirmed Feb 2026. Dawson Holle (House Dist. 31): $500 allocated, not yet sent — approved per committee. Historical averages: 2018 avg $582/candidate (69 recipients) · 2022 avg $723/candidate (29 recipients) · 2024 avg $394/candidate (43 recipients).</div>
+  <div class="source" style="margin-top:12px">Cash balance $36,222.32 from February 2026 financials (Feb 28, 2026). Karen Rohr (House Dist. 31): $500 contributed — confirmed Feb 2026. Dawson Holle (House Dist. 31): $500 allocated, not yet sent — approved per committee. Historical averages: 2018 avg $582/candidate (69 recipients) · 2022 avg $723/candidate (29 recipients) · 2024 avg $394/candidate (43 recipients).</div>
 </div>
 
 <!-- ═══ TAB 5: COMMITTEE & OVERVIEW ═══ -->
@@ -2115,7 +2125,7 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
 
   <div class="section-title"><span class="icon">📌</span> Key Numbers at a Glance</div>
   <div class="card-row">
-    <div class="stat-card green"><div class="label">Cash Balance (Feb 2026)</div><div class="value">$34,029</div><div class="sub">February 2026 financials</div></div>
+    <div class="stat-card green"><div class="label">Cash Balance (Feb 2026)</div><div class="value">$36,222</div><div class="sub">February 2026 financials</div></div>
     <div class="stat-card"><div class="label">Seats on 2026 Ballot</div><div class="value">~72</div><div class="sub">24 Senate + ~48 House (odd districts)</div></div>
     <div class="stat-card"><div class="label">Senate Balance (69th)</div><div class="value">42–5</div><div class="sub">R 42, Dem-NPL 5</div></div>
     <div class="stat-card"><div class="label">House Balance (69th)</div><div class="value">83–11</div><div class="sub">R 83, Dem-NPL 11</div></div>
@@ -2543,7 +2553,7 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
 <footer class="site-footer">
   <strong>DakCUPAC — 2026 North Dakota Legislative Intelligence</strong><br>
   Confidential — Committee Use Only — Not for Public Distribution<br>
-  Cash balance $34,029.32 as of February 28, 2026. All data sourced from ND Secretary of State, ndlegis.gov, and verified public records only.
+  Cash balance $36,222.12 as of April 2026. All data sourced from ND Secretary of State, ndlegis.gov, and verified public records only.
 </footer>
 
 <script>
@@ -2612,12 +2622,20 @@ function saveBudget(cashOrObj, target, splitPct) {
 function broadcastBudget(b) {
   if(!b) b = getBudget();
   b.total = b.cash||0;
-  // Header badge
+  // Compute total allocated from tracker so the header/sidebar shows
+  // "available" (cash - allocated) instead of just cash.
+  var _allocSum = 0;
+  try {
+    var _trk = JSON.parse(localStorage.getItem(TRACKER_KEY) || '{}');
+    Object.keys(_trk).forEach(function(k){ _allocSum += parseInt(_trk[k] && _trk[k].amt) || 0; });
+  } catch(e){}
+  var _available = (b.cash||0) - _allocSum;
+  // Header badge — shows available (cash - allocated)
   var hdr = document.querySelector('.header-badge strong');
-  if(hdr) hdr.textContent = '$' + Math.round(b.cash||0).toLocaleString();
+  if(hdr) hdr.textContent = '$' + Math.round(_available).toLocaleString();
   // Sidebar
   var bsbBal = document.getElementById('bsb-balance');
-  if(bsbBal) bsbBal.textContent = '$' + Math.round(b.cash||0).toLocaleString();
+  if(bsbBal) bsbBal.textContent = '$' + Math.round(_available).toLocaleString();
   // Update budget sidebar with new numbers
   if(typeof updateBudgetSidebar === 'function') updateBudgetSidebar();
   // Update phase plan if strategy room is loaded
@@ -2629,10 +2647,11 @@ function broadcastBudget(b) {
 }
 function loadTracker(){ try{return JSON.parse(localStorage.getItem(TRACKER_KEY)||'{}')}catch(e){return{}} }
 function saveTracker(d){
-  // After saving, broadcast to sync Strategy Room and budget sidebar
+  // After saving, broadcast to sync Strategy Room, sidebar, AND header badge
   setTimeout(function(){
     if(typeof updateStrategyTotals==='function') updateStrategyTotals();
     if(typeof updateBudgetSidebar==='function') updateBudgetSidebar();
+    if(typeof broadcastBudget==='function') broadcastBudget();
   }, 50);
   try{ localStorage.setItem(TRACKER_KEY,JSON.stringify(d)); } catch(e){}
   try{
@@ -3903,7 +3922,7 @@ function getCupacRec(name, dist, chamber, party, isIncumbent) {
   var isFormerLeg = cand && (cand.formerLegislator || cand.formerHouse || cand.formerSenate);
 
   // ── ALLOCATION STRATEGY ──
-  // Budget: $34,029 + ~$12K projected = ~$46K. No ND PAC limits.
+  // Budget: $36,222 + ~$12K projected = ~$46K. No ND PAC limits.
   // Phase 1 (Now→Jun 9): Contested primaries. Phase 2 (Jun 10→Nov 3): General.
   //
   // HEDGE LOGIC for contested primaries:
@@ -4121,6 +4140,39 @@ function getCupacRec(name, dist, chamber, party, isIncumbent) {
     }
   }
 
+  // 3) NEW CANDIDATE POLICY — committee directive: do not auto-recommend
+  //    funding for candidates with no track record and no override status.
+  //    Stick with incumbents (even bad ones get a small amount); new
+  //    candidates get $0 and must be hand-added by committee decision.
+  var _isChampionOverride = (typeof CU_CHAMPIONS !== 'undefined' && CU_CHAMPIONS[name]);
+  var _ldrCheck = LEADERS.find(function(l){ return l.name === name; });
+  var _iblCheck = (cand && (cand.ibl || cand.ib)) || (_ldrCheck && (_ldrCheck.ibl || _ldrCheck.ib));
+  var _transferCheck = cand && (cand.formerHouse || cand.formerSenate);
+  var _hasOverride = _isChampionOverride || !!_ldrCheck || !!_iblCheck || !!_transferCheck;
+
+  // (a) New candidate (not incumbent, no prior CUPAC, no override) → $0.
+  if(!isIncumbent && !hasCupac && !_hasOverride) {
+    tier = 'EVALUATE';
+    icon = '🔍';
+    color = '#1D4ED8';
+    amt = 0;
+    timing = 'Phase 1 — no recommendation (committee decision required)';
+    action = 'New candidate with no prior CUPAC relationship. Committee policy: do not auto-recommend funding for newcomers without history or champion status. Hand-add via Decision dropdown if the committee chooses to support.';
+    // Reset reasons so the new policy line is the headline
+    reasons = ['🆕 New candidate — no prior CUPAC history, no champion / IBL / leadership / transfer status'];
+    reasons.push('Committee policy: stick with incumbents unless committee makes an explicit decision to fund newcomers');
+    if(vote === 'YEA') reasons.push('Note: did support FOM (SB 2266 YEA) — flag for potential committee discussion');
+  }
+  // (b) Incumbent on the bad side (NAY voter or HOLD/NOT-REC tier) — give a
+  //     small floor so we keep some relationship, but lower than ally tiers.
+  //     Skips champions/IBL/leadership/transfers (those already have higher floors).
+  else if(isIncumbent && !_hasOverride && (tier === 'HOLD' || tier === 'NOT RECOMMENDED' || tier === 'ALIGNED' || amt === 0)) {
+    if(amt < 200) {
+      amt = 200;
+      reasons.unshift('💵 Incumbent floor: $200 — committee policy keeps a relationship with every sitting legislator, even the unfriendly ones');
+    }
+  }
+
   // Timing as first line
   reasons.unshift('⏱ '+timing);
   // Budget phase — reads live numbers
@@ -4155,7 +4207,7 @@ var CU_CHAMPIONS = {
 function updateBudgetSidebar() {
   var tracker = JSON.parse(localStorage.getItem(TRACKER_KEY) || '{}');
   var bgt = getBudget();
-  var balance = bgt.cash || 34029;
+  var balance = bgt.cash || 36222;
   var totalAlloc = 0, approved = 0, review = 0, contributed = 0, pass = 0;
   var p1Amt = 0, p1Ct = 0, p2Amt = 0, p2Ct = 0;
 
@@ -5458,6 +5510,7 @@ function renderCandidates(list){
   });
   const sortedDists = Object.keys(byDist).sort((a,b)=>parseInt(a)-parseInt(b));
   let html = '';
+  var _collState = (typeof loadCollapseState === 'function') ? loadCollapseState() : {};
   sortedDists.forEach(dist=>{
     const cands = byDist[dist];
     const isOdd = parseInt(dist)%2===1;
@@ -5466,10 +5519,15 @@ function renderCandidates(list){
     const coverStr = covering.length ? covering.join(', ') : '';
     const _totalCandsD = CANDIDATES.filter(function(c){return parseInt(c.dist)===parseInt(dist);}).length;
     const _candCountD = _totalCandsD ? '<span style="font-size:11px;font-weight:400;margin-left:8px;color:rgba(255,255,255,0.7);">'+_totalCandsD+' candidate'+(_totalCandsD>1?'s':'')+' filed</span>' : '';
-    html += '<div style="grid-column:1/-1;margin-top:16px;margin-bottom:4px;padding:8px 14px;background:var(--teal-dark);color:#fff;border-radius:6px;display:flex;align-items:center;justify-content:space-between;">'
-      +'<span style="font-family:var(--font-display);font-size:15px;font-weight:700;">District '+dist+onBallot+distLeanBadge(dist)+_candCountD+'</span>'
+    var distCollKey = 'cand_dist_' + dist;
+    var distClosed = !!_collState[distCollKey];
+    var caret = distClosed ? '▸' : '▾';
+    html += '<div data-coll-id="'+distCollKey+'" class="coll-head-cand'+(distClosed?' coll-closed':'')+'" onclick="toggleCollapse(\''+distCollKey+'\',this)" style="grid-column:1/-1;margin-top:16px;margin-bottom:4px;padding:8px 14px;background:var(--teal-dark);color:#fff;border-radius:6px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;">'
+      +'<span style="font-family:var(--font-display);font-size:15px;font-weight:700;"><span class="cand-caret" style="display:inline-block;margin-right:8px;">'+caret+'</span>District '+dist+onBallot+distLeanBadge(dist)+_candCountD+'</span>'
       +(coverStr?'<span style="font-size:11px;color:rgba(255,255,255,0.65);">📍 '+coverStr+'</span>':'')
       +'</div>';
+    // Open the body wrapper for the collapsible group
+    html += '<div class="coll-body-cand'+(distClosed?' coll-closed':'')+'" data-coll-body-for="'+distCollKey+'" style="grid-column:1/-1;display:'+(distClosed?'none':'contents')+';">';
     // Sub-group by chamber: Senate first, then House
     var senCands = cands.filter(c=>c.ch==='Senate');
     var houCands = cands.filter(c=>c.ch==='House');
@@ -5501,6 +5559,7 @@ function renderCandidates(list){
         });
       }).join('');
     });
+    html += '</div>'; // close coll-body-cand
   });
   tbody.innerHTML = html;
   document.getElementById('cand-count').textContent = list.length+' of '+CANDIDATES.length+' candidates · '+sortedDists.length+' districts';
@@ -9237,7 +9296,14 @@ function toggleCollapse(id, headEl){
   var state = loadCollapseState();
   state[id] = !state[id];
   saveCollapseState(state);
-  if(headEl) headEl.classList.toggle('coll-closed', !!state[id]);
+  if(headEl){
+    headEl.classList.toggle('coll-closed', !!state[id]);
+    // For Candidates-tab district headers, also toggle the matching body div
+    if(headEl.classList.contains('coll-head-cand')){
+      var body = document.querySelector('[data-coll-body-for="'+id+'"]');
+      if(body) body.classList.toggle('coll-closed', !!state[id]);
+    }
+  }
 }
 // Apply saved state on page load / re-render
 function applyCollapseStateAll(){
@@ -9766,7 +9832,7 @@ function renderPhasePlan() {
   // Budget summary bar — reads from centralized budget
   var totalPlan = phase1Total + phase2Total;
   var _bgt = getBudget();
-  var balance = _bgt.cash || 34029;
+  var balance = _bgt.cash || 36222;
   var projected = _bgt.raise || 12000;
   var totalAvail = balance + projected - (_bgt.federal||0);
   var remaining = totalAvail - totalPlan;
@@ -9812,7 +9878,7 @@ function updateStrategyTotals() {
     else { allocNew += amt; }
   });
   var _bgt2 = getBudget();
-  var _totalAvail2 = (_bgt2.cash||34029) + (_bgt2.raise||0) - (_bgt2.federal||0);
+  var _totalAvail2 = (_bgt2.cash||36222) + (_bgt2.raise||0) - (_bgt2.federal||0);
   var remaining = _totalAvail2 - totalAlloc;
   var remColor = remaining < 0 ? 'var(--red)' : remaining < 5000 ? 'var(--gold)' : 'var(--green)';
 
@@ -10001,7 +10067,7 @@ function renderStrategy() {
   var allocEl = document.getElementById('strat-allocated');
   var remEl = document.getElementById('strat-remaining');
   if(allocEl) allocEl.textContent = '$'+totalAlloc.toLocaleString();
-  if(remEl) { var rem = 34029 - totalAlloc; remEl.textContent = '$'+rem.toLocaleString(); remEl.style.color = rem < 0 ? 'var(--red)' : 'var(--green)'; }
+  if(remEl) { var rem = 36222 - totalAlloc; remEl.textContent = '$'+rem.toLocaleString(); remEl.style.color = rem < 0 ? 'var(--red)' : 'var(--green)'; }
 }
 
 // ── 3. PRIMARY MATCHUP CARDS ──
@@ -10213,17 +10279,17 @@ function generateAgenda() {
   html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;">'
     +'<div style="text-align:center;padding:12px;background:var(--gold-light);border:1px solid var(--gold-border);border-radius:10px;"><div style="font-size:24px;font-weight:700;color:var(--gold);">'+daysToPrimary+'</div><div style="font-size:10px;font-weight:700;color:var(--gold);text-transform:uppercase;">Days to Primary</div></div>'
     +'<div style="text-align:center;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:10px;"><div style="font-size:24px;font-weight:700;color:var(--ink);">'+daysToGeneral+'</div><div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;">Days to General</div></div>'
-    +'<div style="text-align:center;padding:12px;background:var(--teal-light);border:1px solid var(--teal-mid);border-radius:10px;"><div style="font-size:24px;font-weight:700;color:var(--teal);">$'+(34029-totalAllocated).toLocaleString()+'</div><div style="font-size:10px;font-weight:700;color:var(--teal);text-transform:uppercase;">Unallocated</div></div>'
+    +'<div style="text-align:center;padding:12px;background:var(--teal-light);border:1px solid var(--teal-mid);border-radius:10px;"><div style="font-size:24px;font-weight:700;color:var(--teal);">$'+(36222-totalAllocated).toLocaleString()+'</div><div style="font-size:10px;font-weight:700;color:var(--teal);text-transform:uppercase;">Unallocated</div></div>'
     +'<div style="text-align:center;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:10px;"><div style="font-size:24px;font-weight:700;color:var(--ink);">'+contestedDists.size+'</div><div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;">Contested Primaries</div></div>'
   +'</div>';
 
   // Agenda items
   html += '<div style="margin-bottom:20px;"><h3 style="font-size:15px;color:var(--ink);margin-bottom:12px;">1. Budget Status</h3>'
     +'<div style="font-size:13px;line-height:1.8;padding-left:16px;">'
-    +'<div>Opening balance: <strong>$34,029.32</strong></div>'
+    +'<div>Opening balance: <strong>$36,222.32</strong></div>'
     +'<div>Allocated to date: <strong style="color:var(--teal);">$'+totalAllocated.toLocaleString()+'</strong> ('+decisions.length+' decisions)</div>'
     +'<div>Under review: <strong style="color:var(--gold);">'+pending+'</strong> · Approved: <strong style="color:var(--green);">'+approved+'</strong> · Contributed: <strong style="color:var(--teal);">'+contributed+'</strong></div>'
-    +'<div>Remaining: <strong style="color:'+(34029-totalAllocated>0?'var(--green)':'var(--red)')+';">$'+(34029-totalAllocated).toLocaleString()+'</strong></div>'
+    +'<div>Remaining: <strong style="color:'+(36222-totalAllocated>0?'var(--green)':'var(--red)')+';">$'+(36222-totalAllocated).toLocaleString()+'</strong></div>'
     +'</div></div>';
 
   html += '<div style="margin-bottom:20px;"><h3 style="font-size:15px;color:var(--ink);margin-bottom:12px;">2. Contested Primaries — Action Required Before June 9</h3>'
