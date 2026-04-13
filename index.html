@@ -2006,7 +2006,7 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
       <tr class="total-row"><td>TOTAL 2016–2024</td><td class="amt">—</td><td class="amt">$76,182</td><td class="amt">$134,821</td><td>—</td><td><a href="https://cf.sos.nd.gov/search/showcommittee.aspx?cid=281" target="_blank" rel="noopener noreferrer" class="contact-chip web" style="font-size:12px">📄 All Filings</a></td></tr>
     </tbody>
   </table></div>
-  <div class="source">Source: Credit_union_pac_history_20162024.xlsx — Year End Statement rows. SOS: cf.sos.nd.gov. Feb 2026 balance $36,222.32.</div>
+  <div class="source">Source: Credit_union_pac_history_20162024.xlsx — Year End Statement rows. SOS: cf.sos.nd.gov. April 2026 balance $36,222.12.</div>
 
   <div class="section-title"><span class="icon">📊</span> Banker PAC Comparison — Background Context Only</div>
 
@@ -2072,17 +2072,24 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
     <button class="qchip" id="cchip-r"    onclick="toggleCandChip('r')">&#11044; Republican <span class="chip-count" id="cchip-r-ct">&#8212;</span></button>
     <button class="qchip" id="cchip-d"    onclick="toggleCandChip('d')">&#11044; Dem-NPL <span class="chip-count" id="cchip-d-ct">&#8212;</span></button>
   </div>
-  <div class="controls">
-    <label>Filter:</label>
-    <input type="text" id="cand-search" placeholder="Search name…" oninput="filterCandidates()" style="min-width:160px">
-    <select id="cand-chamber" onchange="filterCandidates()"><option value="ALL">All Chambers</option><option value="Senate">Senate</option><option value="House">House</option></select>
-    <select id="cand-cupac-f" onchange="filterCandidates()"><option value="ALL">All Candidates</option><option value="YES">History Only</option><option value="NO">No History</option></select>
-    <span style="display:inline-block;padding:4px 10px;border-radius:8px;background:rgba(13,115,119,0.12);border:1.5px solid var(--teal);color:var(--teal-dark);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;">📜 SB 2266 FOM</span>
-    <select id="cand-sb2266-f" onchange="filterCandidates()" style="border:1.5px solid var(--teal);background:rgba(13,115,119,0.04);font-weight:700;"><option value="ALL">All Votes</option><option value="YEA">✓ YEA — Supported CUs</option><option value="NAY">✕ NAY — Opposed CUs</option><option value="NONE">No prior vote</option></select>
-    <span style="display:inline-block;padding:4px 10px;border-radius:8px;background:rgba(180,83,9,0.12);border:1.5px solid #B45309;color:#92400E;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;">💳 SB 2217 Interchange</span>
-    <select id="cand-sb2217-f" onchange="filterCandidates()" style="border:1.5px solid #B45309;background:rgba(180,83,9,0.04);font-weight:700;"><option value="ALL">All Votes</option><option value="NAY">✓ NAY — Pro-CU (opposed cap)</option><option value="YEA">✕ YEA — Anti-CU (supported cap)</option><option value="NONE">No prior vote</option></select>
-    <button class="btn" onclick="resetCandidates()">Reset</button>
-    <span class="result-count" id="cand-count"></span>
+  <div class="controls" style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:12px 14px;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;">
+    <!-- Row 1: text search + baseline filters -->
+    <input type="text" id="cand-search" placeholder="🔍 Search name…" oninput="filterCandidates()" style="flex:1;min-width:180px;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;">
+    <select id="cand-chamber" onchange="filterCandidates()" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--white);"><option value="ALL">All Chambers</option><option value="Senate">Senate</option><option value="House">House</option></select>
+    <select id="cand-cupac-f" onchange="filterCandidates()" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--white);"><option value="ALL">All Candidates</option><option value="YES">History Only</option><option value="NO">No History</option></select>
+    <!-- Row 2: color-coded bill filters (grouped) -->
+    <div style="display:flex;flex-direction:column;gap:2px;">
+      <div style="font-size:9px;font-weight:800;color:var(--teal-dark);text-transform:uppercase;letter-spacing:.5px;padding-left:2px;">📜 SB 2266 · FOM</div>
+      <select id="cand-sb2266-f" onchange="filterCandidates()" style="border:1.5px solid var(--teal);background:rgba(13,115,119,0.06);font-weight:700;padding:6px 10px;border-radius:8px;font-size:12px;min-width:140px;"><option value="ALL">All Votes</option><option value="YEA">✓ YEA — Supported CUs</option><option value="NAY">✕ NAY — Opposed CUs</option><option value="NONE">No prior vote</option></select>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:2px;">
+      <div style="font-size:9px;font-weight:800;color:#92400E;text-transform:uppercase;letter-spacing:.5px;padding-left:2px;">💳 SB 2217 · Interchange</div>
+      <select id="cand-sb2217-f" onchange="filterCandidates()" style="border:1.5px solid #B45309;background:rgba(180,83,9,0.06);font-weight:700;padding:6px 10px;border-radius:8px;font-size:12px;min-width:140px;"><option value="ALL">All Votes</option><option value="NAY">✓ NAY — Pro-CU (opposed cap)</option><option value="YEA">✕ YEA — Anti-CU (supported cap)</option><option value="NONE">No prior vote</option></select>
+    </div>
+    <div style="margin-left:auto;display:flex;gap:10px;align-items:center;">
+      <button class="btn" onclick="resetCandidates()" style="padding:8px 16px;">Reset</button>
+      <span class="result-count" id="cand-count" style="font-size:12px;color:var(--text-muted);font-style:italic;"></span>
+    </div>
   </div>
   <div class="person-card-grid" id="cand-tbody"></div>
 
@@ -2097,7 +2104,7 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
         <span style="font-size:18px;color:var(--text-muted)">$</span>
         <input type="number" id="bgt-cash" value="36222" min="0" onchange="calcBudget()" style="font-family:var(--font-display);font-size:26px;font-weight:700;color:var(--teal-dark);border:none;background:transparent;width:130px;outline:none">
       </div>
-      <div class="sub">February 2026 financials</div>
+      <div class="sub">April 2026 financials</div>
     </div>
     <div class="stat-card">
       <div class="label">Projected Fundraising</div>
@@ -2125,7 +2132,7 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
     <button class="btn" onclick="exportBudgetCSV()">⬇ Export CSV</button>
     <button class="btn" onclick="clearBudget()" style="background:#8B1A1A">🗑 Reset Budget</button>
   </div>
-  <div class="source" style="margin-top:12px">Cash balance $36,222.32 from February 2026 financials (Feb 28, 2026). Karen Rohr (House Dist. 31): $500 contributed — confirmed Feb 2026. Dawson Holle (House Dist. 31): $500 allocated, not yet sent — approved per committee. Historical averages: 2018 avg $582/candidate (69 recipients) · 2022 avg $723/candidate (29 recipients) · 2024 avg $394/candidate (43 recipients).</div>
+  <div class="source" style="margin-top:12px">Cash balance $36,222.12 from April 2026 financials. Karen Rohr (House Dist. 31): $500 contributed — confirmed Feb 2026. Dawson Holle (House Dist. 31): $500 allocated, not yet sent — approved per committee. Historical averages: 2018 avg $582/candidate (69 recipients) · 2022 avg $723/candidate (29 recipients) · 2024 avg $394/candidate (43 recipients).</div>
 </div>
 
 <!-- ═══ TAB 5: COMMITTEE & OVERVIEW ═══ -->
@@ -3436,11 +3443,16 @@ const CANDIDATES = [
   {ch:'Senate', dist:9,  name:'Jayme Davis',          party:'D', incumbent:false, email:'jayme.m.davis@gmail.com',     phone:'(701) 202-8700', runningForSenate:true, formerHouse:true, currentHouseMember:true, legHistory:'Current House Rep D9 (69th Assembly, serving 2025). Voted YEA on SB 2266 and YEA on SB 2217. Running for Senate D9 in 2026.', ndlegisUrl:'https://ndlegis.gov/biography/jayme-davis', news:'CURRENT HOUSE REP D9 — running for Senate D9 in 2026. CONTESTED D PRIMARY: Gathered signatures to challenge Dem-NPL endorsed incumbent Sen. Marcellais. Both Turtle Mountain Band of Chippewa members. Davis calls 2026 a change election — says strong voices needed for Native communities. Voted YEA on SB 2266 and YEA on SB 2217 as House Rep. (ND Monitor Apr 6 2026; KFGO Apr 7 2026)'},
 
 ];
+// POOLS — aligned with the Budget Plan tier framework.
+// CHAMPIONS (floor $500) → PROTECT (double pro-CU) → MAINTAIN (IBL/leadership)
+// → BUILD (FOM supporters). Incumbent-floor catch-all absorbs HOLD + NOT REC.
 const POOLS = [
-  {id:'leadership', label:'Leadership Relationships', icon:'⭐', color:'var(--teal-dark)', desc:'Senate/House leaders — regardless of ballot status.', default:5000},
-  {id:'competitive', label:'Competitive Races',       icon:'⚔️', color:'var(--green-border)', desc:'Incumbents in contested primaries or tight generals.', default:6000},
-  {id:'openSeat',   label:'Open Seat Candidates',    icon:'🔓', color:'var(--gold-border)', desc:'Districts where incumbent is not running.', default:2000},
-  {id:'incumbent',  label:'Incumbent Maintenance',   icon:'🔄', color:'var(--teal)', desc:'Safe incumbents with prior DakCUPAC relationship.', default:4000},
+  {id:'champions',  label:'⭐ CU Champions',        icon:'⭐', color:'#15803D',             desc:'Committee-designated top allies — floor $500 each.',       default:3000},
+  {id:'protect',    label:'🛡️ PROTECT — Double pro-CU', icon:'🛡️', color:'var(--teal-dark)', desc:'YEA on SB 2266 + NAY on SB 2217 (opposed interchange cap).', default:8000},
+  {id:'maintain',   label:'✅ MAINTAIN — Leadership/IBL', icon:'✅', color:'var(--green-border)', desc:'Leadership, IBL members, chamber transfers — floor $400.', default:8000},
+  {id:'build',      label:'🤝 BUILD — New FOM supporters', icon:'🤝', color:'#0D7377', desc:'YEA on SB 2266 without prior CUPAC history.',              default:5000},
+  {id:'evaluate',   label:'🔍 EVALUATE / HEDGE',    icon:'🔍', color:'var(--gold-border)',  desc:'Experienced legislators and contested-primary hedges.',     default:4000},
+  {id:'incumbent',  label:'💵 Incumbent Floor',     icon:'💵', color:'#B45309',             desc:'Bad-side incumbents — committee policy keeps $200 minimum.', default:2000},
 ];
 
 
