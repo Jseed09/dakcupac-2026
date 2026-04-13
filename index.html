@@ -5169,18 +5169,44 @@ function personCard(cfg){
     }
   }
 
-  // News snippet from candidate or leader data — clickable to open full profile
+  // News snippet — prefer LIVE Google News headlines from cache when
+  // available; fall back to the static cand.news / ldr.note if the
+  // cache is empty. This way every profile card on every tab shows
+  // the freshest reporting as soon as "Fetch News" has been run.
   var newsSnippet = '';
   var _newsSource = _candForLeg || _ldr;
   var _newsText = _newsSource ? (_newsSource.news || _newsSource.note || '') : '';
-  if(_newsText) {
-    // Extract source name for search link (e.g. "Bismarck Tribune" → google search)
+  var _liveHeadlines = [];
+  try {
+    if(typeof _loadNewsCache === 'function' && typeof _newsKey === 'function') {
+      var _nc = _loadNewsCache();
+      var _nk = _newsKey(name, parseInt(dist)||0);
+      if(_nc[_nk] && _nc[_nk].headlines && _nc[_nk].headlines.length) {
+        _liveHeadlines = _nc[_nk].headlines;
+      }
+    }
+  } catch(e){}
+
+  if(_liveHeadlines.length) {
+    // Live headline mode — show the most recent headline prominently
+    // with a link, plus a count of more available.
+    var _top = _liveHeadlines[0];
+    var _more = _liveHeadlines.length > 1 ? ' <span style="color:#92400E;opacity:.7;">+'+(_liveHeadlines.length-1)+' more</span>' : '';
+    var _srcPill = _top.source ? '<span style="font-weight:800;color:#B45309;font-size:9px;">'+_top.source+'</span> ' : '';
+    var _dateStr = _top.date ? ' <span style="color:var(--text-muted);font-size:9px;">'+_top.date+'</span>' : '';
+    newsSnippet = '<div style="font-size:10px;line-height:1.4;color:var(--text);padding:6px 8px;background:rgba(251,191,36,0.08);border:1px solid rgba(180,83,9,0.35);border-radius:6px;margin-top:4px;max-height:60px;overflow:hidden;cursor:pointer" '
+      + 'onclick="openPersonCard(\''+name.replace(/'/g,'&#39;')+'\','+(parseInt(dist)||0)+')" title="Click for full profile with all headlines">'
+      + '<span style="font-weight:800;color:#92400E;font-size:9px;">📰 LATEST</span> '
+      + _srcPill + _top.title + _dateStr + _more
+      + '</div>';
+  } else if(_newsText) {
+    // Fallback to static notes
     var _srcMatch = _newsText.match(/\(([^)]+(?:Tribune|Monitor|InForum|KVRR|Ballotpedia|ndlegis|SoS|Wikipedia)[^)]*)\)/i);
     var _srcLabel = _srcMatch ? _srcMatch[1].replace(/,?\s*\d{4}.*/, '').trim() : '';
     var _searchUrl = _srcLabel ? 'https://www.google.com/search?q='+encodeURIComponent(name+' '+_srcLabel+' North Dakota 2026') : '';
     newsSnippet = '<div style="font-size:10px;line-height:1.4;color:var(--text-dim);padding:6px 8px;background:rgba(255,251,235,0.6);border:1px solid rgba(253,230,138,0.4);border-radius:6px;margin-top:4px;max-height:48px;overflow:hidden;cursor:pointer" '
       +'onclick="openPersonCard(\''+name.replace(/'/g,'&#39;')+'\','+(parseInt(dist)||0)+')" title="Click for full profile">'
-      +'<span style="font-weight:700;color:#92400E;font-size:9px">NEWS</span> '+_newsText.substring(0,150)+((_newsText.length>150)?'...':'')
+      +'<span style="font-weight:700;color:#92400E;font-size:9px">NOTE</span> '+_newsText.substring(0,150)+((_newsText.length>150)?'...':'')
       +(_searchUrl ? ' <a href="'+_searchUrl+'" target="_blank" onclick="event.stopPropagation()" style="color:#1D4ED8;font-weight:700;font-size:9px" title="Search for source article">↗ Source</a>' : '')
       +'</div>';
   }
@@ -10264,9 +10290,16 @@ function refreshAllNews() {
       if(typeof showToast === 'function') showToast({
         type: ok > 0 ? 'success' : 'warning', icon:'📰',
         title: 'News refresh complete',
-        msg: ok+' fetched · '+fail+' unavailable',
+        msg: ok+' fetched · '+fail+' unavailable · Updating every profile…',
         duration: 5000
       });
+      // Re-render EVERY tab that shows profile cards so the fresh
+      // headlines surface everywhere the legislator's name appears.
+      try { if(typeof filterCandidates === 'function') filterCandidates(); } catch(e){}
+      try { if(typeof renderVoteTable === 'function') renderVoteTable(); } catch(e){}
+      try { if(typeof buildProfiles === 'function') buildProfiles(); } catch(e){}
+      try { if(typeof renderWPTable === 'function') renderWPTable(); } catch(e){}
+      try { if(typeof renderBudgetPlan === 'function') renderBudgetPlan(); } catch(e){}
       // Re-render the slide-over if open
       try {
         var pp = document.getElementById('person-panel');
