@@ -5045,6 +5045,18 @@ function personCard(cfg){
   }
 
   // Banker vs CUPAC (fight section)
+  // Auto-populate from FIGHT_DATA if the caller didn't pass it in, so
+  // every profile card across every tab shows the banker-vs-CUPAC
+  // comparison and committee can see how much the banker PACs gave.
+  if(cfg.bankCu == null && typeof FIGHT_DATA !== 'undefined') {
+    var _fd = null;
+    FIGHT_DATA.forEach(function(f){ if(f.n && f.n.toLowerCase()===name.toLowerCase()) _fd = f; });
+    if(_fd) {
+      cfg.bankCu = _fd.cu || 0;
+      cfg.bankNd = _fd.nd || 0;
+      cfg.bankIc = _fd.ic || 0;
+    }
+  }
   var bankerRow = '';
   if(cfg.bankCu!=null){
     var banker=(cfg.bankNd||0)+(cfg.bankIc||0);
@@ -7441,7 +7453,10 @@ function buildDistrictMap(){
   var CW=75, CH=58, PAD=4, CORNER=6;
   var COLS=10, ROWS=6;
   var W=COLS*CW + 2*PAD;
-  var H=ROWS*CH + 2*PAD + 30;
+  // Extra space at the bottom for the legend so it doesn't collide with
+  // the district grid.
+  var LEGEND_SPACE = 40;
+  var H=ROWS*CH + 2*PAD + 30 + LEGEND_SPACE;
   svg.setAttribute('viewBox','0 0 '+W+' '+H);
 
   // ── Contested primary detection ──
