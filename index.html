@@ -2034,7 +2034,7 @@ body.bob-mode .pcard.bob-filtered-out{display:none !important}
   <div class="bob-report-modal">
     <button class="bob-report-close" onclick="closeBobReport()" aria-label="Close">✕</button>
     <h3>📋 Donation History × FOM Vote</h3>
-    <div class="br-sub">Candidate, DakCUPAC donation history, and SB 2266 (Field of Membership) vote — per Bob Herrington's request. YEA = supported credit unions. NAY = opposed.</div>
+    <div class="br-sub"><strong style="color:var(--teal-dark)">2026 ballot only</strong> — every candidate on the odd-district 2026 ballot (ND SOS Apr 6 filings) with their DakCUPAC donation history and SB 2266 (Field of Membership) vote. Per Bob Herrington's request. YEA = supported credit unions. NAY = opposed.</div>
     <div class="bob-report-controls">
       <input id="bob-report-search" class="bob-report-search" type="text" placeholder="Search by name, district, or chamber…" oninput="renderBobReport(this.value)">
       <button id="bob-report-copy-btn" class="bob-report-btn" onclick="copyBobReportCSV()">📋 Copy CSV</button>
@@ -10181,42 +10181,26 @@ function _bobEscHtml(s){
 }
 function buildBobReportData(){
   if(_bobReportData) return _bobReportData;
-  var map = {};
-  function add(name, ch, dist, party){
-    if(!name) return;
-    var k = name.toLowerCase().replace(/[^a-z]/g,'');
-    if(!k) return;
-    if(!map[k]) map[k] = {name:name, ch:'', dist:'', party:''};
-    if(ch && !map[k].ch) map[k].ch = ch;
-    if(dist && !map[k].dist) map[k].dist = String(dist);
-    if(party && !map[k].party) map[k].party = party;
-  }
-  // 2026 candidates (gives current chamber/district/party)
-  if(typeof CANDIDATES !== 'undefined' && CANDIDATES.forEach){
-    CANDIDATES.forEach(function(c){ add(c.name, c.ch, c.dist, c.party); });
-  }
-  // Everyone who voted on SB 2266 (FOM)
-  if(typeof ALL_VOTES !== 'undefined' && ALL_VOTES.forEach){
-    ALL_VOTES.forEach(function(v){ add(v.name, v.chamber, v.dist); });
-  }
-  // Everyone with CUPAC donation history
-  if(typeof CUPAC_HIST !== 'undefined'){
-    Object.keys(CUPAC_HIST).forEach(function(n){ add(n); });
-  }
-  var rows = Object.keys(map).map(function(k){
-    var r = map[k];
-    var donation = (typeof CUPAC_HIST !== 'undefined' && CUPAC_HIST[r.name]) ? CUPAC_HIST[r.name] : null;
-    var vote = (typeof getSB2266Vote === 'function') ? getSB2266Vote(r.name, r.ch) : null;
-    return {
-      name: r.name,
-      ch: r.ch || '',
-      dist: r.dist || '',
-      party: r.party || '',
-      donationTotal: donation ? (donation.amt || '') : '',
-      donationYears: donation ? (donation.years || '') : '',
-      vote: vote || ''
-    };
-  });
+  // 2026 BALLOTED ONLY — matches the web dashboard's Candidates tab logic
+  // (odd districts only, ND SOS April 6 filings). Same filter as the
+  // CSV/PDF generator so the modal and the exported files agree.
+  if(typeof CANDIDATES === 'undefined' || !CANDIDATES.forEach) return [];
+  var rows = CANDIDATES
+    .filter(function(c){ return parseInt(c.dist) % 2 === 1; })
+    .map(function(c){
+      var donation = (typeof CUPAC_HIST !== 'undefined' && CUPAC_HIST[c.name]) ? CUPAC_HIST[c.name] : null;
+      var vote = (typeof getSB2266Vote === 'function') ? getSB2266Vote(c.name, c.ch) : null;
+      return {
+        name: c.name,
+        ch: c.ch || '',
+        dist: c.dist ? String(c.dist) : '',
+        party: c.party || '',
+        incumbent: !!c.incumbent,
+        donationTotal: donation ? (donation.amt || '') : '',
+        donationYears: donation ? (donation.years || '') : '',
+        vote: vote || ''
+      };
+    });
   rows.sort(function(a,b){
     var al = a.name.trim().split(/\s+/).pop().toLowerCase();
     var bl = b.name.trim().split(/\s+/).pop().toLowerCase();
@@ -10286,9 +10270,9 @@ function copyBobReportCSV(){
     var s = String(v).replace(/"/g,'""');
     return /[,"\n]/.test(s) ? '"'+s+'"' : s;
   }
-  var csv = 'Candidate,Chamber,District,Party,CUPAC Total,Donation History,SB 2266 (FOM) Vote\n';
+  var csv = 'Candidate,Chamber,District,Party,Incumbent,CUPAC Total,Donation History (by cycle),SB 2266 FOM Vote\n';
   rows.forEach(function(r){
-    csv += [q(r.name),q(r.ch),q(r.dist),q(r.party),q(r.donationTotal),q(r.donationYears),q(r.vote)].join(',') + '\n';
+    csv += [q(r.name),q(r.ch),q(r.dist),q(r.party),q(r.incumbent?'YES':''),q(r.donationTotal),q(r.donationYears),q(r.vote)].join(',') + '\n';
   });
   var btn = document.getElementById('bob-report-copy-btn');
   var done = function(){
