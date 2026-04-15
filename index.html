@@ -6427,13 +6427,9 @@ function buildCommitteeGeo(){
     // Per his Apr 15 email requesting a simplified candidate/donation/FOM view.
     const isBob = m.name === 'Bob Herrington';
     const bobBtns = isBob ? `
-      <div class="bob-card-strip" style="margin-top:12px;padding:10px 12px;background:linear-gradient(135deg,rgba(13,115,119,0.08),rgba(13,115,119,0.02));border:1.5px dashed rgba(13,115,119,0.35);border-radius:10px;">
-        <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--teal-dark);margin-bottom:3px;">🪄 By Bob, For Bob</div>
-        <div style="font-size:11px;color:var(--text-muted);line-height:1.45;margin-bottom:9px;">Per your Apr 15 email — a clean view of candidate, CUPAC donation history, and SB 2266 (FOM) vote. Nothing else.</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;">
-          <button onclick="event.stopPropagation();openBobReport();" class="bob-card-btn primary">📋 Open Report</button>
-          <button onclick="event.stopPropagation();enterBobMode();" class="bob-card-btn">🪄 Enter Bob Mode</button>
-        </div>
+      <div class="bob-card-strip" style="margin-top:12px;padding:10px 12px;background:var(--teal-light);border:1px solid var(--teal-mid);border-radius:10px;display:flex;gap:6px;flex-wrap:wrap;">
+        <button onclick="event.stopPropagation();openBobReport();" class="bob-card-btn primary">📋 Open Report</button>
+        <button onclick="event.stopPropagation();enterBobMode();" class="bob-card-btn">🪄 Enter Bob Mode</button>
       </div>` : '';
     return `<div class="geo-card${isBob?' geo-card-bob':''}">
       <div class="geo-name">${m.name}${isBob?' <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;background:var(--teal);color:#fff;margin-left:6px;vertical-align:middle">★ You</span>':''}</div>
