@@ -309,6 +309,11 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
 .geo-card .geo-districts{display:flex;flex-wrap:wrap;gap:6px}
 .geo-dist{background:var(--teal-light);color:var(--teal-dark);border:1px solid var(--border);font-size:13px;font-weight:700;padding:3px 10px;border-radius:12px}
 .geo-dist.incomplete{background:#FFF8E6;color:var(--gold-text);border-color:var(--gold-border)}
+.geo-card-bob{border:2px solid var(--teal);box-shadow:0 4px 18px rgba(13,115,119,0.2)}
+.bob-card-btn{padding:7px 12px;border-radius:7px;background:var(--white);color:var(--teal-dark);border:1.5px solid var(--teal);font-size:11px;font-weight:800;cursor:pointer;font-family:inherit;transition:background .15s,color .15s;white-space:nowrap}
+.bob-card-btn:hover{background:var(--teal-light)}
+.bob-card-btn.primary{background:var(--teal);color:#fff;border-color:var(--teal)}
+.bob-card-btn.primary:hover{background:var(--teal-dark);border-color:var(--teal-dark);color:#fff}
 
 /* ── FILTER CONTROLS ── */
 .controls{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:20px;align-items:center}
@@ -674,12 +679,67 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
 .bob-donation-none{color:var(--text-dim);font-style:italic;font-size:11px}
 .bob-report-close{position:absolute;top:16px;right:18px;background:none;border:none;font-size:18px;cursor:pointer;color:var(--text-muted);padding:4px 8px;border-radius:6px}
 .bob-report-close:hover{color:var(--ink);background:var(--surface-2)}
-.kh-quick-report{background:linear-gradient(90deg,rgba(13,115,119,0.08),rgba(13,115,119,0.02));border:1px solid rgba(13,115,119,0.25);border-radius:10px;padding:12px 14px;margin:0 0 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.kh-quick-report-text{flex:1;min-width:180px}
-.kh-quick-report-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--teal-dark);margin-bottom:2px}
-.kh-quick-report-desc{font-size:11px;color:var(--text-muted);line-height:1.45}
-.kh-quick-report-btn{padding:9px 14px;border-radius:8px;background:var(--teal);color:#fff;border:none;font-weight:800;font-size:11px;cursor:pointer;font-family:inherit;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap;transition:background .15s}
-.kh-quick-report-btn:hover{background:var(--teal-dark)}
+/* ── BOB MODE — whole-dashboard simplified view (cards kept) ── */
+body.bob-mode .site-header{display:none !important}
+body.bob-mode .nav-bar{display:none !important}
+body.bob-mode #tier-filter-bar{display:none !important}
+body.bob-mode .budget-sidebar,
+body.bob-mode .budget-sidebar-tab{display:none !important}
+body.bob-mode #cupac-cake-modal,
+body.bob-mode #gac-modal{display:none !important}
+/* Only the candidates panel is visible */
+body.bob-mode .panel:not(#panel-candidates){display:none !important}
+body.bob-mode #panel-candidates.panel{display:block !important;padding-top:8px}
+/* Inside candidates panel, hide everything except the card grid */
+body.bob-mode #panel-candidates > *{display:none !important}
+body.bob-mode #panel-candidates > #cand-tbody{display:grid !important}
+body.bob-mode #panel-candidates > .bob-mode-notice{display:block !important}
+/* Bob mode persistent top banner */
+#bob-mode-banner{display:none;position:sticky;top:0;z-index:210;background:linear-gradient(90deg,#085155 0%,#0D7377 100%);color:#fff;padding:10px 20px;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;box-shadow:0 2px 12px rgba(0,0,0,0.25);font-family:var(--font-body)}
+body.bob-mode #bob-mode-banner{display:flex}
+#bob-mode-banner .bmb-title{font-family:var(--font-display);font-size:16px;font-weight:800;letter-spacing:.01em;display:flex;align-items:center;gap:10px}
+#bob-mode-banner .bmb-sub{font-size:11px;color:rgba(255,255,255,0.8);margin-top:1px}
+#bob-mode-banner .bmb-search{flex:1;min-width:160px;max-width:320px;padding:7px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.25);background:rgba(255,255,255,0.12);color:#fff;font-size:12px;font-family:inherit;outline:none}
+#bob-mode-banner .bmb-search::placeholder{color:rgba(255,255,255,0.6)}
+#bob-mode-banner .bmb-search:focus{background:rgba(255,255,255,0.18);border-color:rgba(255,255,255,0.5)}
+#bob-mode-banner .bmb-btn{padding:7px 12px;border-radius:8px;background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.35);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}
+#bob-mode-banner .bmb-btn:hover{background:rgba(255,255,255,0.25)}
+#bob-mode-banner .bmb-btn.exit{background:#fff;color:var(--teal-dark);border-color:#fff;font-weight:800}
+#bob-mode-banner .bmb-btn.exit:hover{background:#EAF4F4}
+#bob-mode-banner .bmb-filter{display:flex;gap:4px;flex-wrap:wrap}
+#bob-mode-banner .bmb-chip{padding:5px 10px;border-radius:6px;background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.25);font-size:10px;font-weight:700;cursor:pointer;text-transform:uppercase;letter-spacing:.3px}
+#bob-mode-banner .bmb-chip.active{background:#fff;color:var(--teal-dark);border-color:#fff}
+/* Compact cards in Bob mode */
+body.bob-mode .pcard{padding:12px !important;min-height:auto !important}
+body.bob-mode .pcard-body{gap:6px !important}
+body.bob-mode .pcard-hdr .pcard-badges{display:none !important}
+body.bob-mode .pcard-hdr .pcard-meta{display:block !important;font-size:11px !important;color:var(--text-muted) !important}
+body.bob-mode .pcard-name-extras{display:none !important}
+body.bob-mode .pcard-name{cursor:default !important}
+body.bob-mode .pcard-name svg{display:none !important}
+body.bob-mode .pcard-datagrid{grid-template-columns:1fr !important;gap:0 !important;padding:0 !important;margin:0 !important;background:transparent !important;border:none !important}
+body.bob-mode .pcard-datagrid > div:not(.pc-voting-history){display:none !important}
+body.bob-mode .pc-voting-history .pcard-gridlabel{display:none !important}
+body.bob-mode .pc-sb2217-row{display:none !important}
+body.bob-mode .pc-sb2266-row span:first-child{min-width:auto !important;color:var(--teal-dark) !important;font-weight:800 !important}
+body.bob-mode .pc-sb2266-row span:first-child::after{content:" (FOM)";font-weight:700;color:var(--text-muted)}
+body.bob-mode .pcard-section:not(.pc-cupac-section){display:none !important}
+body.bob-mode .pc-cupac-section{padding:0 !important;margin:0 !important;background:transparent !important;border:none !important}
+body.bob-mode .pcard-tracker{display:none !important}
+body.bob-mode .pcard-footer{display:none !important}
+body.bob-mode .pcard-employer{display:none !important}
+/* Don't shade not-running cards in Bob view — Bob wants a clean read */
+body.bob-mode .pcard.pcard-notrunning{filter:none !important;opacity:1 !important}
+/* Filtered-out cards in Bob mode */
+body.bob-mode .pcard.bob-filtered-out{display:none !important}
+/* Print-friendly tweaks when Bob mode is on */
+@media print{
+  body.bob-mode #bob-mode-banner{position:static;background:#085155 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body.bob-mode #bob-mode-banner .bmb-btn,
+  body.bob-mode #bob-mode-banner .bmb-search,
+  body.bob-mode #bob-mode-banner .bmb-filter{display:none !important}
+  body.bob-mode .pcard{break-inside:avoid;page-break-inside:avoid}
+}
 /* ── COLLAPSIBLE SECTIONS ── */
 .coll-head{cursor:pointer;user-select:none;position:relative}
 .coll-head::before{content:'▾';display:inline-block;margin-right:8px;font-size:14px;transition:transform .18s ease;color:var(--teal);font-weight:700}
@@ -1930,14 +1990,7 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
   <div class="keyboard-help-modal" style="position:relative">
     <button class="keyboard-help-close" onclick="closeKeyboardHelp()" aria-label="Close">✕</button>
     <h3>⌨️ Keyboard Shortcuts</h3>
-    <div class="kh-sub">Speed-run the dashboard without touching your mouse.</div>
-    <div class="kh-quick-report">
-      <div class="kh-quick-report-text">
-        <div class="kh-quick-report-title">📋 Donation × FOM Report</div>
-        <div class="kh-quick-report-desc">Clean view: candidate, CUPAC donation history, and SB 2266 (Field of Membership) vote. Nothing else. Per Bob Herrington's request.</div>
-      </div>
-      <button class="kh-quick-report-btn" onclick="closeKeyboardHelp();openBobReport();">Open Report →</button>
-    </div>
+    <div class="kh-sub">Speed-run the dashboard without touching your mouse. <span style="color:var(--teal-dark);font-weight:700">Tip:</span> Bob's simplified FOM × donation view lives on his card in Committee &amp; Overview.</div>
     <div class="kh-group">
       <div class="kh-group-title">Navigation</div>
       <div class="kh-row"><span>Leadership tab</span><span class="kh-keys"><span class="kh-key">1</span></span></div>
@@ -2011,6 +2064,23 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
     <div class="header-badge">⚑ Filing Deadline Apr 6</div>
   </div>
 </header>
+
+<!-- BOB MODE — persistent banner (only visible when body.bob-mode) -->
+<div id="bob-mode-banner" role="region" aria-label="Bob Mode">
+  <div>
+    <div class="bmb-title">🪄 Bob Mode <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.3);letter-spacing:.3px;text-transform:uppercase">By Bob, For Bob</span></div>
+    <div class="bmb-sub">Every candidate · CUPAC donation history · SB 2266 (FOM) vote · nothing else</div>
+  </div>
+  <input id="bob-mode-search" class="bmb-search" type="text" placeholder="Search candidates…" oninput="bobModeFilter()">
+  <div class="bmb-filter">
+    <button class="bmb-chip active" data-bob-filter="all"  onclick="setBobModeVoteFilter('all',this)">All</button>
+    <button class="bmb-chip"        data-bob-filter="yea"  onclick="setBobModeVoteFilter('yea',this)">✓ YEA</button>
+    <button class="bmb-chip"        data-bob-filter="nay"  onclick="setBobModeVoteFilter('nay',this)">✗ NAY</button>
+    <button class="bmb-chip"        data-bob-filter="cupac" onclick="setBobModeVoteFilter('cupac',this)">💰 CUPAC</button>
+  </div>
+  <button class="bmb-btn" onclick="printBobReport()" title="Print the tabular version">🖨️ Print</button>
+  <button class="bmb-btn exit" onclick="exitBobMode()" title="Exit Bob Mode (Esc)">✕ Exit Bob Mode</button>
+</div>
 
 <!-- 5 TABS NAV -->
 <nav class="nav-bar" role="navigation">
@@ -5512,7 +5582,7 @@ function personCard(cfg){
   var _empRow = '';
   var _profSrc = _candForLeg || _ldr;
   if(_profSrc && _profSrc.employer) {
-    _empRow = '<div style="font-size:10px;color:var(--text-dim);padding:3px 0;border-top:1px dashed var(--border);margin-top:3px;">💼 '+_profSrc.employer+'</div>';
+    _empRow = '<div class="pcard-employer" style="font-size:10px;color:var(--text-dim);padding:3px 0;border-top:1px dashed var(--border);margin-top:3px;">💼 '+_profSrc.employer+'</div>';
   }
   var _profLinks = [];
   if(_profSrc && _profSrc.wiki) _profLinks.push('<a href="'+_profSrc.wiki+'" target="_blank" style="font-size:9px;color:#1D4ED8;font-weight:700;text-decoration:none;">Wikipedia ↗</a>');
@@ -5552,7 +5622,7 @@ function personCard(cfg){
       +'<div>'
         +'<div class="pcard-name" onclick="openPersonCard(\''+safeName+'\','+(parseInt(dist)||0)+')" title="Open full profile">'
           +_pcTitle+name+(_pcStatusLabel?' <span style="font-size:11px;font-weight:600;opacity:.85">('+_pcStatusLabel+')</span>':'')
-          +iblBadge+pins+' <span style="font-size:12px;opacity:.6">▸</span>'
+          +'<span class="pcard-name-extras">'+iblBadge+pins+' <span style="font-size:12px;opacity:.6">▸</span></span>'
         +'</div>'
         +'<div class="pcard-badges">'+ballot+'</div>'
         +'<div class="pcard-meta">'+meta.join(' · ')+'</div>'
@@ -5563,24 +5633,24 @@ function personCard(cfg){
     +'<div class="pcard-body">'
 
       +'<div class="pcard-datagrid">'
-        +'<div>'
+        +'<div class="pc-voting-history">'
           +'<div class="pcard-gridlabel">Voting History</div>'
           +'<div style="display:flex;flex-direction:column;gap:4px;margin-top:2px;">'
-            +'<div style="display:flex;align-items:center;gap:6px;"><span style="font-size:9px;font-weight:700;color:var(--text-muted);min-width:54px;">SB 2266</span>'+vb+'</div>'
-            +'<div style="display:flex;align-items:center;gap:6px;"><span style="font-size:9px;font-weight:700;color:var(--text-muted);min-width:54px;">SB 2217</span>'+vb2+'</div>'
+            +'<div class="pc-sb2266-row" style="display:flex;align-items:center;gap:6px;"><span style="font-size:9px;font-weight:700;color:var(--text-muted);min-width:54px;">SB 2266</span>'+vb+'</div>'
+            +'<div class="pc-sb2217-row" style="display:flex;align-items:center;gap:6px;"><span style="font-size:9px;font-weight:700;color:var(--text-muted);min-width:54px;">SB 2217</span>'+vb2+'</div>'
           +'</div>'
         +'</div>'
-        +'<div>'
+        +'<div class="pc-ballot-cell">'
           +'<div class="pcard-gridlabel">2026 Ballot</div>'
           +ballotGridBadge
         +'</div>'
-        +'<div>'
+        +'<div class="pc-decision-cell">'
           +'<div class="pcard-gridlabel">Decision</div>'
           +'<div style="display:flex;align-items:center;font-size:12px;color:var(--text)">'+dot+''+dotLabels[saved.status]+(saved.amt?(' <strong style="margin-left:4px;color:var(--teal-dark)">$'+saved.amt+'</strong>'):'')+'</div>'
         +'</div>'
       +'</div>'
 
-      +'<div class="pcard-section">'
+      +'<div class="pcard-section pc-cupac-section">'
         +'<div class="pcard-gridlabel">CUPAC History — '+(cupacTotal?'<strong style="color:var(--teal-dark)">'+cupacTotal+'</strong>':'<span style="color:var(--text-muted)">$0</span>')+'</div>'
         +'<div style="margin-top:4px;">'+bars+'</div>'
       +'</div>'
@@ -6333,10 +6403,24 @@ function buildCommitteeGeo(){
     const badges = m.districts.length
       ? m.districts.map(d=>`<span class="geo-dist${m.complete?'':' incomplete'}" onclick="jumpToDistrict(${d})" title="Look up District ${d}">Dist. ${d} 🔍</span>`).join('')
       : '<span class="geo-dist incomplete">⚠ Districts not confirmed</span>';
-    return `<div class="geo-card">
-      <div class="geo-name">${m.name}</div>
+    // Bob Herrington's card gets a dedicated "By Bob, For Bob" button strip
+    // that launches the report or toggles the whole-dashboard Bob View mode.
+    // Per his Apr 15 email requesting a simplified candidate/donation/FOM view.
+    const isBob = m.name === 'Bob Herrington';
+    const bobBtns = isBob ? `
+      <div class="bob-card-strip" style="margin-top:12px;padding:10px 12px;background:linear-gradient(135deg,rgba(13,115,119,0.08),rgba(13,115,119,0.02));border:1.5px dashed rgba(13,115,119,0.35);border-radius:10px;">
+        <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--teal-dark);margin-bottom:3px;">🪄 By Bob, For Bob</div>
+        <div style="font-size:11px;color:var(--text-muted);line-height:1.45;margin-bottom:9px;">Per your Apr 15 email — a clean view of candidate, CUPAC donation history, and SB 2266 (FOM) vote. Nothing else.</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button onclick="event.stopPropagation();openBobReport();" class="bob-card-btn primary">📋 Open Report</button>
+          <button onclick="event.stopPropagation();enterBobMode();" class="bob-card-btn">🪄 Enter Bob Mode</button>
+        </div>
+      </div>` : '';
+    return `<div class="geo-card${isBob?' geo-card-bob':''}">
+      <div class="geo-name">${m.name}${isBob?' <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;background:var(--teal);color:#fff;margin-left:6px;vertical-align:middle">★ You</span>':''}</div>
       <div class="geo-cu">${m.title} · ${m.cu}</div>
       <div>${badges}</div>
+      ${bobBtns}
     </div>`;
   }).join('');
   if(!filtered.length) document.getElementById('committee-geo-grid').innerHTML='<p style="color:var(--text-muted);font-style:italic">No matches.</p>';
@@ -10208,6 +10292,70 @@ function copyBobReportCSV(){
     document.body.removeChild(ta);
   }
 }
+// ──────────────────────────────────────────────────────────────
+// BOB MODE — whole-dashboard simplified view that keeps the cards
+// ──────────────────────────────────────────────────────────────
+function enterBobMode(){
+  document.body.classList.add('bob-mode');
+  // Force-switch to candidates tab — that's where the cards live.
+  try {
+    var tabs = document.querySelectorAll('.nav-tab');
+    var order = ['leadership','sb2266','history','candidates','committee','winprob','strategy'];
+    var idx = order.indexOf('candidates');
+    if(tabs[idx] && typeof showPanel === 'function') showPanel('candidates', tabs[idx]);
+  } catch(e){}
+  // Reset filter state
+  var searchEl = document.getElementById('bob-mode-search');
+  if(searchEl) searchEl.value = '';
+  _bobModeVoteFilter = 'all';
+  var chips = document.querySelectorAll('#bob-mode-banner .bmb-chip');
+  chips.forEach(function(c){ c.classList.toggle('active', c.getAttribute('data-bob-filter') === 'all'); });
+  // Scroll to top of cards
+  setTimeout(function(){ window.scrollTo({top:0, behavior:'smooth'}); }, 60);
+  // Apply filter (reveals all by default)
+  bobModeFilter();
+}
+function exitBobMode(){
+  document.body.classList.remove('bob-mode');
+  // Clear any Bob-mode hide flags so cards come back normally
+  document.querySelectorAll('.pcard.bob-filtered-out').forEach(function(el){
+    el.classList.remove('bob-filtered-out');
+  });
+}
+function toggleBobMode(){
+  if(document.body.classList.contains('bob-mode')) exitBobMode();
+  else enterBobMode();
+}
+var _bobModeVoteFilter = 'all';
+function setBobModeVoteFilter(which, btn){
+  _bobModeVoteFilter = which;
+  var chips = document.querySelectorAll('#bob-mode-banner .bmb-chip');
+  chips.forEach(function(c){ c.classList.remove('active'); });
+  if(btn) btn.classList.add('active');
+  bobModeFilter();
+}
+function bobModeFilter(){
+  var q = (document.getElementById('bob-mode-search') || {value:''}).value.toLowerCase().trim();
+  var cards = document.querySelectorAll('#panel-candidates .pcard');
+  cards.forEach(function(card){
+    var nameEl = card.querySelector('.pcard-name');
+    var name = nameEl ? nameEl.textContent.trim() : '';
+    var hide = false;
+    if(q && name.toLowerCase().indexOf(q) < 0) hide = true;
+    if(!hide && _bobModeVoteFilter !== 'all'){
+      var cls = card.className || '';
+      if(_bobModeVoteFilter === 'yea' && cls.indexOf('pcard-yea') < 0) hide = true;
+      else if(_bobModeVoteFilter === 'nay' && cls.indexOf('pcard-nay') < 0) hide = true;
+      else if(_bobModeVoteFilter === 'cupac'){
+        // Has CUPAC history if the CUPAC section has any non-zero $ amount
+        var cu = card.querySelector('.pc-cupac-section');
+        var txt = cu ? cu.textContent : '';
+        if(!/\$[1-9]/.test(txt)) hide = true;
+      }
+    }
+    card.classList.toggle('bob-filtered-out', hide);
+  });
+}
 function printBobReport(){
   var rows = buildBobReportData();
   var w = window.open('','','width=1000,height=800');
@@ -10349,6 +10497,7 @@ document.addEventListener('keydown', function(e){
   var isHelpOpen = khOverlay && khOverlay.classList.contains('open');
   var brOverlay = document.getElementById('bob-report-overlay');
   var isBobReportOpen = brOverlay && brOverlay.classList.contains('open');
+  var isBobModeOn = document.body.classList.contains('bob-mode');
 
   // Bob report modal — esc closes (handle before help so typing in search still works)
   if(isBobReportOpen) {
@@ -10360,6 +10509,11 @@ document.addEventListener('keydown', function(e){
   if(isHelpOpen) {
     if(e.key === 'Escape') { e.preventDefault(); closeKeyboardHelp(); return; }
     return;
+  }
+
+  // Bob Mode — esc exits (but only when NOT typing in the search field)
+  if(isBobModeOn && e.key === 'Escape' && !isTyping) {
+    e.preventDefault(); exitBobMode(); return;
   }
 
   // Search modal hotkeys
