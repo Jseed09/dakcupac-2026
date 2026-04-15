@@ -2039,7 +2039,7 @@ body.bob-mode .pcard.bob-filtered-out{display:none !important}
   <div class="bob-report-modal">
     <button class="bob-report-close" onclick="closeBobReport()" aria-label="Close">✕</button>
     <h3>📋 Donation History × FOM Vote</h3>
-    <div class="br-sub"><strong style="color:var(--teal-dark)">2026 ballot only</strong> — every candidate on the odd-district 2026 ballot (ND SOS Apr 6 filings) with their DakCUPAC donation history and SB 2266 (Field of Membership) vote. Per Bob Herrington's request. YEA = supported credit unions. NAY = opposed.</div>
+    <div class="br-sub">Every legislator in our universe — 2026 ballot filings, everyone who voted on SB 2266 in the 68th Assembly, and everyone with a DakCUPAC donation history. YEA = supported credit unions. NAY = opposed.</div>
     <div class="bob-report-controls">
       <input id="bob-report-search" class="bob-report-search" type="text" placeholder="Search by name, district, or chamber…" oninput="renderBobReport(this.value)">
       <button id="bob-report-excel-btn" class="bob-report-btn primary" onclick="downloadBobExcel()" title="Download a styled Excel workbook (.xlsx) with frozen header, autofilter, year-by-year columns, and a summary sheet">📥 Download Excel</button>
@@ -10183,26 +10183,48 @@ function _bobEscHtml(s){
 }
 function buildBobReportData(){
   if(_bobReportData) return _bobReportData;
-  // 2026 BALLOTED ONLY — matches the web dashboard's Candidates tab logic
-  // (odd districts only, ND SOS April 6 filings). Same filter as the
-  // CSV/PDF generator so the modal and the exported files agree.
-  if(typeof CANDIDATES === 'undefined' || !CANDIDATES.forEach) return [];
-  var rows = CANDIDATES
-    .filter(function(c){ return parseInt(c.dist) % 2 === 1; })
-    .map(function(c){
-      var donation = (typeof CUPAC_HIST !== 'undefined' && CUPAC_HIST[c.name]) ? CUPAC_HIST[c.name] : null;
-      var vote = (typeof getSB2266Vote === 'function') ? getSB2266Vote(c.name, c.ch) : null;
-      return {
-        name: c.name,
-        ch: c.ch || '',
-        dist: c.dist ? String(c.dist) : '',
-        party: c.party || '',
-        incumbent: !!c.incumbent,
-        donationTotal: donation ? (donation.amt || '') : '',
-        donationYears: donation ? (donation.years || '') : '',
-        vote: vote || ''
-      };
+  // FULL UNIVERSE — everyone with a 2026 filing OR a historical SB 2266
+  // vote OR a prior DakCUPAC donation. Deduplicated by name.
+  var map = {};
+  function add(name, info){
+    if(!name) return;
+    var k = name.toLowerCase().replace(/[^a-z]/g,'');
+    if(!k) return;
+    if(!map[k]) map[k] = {name:name, ch:'', dist:'', party:'', incumbent:false};
+    var e = map[k];
+    if(info){
+      if(info.ch && !e.ch) e.ch = info.ch;
+      if(info.dist && !e.dist) e.dist = String(info.dist);
+      if(info.party && !e.party) e.party = info.party;
+      if(info.incumbent) e.incumbent = true;
+    }
+  }
+  if(typeof CANDIDATES !== 'undefined' && CANDIDATES.forEach){
+    CANDIDATES.forEach(function(c){
+      add(c.name, {ch:c.ch, dist:c.dist, party:c.party, incumbent:c.incumbent});
     });
+  }
+  if(typeof ALL_VOTES !== 'undefined' && ALL_VOTES.forEach){
+    ALL_VOTES.forEach(function(v){ add(v.name, {ch:v.chamber, dist:v.dist}); });
+  }
+  if(typeof CUPAC_HIST !== 'undefined'){
+    Object.keys(CUPAC_HIST).forEach(function(n){ add(n); });
+  }
+  var rows = Object.keys(map).map(function(k){
+    var r = map[k];
+    var donation = (typeof CUPAC_HIST !== 'undefined' && CUPAC_HIST[r.name]) ? CUPAC_HIST[r.name] : null;
+    var vote = (typeof getSB2266Vote === 'function') ? getSB2266Vote(r.name, r.ch) : null;
+    return {
+      name: r.name,
+      ch: r.ch || '',
+      dist: r.dist || '',
+      party: r.party || '',
+      incumbent: !!r.incumbent,
+      donationTotal: donation ? (donation.amt || '') : '',
+      donationYears: donation ? (donation.years || '') : '',
+      vote: vote || ''
+    };
+  });
   rows.sort(function(a,b){
     var al = a.name.trim().split(/\s+/).pop().toLowerCase();
     var bl = b.name.trim().split(/\s+/).pop().toLowerCase();
@@ -10419,17 +10441,17 @@ function downloadBobExcel(){
   var nay = rows.filter(function(r){return r.vote==='NAY';}).length;
 
   var summary = [
-    ['DakCUPAC — 2026 Balloted Candidates · FOM × Donation Report'],
+    ['DakCUPAC — Full Universe · FOM × Donation Report'],
     [''],
     ['Generated', new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})],
     ['Prepared for', 'Bob Herrington · North Star Community CU · DakCUPAC Committee'],
     ['Confidentiality', 'Committee Use Only — Not for Public Distribution'],
     [''],
     ['SCOPE', ''],
-    ['Candidates on 2026 ballot', rows.length],
-    ['Senate / House split', sen + ' Senate / ' + hou + ' House'],
-    ['Incumbents running', inc],
-    ['Challengers / open seats', rows.length - inc],
+    ['Total people in report', rows.length],
+    ['Senate / House (known chambers)', sen + ' Senate / ' + hou + ' House'],
+    ['2026 incumbents', inc],
+    ['Non-incumbents / historical', rows.length - inc],
     [''],
     ['DONATION HISTORY (2016–2024)', ''],
     ['Candidates with prior CUPAC giving', withDon],
@@ -10504,7 +10526,7 @@ function downloadBobExcel(){
   });
 
   var wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, '2026 Candidates');
+  XLSX.utils.book_append_sheet(wb, ws, 'FOM × Donations');
   XLSX.utils.book_append_sheet(wb, sws, 'Summary & Legend');
   wb.Props = {
     Title: 'DakCUPAC 2026 FOM × Donation Report',
@@ -10727,16 +10749,16 @@ function printBobReport(){
 
   html += '<div class="hdr">'
     + '<div>'
-    +   '<h1>DakCUPAC — 2026 Balloted Candidates × FOM Vote</h1>'
-    +   '<div class="sub">Every candidate on the 2026 ballot (ND SOS · Apr 6 filings) with their DakCUPAC donation history by cycle and Field of Membership (SB 2266) vote. Prepared for Bob Herrington.</div>'
+    +   '<h1>DakCUPAC — Candidate × FOM Vote × Donation History</h1>'
+    +   '<div class="sub">Every candidate and legislator in our universe — 2026 ballot filings, SB 2266 voters, and prior DakCUPAC donation recipients. Prepared for Bob Herrington.</div>'
     + '</div>'
     + '<div class="stamp">DakCUPAC<br>Confidential · Committee Use Only<br>Generated '+esc(today)+'</div>'
     + '</div>';
 
   html += '<div class="stats">'
-    + '<div class="stat"><div class="val">'+stats.total+'</div><div class="lbl">2026 Candidates</div></div>'
+    + '<div class="stat"><div class="val">'+stats.total+'</div><div class="lbl">Total People</div></div>'
     + '<div class="stat"><div class="val">'+stats.senate+' / '+stats.house+'</div><div class="lbl">Senate / House</div></div>'
-    + '<div class="stat"><div class="val">'+stats.incumbents+'</div><div class="lbl">Incumbents</div></div>'
+    + '<div class="stat"><div class="val">'+stats.incumbents+'</div><div class="lbl">2026 Incumbents</div></div>'
     + '<div class="stat"><div class="val">'+stats.withDonation+'</div><div class="lbl">With CUPAC</div></div>'
     + '<div class="stat"><div class="val" style="color:#15803D">'+stats.yea+'</div><div class="lbl">SB 2266 YEA</div></div>'
     + '<div class="stat"><div class="val" style="color:#B91C1C">'+stats.nay+'</div><div class="lbl">SB 2266 NAY</div></div>'
@@ -10802,9 +10824,9 @@ function printBobReport(){
 
   html += '</tbody></table>';
   html += '<div class="footer">'
-    + 'DakCUPAC · 2026 BALLOTED ONLY · '+stats.total+' candidates ('+stats.senate+' Senate · '+stats.house+' House · '+stats.incumbents+' incumbents) · '
+    + 'DakCUPAC · Full universe · '+stats.total+' people ('+stats.senate+' Senate · '+stats.house+' House · '+stats.incumbents+' 2026 incumbents) · '
     + stats.withDonation+' with prior CUPAC history · '+stats.yea+' YEA / '+stats.nay+' NAY on SB 2266 (FOM)<br>'
-    + 'Source: ND SOS Apr 6 2026 filings · DakCUPAC cycles 2016–2024 · ND 68th Assembly SB 2266 roll call<br>'
+    + 'Source: ND SOS 2026 filings · DakCUPAC cycles 2016–2024 · ND 68th Assembly SB 2266 roll call<br>'
     + '<strong>Confidential — Committee Use Only — Not for Public Distribution</strong>'
     + '</div>';
   html += '</body></html>';
