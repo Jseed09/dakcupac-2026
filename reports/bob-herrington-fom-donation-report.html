@@ -4,14 +4,16 @@
 <meta charset="UTF-8">
 <title>DakCUPAC — Donation History × FOM Vote Report</title>
 <style>
-  @page { size: letter; margin: 0.5in; }
+  @page { size: letter landscape; margin: 0.4in; }
   body {
     font-family: -apple-system, Segoe UI, Helvetica, Arial, sans-serif;
-    font-size: 10px;
+    font-size: 9.5px;
     color: #0A1628;
-    padding: 20px 28px;
-    max-width: 1020px;
+    padding: 16px 24px;
+    max-width: 1100px;
     margin: 0 auto;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
   .hdr {
     display: flex; justify-content: space-between; align-items: flex-start;
@@ -39,21 +41,32 @@
   thead { display: table-header-group; }
   tr { page-break-inside: avoid; }
   th {
-    background: #F7F8FA; border-bottom: 2px solid #0D7377; padding: 6px 8px;
-    text-align: left; font-size: 9px; font-weight: 800; text-transform: uppercase;
-    letter-spacing: .4px; color: #4A6080;
+    background: #0D7377; color: #fff;
+    padding: 7px 6px;
+    text-align: left; font-size: 8.5px; font-weight: 800; text-transform: uppercase;
+    letter-spacing: .3px;
+    border-right: 1px solid #085155;
   }
+  th.num { text-align: right; }
+  th.ctr { text-align: center; }
   td {
-    padding: 6px 8px; border-bottom: 1px solid #EEF0F4; vertical-align: top;
-    font-size: 10px;
+    padding: 5px 6px; border-bottom: 1px solid #EEF0F4; vertical-align: middle;
+    font-size: 9.5px;
   }
+  td.name { font-weight: 700; color: #0A1628; }
+  td.num  { text-align: right; font-variant-numeric: tabular-nums; }
+  td.ctr  { text-align: center; }
   tbody tr:nth-child(even) { background: #FAFBFC; }
-  .yea { color: #15803D; font-weight: 800; }
-  .nay { color: #B91C1C; font-weight: 800; }
-  .absent { color: #C17D0E; font-weight: 800; }
+  .yea-pill {
+    display:inline-block; padding:2px 8px; border-radius:4px;
+    background:#DCFCE7; color:#15803D; font-weight:800; font-size:9px;
+  }
+  .nay-pill {
+    display:inline-block; padding:2px 8px; border-radius:4px;
+    background:#FEF2F2; color:#B91C1C; font-weight:800; font-size:9px;
+  }
   .muted { color: #7A94B0; font-style: italic; }
-  .dollar { color: #0D7377; font-weight: 700; }
-  .cycle { color: #7A94B0; font-size: 9px; }
+  .dollar { color: #085155; font-weight: 800; }
   .footer {
     margin-top: 18px; padding-top: 10px; border-top: 1px solid #D1D9E4;
     font-size: 9px; color: #7A94B0; text-align: center;
@@ -101,1456 +114,2036 @@
   <table>
     <thead>
       <tr>
-        <th style="width:22%">Candidate</th>
-        <th style="width:8%">Chamber</th>
-        <th style="width:6%">Dist.</th>
-        <th style="width:5%">Party</th>
-        <th style="width:7%">Inc.</th>
-        <th style="width:10%">CUPAC Total</th>
-        <th style="width:27%">Donation History (by cycle)</th>
-        <th style="width:15%">SB 2266 · FOM</th>
+        <th style="width:21%">Candidate</th>
+        <th style="width:7%" class="ctr">Chamber</th>
+        <th style="width:5%" class="ctr">Dist.</th>
+        <th style="width:5%" class="ctr">Party</th>
+        <th style="width:5%" class="ctr">Inc.</th>
+        <th style="width:7%" class="num">2016</th>
+        <th style="width:7%" class="num">2018</th>
+        <th style="width:7%" class="num">2020</th>
+        <th style="width:7%" class="num">2022</th>
+        <th style="width:7%" class="num">2024</th>
+        <th style="width:9%" class="num">Total</th>
+        <th style="width:13%" class="ctr">SB 2266 · FOM</th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td><strong>Don Aandal</strong></td>
-        <td>House</td>
-        <td>17</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Mary K Adams</strong></td>
-        <td>Senate</td>
-        <td>43</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Jesus Albry Aguirre</strong></td>
-        <td>House</td>
-        <td>33</td>
-        <td>R</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Grant Allex</strong></td>
-        <td>House</td>
-        <td>27</td>
-        <td>R</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Karen A Anderson</strong></td>
-        <td>House</td>
-        <td>19</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="dollar">$300</span></td>
-        <td><span class="cycle">$300 (2016)</span></td>
-        <td class="yea">✓ YEA — Supported CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Anastassiya (Stass) Andrianova</strong></td>
-        <td>House</td>
-        <td>11</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Michelle Axtman</strong></td>
-        <td>Senate</td>
-        <td>7</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="nay">✗ NAY — Opposed CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Sandy Baertsch</strong></td>
-        <td>House</td>
-        <td>39</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Kimball Banks</strong></td>
-        <td>House</td>
-        <td>33</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Jeff Barta</strong></td>
-        <td>Senate</td>
-        <td>43</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="yea">✓ YEA — Supported CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Todd Beard</strong></td>
-        <td>Senate</td>
-        <td>23</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="yea">✓ YEA — Supported CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Gaylynn Becker</strong></td>
-        <td>House</td>
-        <td>7</td>
-        <td>R</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Rick Becker</strong></td>
-        <td>House</td>
-        <td>7</td>
-        <td>R</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Brad Bekkedahl</strong></td>
-        <td>Senate</td>
-        <td>1</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="dollar">$400</span></td>
-        <td><span class="cycle">$400 (2018)</span></td>
-        <td class="nay">✗ NAY — Opposed CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Jennifer Benson</strong></td>
-        <td>House</td>
-        <td>41</td>
-        <td>R</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Katie Benton</strong></td>
-        <td>Senate</td>
-        <td>17</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Keith Boehm</strong></td>
-        <td>Senate</td>
-        <td>33</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="yea">✓ YEA — Supported CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Roger Brabandt</strong></td>
-        <td>House</td>
-        <td>5</td>
-        <td>R</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Collette Brown</strong></td>
-        <td>House</td>
-        <td>9</td>
-        <td>D</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Russell Bubach</strong></td>
-        <td>House</td>
-        <td>13</td>
-        <td>R</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Mark Casler</strong></td>
-        <td>House</td>
-        <td>23</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Jill T Chandler</strong></td>
-        <td>House</td>
-        <td>43</td>
-        <td>R</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Sean Cleary</strong></td>
-        <td>Senate</td>
-        <td>35</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="dollar">$700</span></td>
-        <td><span class="cycle">$700 (2022)</span></td>
-        <td class="nay">✗ NAY — Opposed CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Liz Conmy</strong></td>
-        <td>House</td>
-        <td>11</td>
-        <td>D</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="yea">✓ YEA — Supported CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Jayme Davis</strong></td>
-        <td>Senate</td>
-        <td>9</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="yea">✓ YEA — Supported CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Kyle Davison</strong></td>
-        <td>Senate</td>
-        <td>41</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="dollar">$400</span></td>
-        <td><span class="cycle">$400 (2018)</span></td>
-        <td class="yea">✓ YEA — Supported CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Nyamal Dei</strong></td>
-        <td>Senate</td>
-        <td>41</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Blaine Deslauriers</strong></td>
-        <td>House</td>
-        <td>3</td>
-        <td>R</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Jason Dodge</strong></td>
-        <td>House</td>
-        <td>39</td>
-        <td>R</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Laura Dronen</strong></td>
-        <td>House</td>
-        <td>21</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Frances Drury</strong></td>
-        <td>House</td>
-        <td>15</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Everett Duckworth</strong></td>
-        <td>House</td>
-        <td>13</td>
-        <td>R</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Mike Dwyer</strong></td>
-        <td>Senate</td>
-        <td>47</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="dollar">$400</span></td>
-        <td><span class="cycle">$400 (2018)</span></td>
-        <td class="nay">✗ NAY — Opposed CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Kyle Erickson</strong></td>
-        <td>House</td>
-        <td>5</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Judy Estenson</strong></td>
-        <td>Senate</td>
-        <td>15</td>
-        <td>R</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="dollar">$400</span></td>
-        <td><span class="cycle">$400 (2024)</span></td>
-        <td class="yea">✓ YEA — Supported CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Matt Evans</strong></td>
-        <td>House</td>
-        <td>25</td>
-        <td>R</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Jay Fisher</strong></td>
-        <td>Senate</td>
-        <td>5</td>
-        <td>R</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="dollar">$250</span></td>
-        <td><span class="cycle">$250 (2018)</span></td>
-        <td class="nay">✗ NAY — Opposed CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Kathy Frelich</strong></td>
-        <td>House</td>
-        <td>15</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="yea">✓ YEA — Supported CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Maggi Gadaire</strong></td>
-        <td>House</td>
-        <td>13</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Laurie Garbel</strong></td>
-        <td>House</td>
-        <td>1</td>
-        <td>R</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Brenda Jo Gillund</strong></td>
-        <td>House</td>
-        <td>13</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Terry Goerger</strong></td>
-        <td>House</td>
-        <td>25</td>
-        <td>R</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Mary Graner</strong></td>
-        <td>Senate</td>
-        <td>31</td>
-        <td>R</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>LaurieBeth Hager</strong></td>
-        <td>House</td>
-        <td>21</td>
-        <td>D</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="yea">✓ YEA — Supported CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Craig Headland</strong></td>
-        <td>House</td>
-        <td>29</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="dollar">$700</span></td>
-        <td><span class="cycle">$400 (2018) · $300 (2022)</span></td>
-        <td class="yea">✓ YEA — Supported CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Mike Heger</strong></td>
-        <td>House</td>
-        <td>33</td>
-        <td>R</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Stacy Heidenreich</strong></td>
-        <td>House</td>
-        <td>41</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Bob Heitkamp</strong></td>
-        <td>Senate</td>
-        <td>25</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Donna Henderson</strong></td>
-        <td>House</td>
-        <td>15</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="nay">✗ NAY — Opposed CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Crystal Hendrickson</strong></td>
-        <td>House</td>
-        <td>3</td>
-        <td>R</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Jefferey E Hermanson</strong></td>
-        <td>Senate</td>
-        <td>19</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Jolene L Hermanson</strong></td>
-        <td>House</td>
-        <td>19</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Tara Hiatt</strong></td>
-        <td>House</td>
-        <td>3</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Dawson Holle</strong></td>
-        <td>House</td>
-        <td>31</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="dollar">$500</span></td>
-        <td><span class="cycle">$500 (2026 — allocated)</span></td>
-        <td class="yea">✓ YEA — Supported CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Mike Holmes</strong></td>
-        <td>House</td>
-        <td>43</td>
-        <td>R</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Jerri Hopfauf</strong></td>
-        <td>Senate</td>
-        <td>7</td>
-        <td>R</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Kevin Horneman</strong></td>
-        <td>Senate</td>
-        <td>7</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Jeff Hoverson</strong></td>
-        <td>House</td>
-        <td>3</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="nay">✗ NAY — Opposed CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Rosann Jacobs-Fode</strong></td>
-        <td>House</td>
-        <td>47</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Alex Johnson</strong></td>
-        <td>House</td>
-        <td>1</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Corey Johnson</strong></td>
-        <td>House</td>
-        <td>23</td>
-        <td>R</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Reed Johnson</strong></td>
-        <td>House</td>
-        <td>17</td>
-        <td>R</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Taylor Johnson</strong></td>
-        <td>House</td>
-        <td>35</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Jim Jonas</strong></td>
-        <td>House</td>
-        <td>13</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="nay">✗ NAY — Opposed CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Susan Josephson</strong></td>
-        <td>House</td>
-        <td>37</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Karen Karls</strong></td>
-        <td>House</td>
-        <td>35</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="dollar">$300</span></td>
-        <td><span class="cycle">$300 (2018)</span></td>
-        <td class="nay">✗ NAY — Opposed CUs</td>
-      </tr>
-      <tr>
-        <td><strong>John Kelly</strong></td>
-        <td>Senate</td>
-        <td>29</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Keith Kempenich</strong></td>
-        <td>House</td>
-        <td>39</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="nay">✗ NAY — Opposed CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Corry Kenner</strong></td>
-        <td>House</td>
-        <td>15</td>
-        <td>R</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Kristin Kenner</strong></td>
-        <td>Senate</td>
-        <td>15</td>
-        <td>R</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Greg Kessel</strong></td>
-        <td>Senate</td>
-        <td>39</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="yea">✓ YEA — Supported CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Shawn Kessel</strong></td>
-        <td>House</td>
-        <td>27</td>
-        <td>R</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Kylan Klauzer</strong></td>
-        <td>House</td>
-        <td>37</td>
-        <td>R</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Stacie Kruckenberg</strong></td>
-        <td>House</td>
-        <td>33</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Lynne M Lafer-Halvorson</strong></td>
-        <td>House</td>
-        <td>35</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Landis Larson</strong></td>
-        <td>Senate</td>
-        <td>13</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Jon Lee</strong></td>
-        <td>House</td>
-        <td>47</td>
-        <td>R</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Judy Lee</strong></td>
-        <td>Senate</td>
-        <td>13</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="dollar">$400</span></td>
-        <td><span class="cycle">$400 (2018)</span></td>
-        <td class="nay">✗ NAY — Opposed CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Shelley Lenz</strong></td>
-        <td>House</td>
-        <td>37</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Don Lippert</strong></td>
-        <td>House</td>
-        <td>45</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Ross Lockhart</strong></td>
-        <td>House</td>
-        <td>45</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Scott Louser</strong></td>
-        <td>House</td>
-        <td>5</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="dollar">$800</span></td>
-        <td><span class="cycle">$400 (2018) · $400 (2022)</span></td>
-        <td class="nay">✗ NAY — Opposed CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Larry Luick</strong></td>
-        <td>Senate</td>
-        <td>25</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="dollar">$700</span></td>
-        <td><span class="cycle">$400 (2018) · $300 (2022)</span></td>
-        <td class="nay">✗ NAY — Opposed CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Richard Marcellais</strong></td>
-        <td>Senate</td>
-        <td>9</td>
-        <td>D</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="dollar">$500</span></td>
-        <td><span class="cycle">$250 (2018) · $250 (2022)</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Bob Martinson</strong></td>
-        <td>House</td>
-        <td>35</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="dollar">$300</span></td>
-        <td><span class="cycle">$300 (2018)</span></td>
-        <td class="nay">✗ NAY — Opposed CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Tim Mathern</strong></td>
-        <td>Senate</td>
-        <td>11</td>
-        <td>D</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="dollar">$400</span></td>
-        <td><span class="cycle">$400 (2018)</span></td>
-        <td class="yea">✓ YEA — Supported CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Lukas Arthur Maughan</strong></td>
-        <td>House</td>
-        <td>43</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Natalie Mclaughlin</strong></td>
-        <td>House</td>
-        <td>3</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Carrie McLeod</strong></td>
-        <td>House</td>
-        <td>45</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="absent">○ ABSENT</td>
-      </tr>
-      <tr>
-        <td><strong>Timothy Mihalick</strong></td>
-        <td>House</td>
-        <td>3</td>
-        <td>R</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Dan Mitchell</strong></td>
-        <td>Senate</td>
-        <td>45</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Alisa Mitskog</strong></td>
-        <td>House</td>
-        <td>25</td>
-        <td>D</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="dollar">$300</span></td>
-        <td><span class="cycle">$300 (2018)</span></td>
-        <td class="nay">✗ NAY — Opposed CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Sharlet Mohr</strong></td>
-        <td>House</td>
-        <td>23</td>
-        <td>R</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>David Monson</strong></td>
-        <td>House</td>
-        <td>19</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="dollar">$1,000</span></td>
-        <td><span class="cycle">$300 (2016) · $300 (2020) · $400 (2022)</span></td>
-        <td class="nay">✗ NAY — Opposed CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Cole Montoya</strong></td>
-        <td>House</td>
-        <td>47</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Michael Motschenbacher</strong></td>
-        <td>House</td>
-        <td>47</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="dollar">$400</span></td>
-        <td><span class="cycle">$400 (2022)</span></td>
-        <td class="nay">✗ NAY — Opposed CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Eric J Murphy</strong></td>
-        <td>House</td>
-        <td>43</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="nay">✗ NAY — Opposed CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Janne Myrdal</strong></td>
-        <td>Senate</td>
-        <td>19</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="dollar">$900</span></td>
-        <td><span class="cycle">$300 (2016) · $300 (2020) · $300 (2022)</span></td>
-        <td class="nay">✗ NAY — Opposed CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Dennis Nehring</strong></td>
-        <td>House</td>
-        <td>23</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Dianne Norris</strong></td>
-        <td>House</td>
-        <td>29</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Anna S (Garrett) Novak</strong></td>
-        <td>House</td>
-        <td>33</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="nay">✗ NAY — Opposed CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Christine O&#39;Riley</strong></td>
-        <td>Senate</td>
-        <td>11</td>
-        <td>R</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Bill Patrie</strong></td>
-        <td>Senate</td>
-        <td>47</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Bob Paulson</strong></td>
-        <td>Senate</td>
-        <td>3</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="yea">✓ YEA — Supported CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Dale Pittman</strong></td>
-        <td>Senate</td>
-        <td>35</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Duane Poitra</strong></td>
-        <td>House</td>
-        <td>9</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Lynnell Popowski</strong></td>
-        <td>House</td>
-        <td>19</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Zach Raknerud</strong></td>
-        <td>House</td>
-        <td>5</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Kevin K Remington</strong></td>
-        <td>House</td>
-        <td>31</td>
-        <td>R</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>David Richter</strong></td>
-        <td>House</td>
-        <td>1</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="nay">✗ NAY — Opposed CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Kristin Roers</strong></td>
-        <td>Senate</td>
-        <td>27</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="dollar">$300</span></td>
-        <td><span class="cycle">$300 (2022)</span></td>
-        <td class="nay">✗ NAY — Opposed CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Karen Rohr</strong></td>
-        <td>House</td>
-        <td>31</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="dollar">$700</span></td>
-        <td><span class="cycle">$300 (2018) · $400 (2022)</span></td>
-        <td class="yea">✓ YEA — Supported CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Dean Rummel</strong></td>
-        <td>Senate</td>
-        <td>37</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="nay">✗ NAY — Opposed CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Philip Sallberg</strong></td>
-        <td>Senate</td>
-        <td>13</td>
-        <td>R</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Mark Sanford</strong></td>
-        <td>House</td>
-        <td>17</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="dollar">$300</span></td>
-        <td><span class="cycle">$300 (2018)</span></td>
-        <td class="nay">✗ NAY — Opposed CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Steve Sauter</strong></td>
-        <td>House</td>
-        <td>7</td>
-        <td>R</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Donald Schaible</strong></td>
-        <td>Senate</td>
-        <td>31</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="dollar">$700</span></td>
-        <td><span class="cycle">$400 (2018) · $300 (2022)</span></td>
-        <td class="nay">✗ NAY — Opposed CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Mike Schatz</strong></td>
-        <td>House</td>
-        <td>39</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="dollar">$600</span></td>
-        <td><span class="cycle">$300 (2016) · $300 (2020)</span></td>
-        <td class="nay">✗ NAY — Opposed CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Austen Schauer</strong></td>
-        <td>House</td>
-        <td>13</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="dollar">$250</span></td>
-        <td><span class="cycle">$250 (2018)</span></td>
-        <td class="nay">✗ NAY — Opposed CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Jim Schmidt</strong></td>
-        <td>House</td>
-        <td>31</td>
-        <td>R</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Mary Schneider</strong></td>
-        <td>Senate</td>
-        <td>21</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="dollar">$300</span></td>
-        <td><span class="cycle">$300 (2018)</span></td>
-        <td class="yea">✓ YEA — Supported CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Jonathan Sickler</strong></td>
-        <td>Senate</td>
-        <td>17</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="nay">✗ NAY — Opposed CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Kathy Skroch</strong></td>
-        <td>House</td>
-        <td>25</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Rich Slagle</strong></td>
-        <td>House</td>
-        <td>41</td>
-        <td>R</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Signe Snortland</strong></td>
-        <td>Senate</td>
-        <td>33</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Ronald Sorvaag</strong></td>
-        <td>Senate</td>
-        <td>45</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="dollar">$700</span></td>
-        <td><span class="cycle">$400 (2018) · $300 (2022)</span></td>
-        <td class="nay">✗ NAY — Opposed CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Kelly Spilman</strong></td>
-        <td>Senate</td>
-        <td>31</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Tim Spilman</strong></td>
-        <td>House</td>
-        <td>31</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Michael A Steele</strong></td>
-        <td>House</td>
-        <td>23</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Vicky Steiner</strong></td>
-        <td>House</td>
-        <td>37</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="dollar">$300</span></td>
-        <td><span class="cycle">$300 (2018)</span></td>
-        <td class="yea">✓ YEA — Supported CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Greg Stemen</strong></td>
-        <td>House</td>
-        <td>27</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="dollar">$300</span></td>
-        <td><span class="cycle">$300 (2022)</span></td>
-        <td class="nay">✗ NAY — Opposed CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Michael Thiesen</strong></td>
-        <td>Senate</td>
-        <td>3</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Jason Thoms</strong></td>
-        <td>House</td>
-        <td>7</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Steve Thoring</strong></td>
-        <td>House</td>
-        <td>1</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Chris Tiongson</strong></td>
-        <td>House</td>
-        <td>41</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Bill Tveit</strong></td>
-        <td>House</td>
-        <td>33</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="nay">✗ NAY — Opposed CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Greg Vetter</strong></td>
-        <td>House</td>
-        <td>7</td>
-        <td>R</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Scott Wagner</strong></td>
-        <td>House</td>
-        <td>45</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="nay">✗ NAY — Opposed CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Terry M Wanzek</strong></td>
-        <td>Senate</td>
-        <td>29</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="dollar">$800</span></td>
-        <td><span class="cycle">$400 (2018) · $400 (2022)</span></td>
-        <td class="nay">✗ NAY — Opposed CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Kent Weston</strong></td>
-        <td>Senate</td>
-        <td>15</td>
-        <td>R</td>
-        <td><strong style="color:#0D7377">★ INC</strong></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="yea">✓ YEA — Supported CUs</td>
-      </tr>
-      <tr>
-        <td><strong>Rissa M Williams</strong></td>
-        <td>House</td>
-        <td>31</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Tiffany Williams-Rice</strong></td>
-        <td>House</td>
-        <td>7</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Kevin Wolsky</strong></td>
-        <td>House</td>
-        <td>29</td>
-        <td>R</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
-      </tr>
-      <tr>
-        <td><strong>Tyler York</strong></td>
-        <td>House</td>
-        <td>43</td>
-        <td>D</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">$0</span></td>
-        <td><span class="muted">No prior CUPAC giving</span></td>
-        <td class="muted">— New / No Vote</td>
+        <td class="name">Don Aandal</td>
+        <td class="ctr">House</td>
+        <td class="ctr">17</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Mary K Adams</td>
+        <td class="ctr">Senate</td>
+        <td class="ctr">43</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Jesus Albry Aguirre</td>
+        <td class="ctr">House</td>
+        <td class="ctr">33</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Grant Allex</td>
+        <td class="ctr">House</td>
+        <td class="ctr">27</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Karen A Anderson</td>
+        <td class="ctr">House</td>
+        <td class="ctr">19</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num">$300</td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="dollar">$300</span></td>
+        <td class="ctr"><span class="yea-pill">✓ YEA</span></td>
+      </tr>
+      <tr>
+        <td class="name">Anastassiya (Stass) Andrianova</td>
+        <td class="ctr">House</td>
+        <td class="ctr">11</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Michelle Axtman</td>
+        <td class="ctr">Senate</td>
+        <td class="ctr">7</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="nay-pill">✗ NAY</span></td>
+      </tr>
+      <tr>
+        <td class="name">Sandy Baertsch</td>
+        <td class="ctr">House</td>
+        <td class="ctr">39</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Kimball Banks</td>
+        <td class="ctr">House</td>
+        <td class="ctr">33</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Jeff Barta</td>
+        <td class="ctr">Senate</td>
+        <td class="ctr">43</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="yea-pill">✓ YEA</span></td>
+      </tr>
+      <tr>
+        <td class="name">Todd Beard</td>
+        <td class="ctr">Senate</td>
+        <td class="ctr">23</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="yea-pill">✓ YEA</span></td>
+      </tr>
+      <tr>
+        <td class="name">Gaylynn Becker</td>
+        <td class="ctr">House</td>
+        <td class="ctr">7</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Rick Becker</td>
+        <td class="ctr">House</td>
+        <td class="ctr">7</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Brad Bekkedahl</td>
+        <td class="ctr">Senate</td>
+        <td class="ctr">1</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num">$400</td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="dollar">$400</span></td>
+        <td class="ctr"><span class="nay-pill">✗ NAY</span></td>
+      </tr>
+      <tr>
+        <td class="name">Jennifer Benson</td>
+        <td class="ctr">House</td>
+        <td class="ctr">41</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Katie Benton</td>
+        <td class="ctr">Senate</td>
+        <td class="ctr">17</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Keith Boehm</td>
+        <td class="ctr">Senate</td>
+        <td class="ctr">33</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="yea-pill">✓ YEA</span></td>
+      </tr>
+      <tr>
+        <td class="name">Roger Brabandt</td>
+        <td class="ctr">House</td>
+        <td class="ctr">5</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Collette Brown</td>
+        <td class="ctr">House</td>
+        <td class="ctr">9</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Russell Bubach</td>
+        <td class="ctr">House</td>
+        <td class="ctr">13</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Mark Casler</td>
+        <td class="ctr">House</td>
+        <td class="ctr">23</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Jill T Chandler</td>
+        <td class="ctr">House</td>
+        <td class="ctr">43</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Sean Cleary</td>
+        <td class="ctr">Senate</td>
+        <td class="ctr">35</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num">$700</td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="dollar">$700</span></td>
+        <td class="ctr"><span class="nay-pill">✗ NAY</span></td>
+      </tr>
+      <tr>
+        <td class="name">Liz Conmy</td>
+        <td class="ctr">House</td>
+        <td class="ctr">11</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="yea-pill">✓ YEA</span></td>
+      </tr>
+      <tr>
+        <td class="name">Jayme Davis</td>
+        <td class="ctr">Senate</td>
+        <td class="ctr">9</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="yea-pill">✓ YEA</span></td>
+      </tr>
+      <tr>
+        <td class="name">Kyle Davison</td>
+        <td class="ctr">Senate</td>
+        <td class="ctr">41</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num">$400</td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="dollar">$400</span></td>
+        <td class="ctr"><span class="yea-pill">✓ YEA</span></td>
+      </tr>
+      <tr>
+        <td class="name">Nyamal Dei</td>
+        <td class="ctr">Senate</td>
+        <td class="ctr">41</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Blaine Deslauriers</td>
+        <td class="ctr">House</td>
+        <td class="ctr">3</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Jason Dodge</td>
+        <td class="ctr">House</td>
+        <td class="ctr">39</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Laura Dronen</td>
+        <td class="ctr">House</td>
+        <td class="ctr">21</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Frances Drury</td>
+        <td class="ctr">House</td>
+        <td class="ctr">15</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Everett Duckworth</td>
+        <td class="ctr">House</td>
+        <td class="ctr">13</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Mike Dwyer</td>
+        <td class="ctr">Senate</td>
+        <td class="ctr">47</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num">$400</td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="dollar">$400</span></td>
+        <td class="ctr"><span class="nay-pill">✗ NAY</span></td>
+      </tr>
+      <tr>
+        <td class="name">Kyle Erickson</td>
+        <td class="ctr">House</td>
+        <td class="ctr">5</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Judy Estenson</td>
+        <td class="ctr">Senate</td>
+        <td class="ctr">15</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num">$400</td>
+        <td class="num"><span class="dollar">$400</span></td>
+        <td class="ctr"><span class="yea-pill">✓ YEA</span></td>
+      </tr>
+      <tr>
+        <td class="name">Matt Evans</td>
+        <td class="ctr">House</td>
+        <td class="ctr">25</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Jay Fisher</td>
+        <td class="ctr">Senate</td>
+        <td class="ctr">5</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num">$250</td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="dollar">$250</span></td>
+        <td class="ctr"><span class="nay-pill">✗ NAY</span></td>
+      </tr>
+      <tr>
+        <td class="name">Kathy Frelich</td>
+        <td class="ctr">House</td>
+        <td class="ctr">15</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="yea-pill">✓ YEA</span></td>
+      </tr>
+      <tr>
+        <td class="name">Maggi Gadaire</td>
+        <td class="ctr">House</td>
+        <td class="ctr">13</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Laurie Garbel</td>
+        <td class="ctr">House</td>
+        <td class="ctr">1</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Brenda Jo Gillund</td>
+        <td class="ctr">House</td>
+        <td class="ctr">13</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Terry Goerger</td>
+        <td class="ctr">House</td>
+        <td class="ctr">25</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Mary Graner</td>
+        <td class="ctr">Senate</td>
+        <td class="ctr">31</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">LaurieBeth Hager</td>
+        <td class="ctr">House</td>
+        <td class="ctr">21</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="yea-pill">✓ YEA</span></td>
+      </tr>
+      <tr>
+        <td class="name">Craig Headland</td>
+        <td class="ctr">House</td>
+        <td class="ctr">29</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num">$400</td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num">$300</td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="dollar">$700</span></td>
+        <td class="ctr"><span class="yea-pill">✓ YEA</span></td>
+      </tr>
+      <tr>
+        <td class="name">Mike Heger</td>
+        <td class="ctr">House</td>
+        <td class="ctr">33</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Stacy Heidenreich</td>
+        <td class="ctr">House</td>
+        <td class="ctr">41</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Bob Heitkamp</td>
+        <td class="ctr">Senate</td>
+        <td class="ctr">25</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Donna Henderson</td>
+        <td class="ctr">House</td>
+        <td class="ctr">15</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="nay-pill">✗ NAY</span></td>
+      </tr>
+      <tr>
+        <td class="name">Crystal Hendrickson</td>
+        <td class="ctr">House</td>
+        <td class="ctr">3</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Jefferey E Hermanson</td>
+        <td class="ctr">Senate</td>
+        <td class="ctr">19</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Jolene L Hermanson</td>
+        <td class="ctr">House</td>
+        <td class="ctr">19</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Tara Hiatt</td>
+        <td class="ctr">House</td>
+        <td class="ctr">3</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Dawson Holle</td>
+        <td class="ctr">House</td>
+        <td class="ctr">31</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="dollar">$500</span></td>
+        <td class="ctr"><span class="yea-pill">✓ YEA</span></td>
+      </tr>
+      <tr>
+        <td class="name">Mike Holmes</td>
+        <td class="ctr">House</td>
+        <td class="ctr">43</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Jerri Hopfauf</td>
+        <td class="ctr">Senate</td>
+        <td class="ctr">7</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Kevin Horneman</td>
+        <td class="ctr">Senate</td>
+        <td class="ctr">7</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Jeff Hoverson</td>
+        <td class="ctr">House</td>
+        <td class="ctr">3</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="nay-pill">✗ NAY</span></td>
+      </tr>
+      <tr>
+        <td class="name">Rosann Jacobs-Fode</td>
+        <td class="ctr">House</td>
+        <td class="ctr">47</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Alex Johnson</td>
+        <td class="ctr">House</td>
+        <td class="ctr">1</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Corey Johnson</td>
+        <td class="ctr">House</td>
+        <td class="ctr">23</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Reed Johnson</td>
+        <td class="ctr">House</td>
+        <td class="ctr">17</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Taylor Johnson</td>
+        <td class="ctr">House</td>
+        <td class="ctr">35</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Jim Jonas</td>
+        <td class="ctr">House</td>
+        <td class="ctr">13</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="nay-pill">✗ NAY</span></td>
+      </tr>
+      <tr>
+        <td class="name">Susan Josephson</td>
+        <td class="ctr">House</td>
+        <td class="ctr">37</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Karen Karls</td>
+        <td class="ctr">House</td>
+        <td class="ctr">35</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num">$300</td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="dollar">$300</span></td>
+        <td class="ctr"><span class="nay-pill">✗ NAY</span></td>
+      </tr>
+      <tr>
+        <td class="name">John Kelly</td>
+        <td class="ctr">Senate</td>
+        <td class="ctr">29</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Keith Kempenich</td>
+        <td class="ctr">House</td>
+        <td class="ctr">39</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="nay-pill">✗ NAY</span></td>
+      </tr>
+      <tr>
+        <td class="name">Corry Kenner</td>
+        <td class="ctr">House</td>
+        <td class="ctr">15</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Kristin Kenner</td>
+        <td class="ctr">Senate</td>
+        <td class="ctr">15</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Greg Kessel</td>
+        <td class="ctr">Senate</td>
+        <td class="ctr">39</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="yea-pill">✓ YEA</span></td>
+      </tr>
+      <tr>
+        <td class="name">Shawn Kessel</td>
+        <td class="ctr">House</td>
+        <td class="ctr">27</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Kylan Klauzer</td>
+        <td class="ctr">House</td>
+        <td class="ctr">37</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Stacie Kruckenberg</td>
+        <td class="ctr">House</td>
+        <td class="ctr">33</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Lynne M Lafer-Halvorson</td>
+        <td class="ctr">House</td>
+        <td class="ctr">35</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Landis Larson</td>
+        <td class="ctr">Senate</td>
+        <td class="ctr">13</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Jon Lee</td>
+        <td class="ctr">House</td>
+        <td class="ctr">47</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Judy Lee</td>
+        <td class="ctr">Senate</td>
+        <td class="ctr">13</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num">$400</td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="dollar">$400</span></td>
+        <td class="ctr"><span class="nay-pill">✗ NAY</span></td>
+      </tr>
+      <tr>
+        <td class="name">Shelley Lenz</td>
+        <td class="ctr">House</td>
+        <td class="ctr">37</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Don Lippert</td>
+        <td class="ctr">House</td>
+        <td class="ctr">45</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Ross Lockhart</td>
+        <td class="ctr">House</td>
+        <td class="ctr">45</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Scott Louser</td>
+        <td class="ctr">House</td>
+        <td class="ctr">5</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num">$400</td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num">$400</td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="dollar">$800</span></td>
+        <td class="ctr"><span class="nay-pill">✗ NAY</span></td>
+      </tr>
+      <tr>
+        <td class="name">Larry Luick</td>
+        <td class="ctr">Senate</td>
+        <td class="ctr">25</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num">$400</td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num">$300</td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="dollar">$700</span></td>
+        <td class="ctr"><span class="nay-pill">✗ NAY</span></td>
+      </tr>
+      <tr>
+        <td class="name">Richard Marcellais</td>
+        <td class="ctr">Senate</td>
+        <td class="ctr">9</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num">$250</td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num">$250</td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="dollar">$500</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Bob Martinson</td>
+        <td class="ctr">House</td>
+        <td class="ctr">35</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num">$300</td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="dollar">$300</span></td>
+        <td class="ctr"><span class="nay-pill">✗ NAY</span></td>
+      </tr>
+      <tr>
+        <td class="name">Tim Mathern</td>
+        <td class="ctr">Senate</td>
+        <td class="ctr">11</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num">$400</td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="dollar">$400</span></td>
+        <td class="ctr"><span class="yea-pill">✓ YEA</span></td>
+      </tr>
+      <tr>
+        <td class="name">Lukas Arthur Maughan</td>
+        <td class="ctr">House</td>
+        <td class="ctr">43</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Natalie Mclaughlin</td>
+        <td class="ctr">House</td>
+        <td class="ctr">3</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Carrie McLeod</td>
+        <td class="ctr">House</td>
+        <td class="ctr">45</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Timothy Mihalick</td>
+        <td class="ctr">House</td>
+        <td class="ctr">3</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Dan Mitchell</td>
+        <td class="ctr">Senate</td>
+        <td class="ctr">45</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Alisa Mitskog</td>
+        <td class="ctr">House</td>
+        <td class="ctr">25</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num">$300</td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="dollar">$300</span></td>
+        <td class="ctr"><span class="nay-pill">✗ NAY</span></td>
+      </tr>
+      <tr>
+        <td class="name">Sharlet Mohr</td>
+        <td class="ctr">House</td>
+        <td class="ctr">23</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">David Monson</td>
+        <td class="ctr">House</td>
+        <td class="ctr">19</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num">$300</td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num">$300</td>
+        <td class="num">$400</td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="dollar">$1,000</span></td>
+        <td class="ctr"><span class="nay-pill">✗ NAY</span></td>
+      </tr>
+      <tr>
+        <td class="name">Cole Montoya</td>
+        <td class="ctr">House</td>
+        <td class="ctr">47</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Michael Motschenbacher</td>
+        <td class="ctr">House</td>
+        <td class="ctr">47</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num">$400</td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="dollar">$400</span></td>
+        <td class="ctr"><span class="nay-pill">✗ NAY</span></td>
+      </tr>
+      <tr>
+        <td class="name">Eric J Murphy</td>
+        <td class="ctr">House</td>
+        <td class="ctr">43</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="nay-pill">✗ NAY</span></td>
+      </tr>
+      <tr>
+        <td class="name">Janne Myrdal</td>
+        <td class="ctr">Senate</td>
+        <td class="ctr">19</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num">$300</td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num">$300</td>
+        <td class="num">$300</td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="dollar">$900</span></td>
+        <td class="ctr"><span class="nay-pill">✗ NAY</span></td>
+      </tr>
+      <tr>
+        <td class="name">Dennis Nehring</td>
+        <td class="ctr">House</td>
+        <td class="ctr">23</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Dianne Norris</td>
+        <td class="ctr">House</td>
+        <td class="ctr">29</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Anna S (Garrett) Novak</td>
+        <td class="ctr">House</td>
+        <td class="ctr">33</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="nay-pill">✗ NAY</span></td>
+      </tr>
+      <tr>
+        <td class="name">Christine O&#39;Riley</td>
+        <td class="ctr">Senate</td>
+        <td class="ctr">11</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Bill Patrie</td>
+        <td class="ctr">Senate</td>
+        <td class="ctr">47</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Bob Paulson</td>
+        <td class="ctr">Senate</td>
+        <td class="ctr">3</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="yea-pill">✓ YEA</span></td>
+      </tr>
+      <tr>
+        <td class="name">Dale Pittman</td>
+        <td class="ctr">Senate</td>
+        <td class="ctr">35</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Duane Poitra</td>
+        <td class="ctr">House</td>
+        <td class="ctr">9</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Lynnell Popowski</td>
+        <td class="ctr">House</td>
+        <td class="ctr">19</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Zach Raknerud</td>
+        <td class="ctr">House</td>
+        <td class="ctr">5</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Kevin K Remington</td>
+        <td class="ctr">House</td>
+        <td class="ctr">31</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">David Richter</td>
+        <td class="ctr">House</td>
+        <td class="ctr">1</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="nay-pill">✗ NAY</span></td>
+      </tr>
+      <tr>
+        <td class="name">Kristin Roers</td>
+        <td class="ctr">Senate</td>
+        <td class="ctr">27</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num">$300</td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="dollar">$300</span></td>
+        <td class="ctr"><span class="nay-pill">✗ NAY</span></td>
+      </tr>
+      <tr>
+        <td class="name">Karen Rohr</td>
+        <td class="ctr">House</td>
+        <td class="ctr">31</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num">$300</td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num">$400</td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="dollar">$700</span></td>
+        <td class="ctr"><span class="yea-pill">✓ YEA</span></td>
+      </tr>
+      <tr>
+        <td class="name">Dean Rummel</td>
+        <td class="ctr">Senate</td>
+        <td class="ctr">37</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="nay-pill">✗ NAY</span></td>
+      </tr>
+      <tr>
+        <td class="name">Philip Sallberg</td>
+        <td class="ctr">Senate</td>
+        <td class="ctr">13</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Mark Sanford</td>
+        <td class="ctr">House</td>
+        <td class="ctr">17</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num">$300</td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="dollar">$300</span></td>
+        <td class="ctr"><span class="nay-pill">✗ NAY</span></td>
+      </tr>
+      <tr>
+        <td class="name">Steve Sauter</td>
+        <td class="ctr">House</td>
+        <td class="ctr">7</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Donald Schaible</td>
+        <td class="ctr">Senate</td>
+        <td class="ctr">31</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num">$400</td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num">$300</td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="dollar">$700</span></td>
+        <td class="ctr"><span class="nay-pill">✗ NAY</span></td>
+      </tr>
+      <tr>
+        <td class="name">Mike Schatz</td>
+        <td class="ctr">House</td>
+        <td class="ctr">39</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num">$300</td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num">$300</td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="dollar">$600</span></td>
+        <td class="ctr"><span class="nay-pill">✗ NAY</span></td>
+      </tr>
+      <tr>
+        <td class="name">Austen Schauer</td>
+        <td class="ctr">House</td>
+        <td class="ctr">13</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num">$250</td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="dollar">$250</span></td>
+        <td class="ctr"><span class="nay-pill">✗ NAY</span></td>
+      </tr>
+      <tr>
+        <td class="name">Jim Schmidt</td>
+        <td class="ctr">House</td>
+        <td class="ctr">31</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Mary Schneider</td>
+        <td class="ctr">Senate</td>
+        <td class="ctr">21</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num">$300</td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="dollar">$300</span></td>
+        <td class="ctr"><span class="yea-pill">✓ YEA</span></td>
+      </tr>
+      <tr>
+        <td class="name">Jonathan Sickler</td>
+        <td class="ctr">Senate</td>
+        <td class="ctr">17</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="nay-pill">✗ NAY</span></td>
+      </tr>
+      <tr>
+        <td class="name">Kathy Skroch</td>
+        <td class="ctr">House</td>
+        <td class="ctr">25</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Rich Slagle</td>
+        <td class="ctr">House</td>
+        <td class="ctr">41</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Signe Snortland</td>
+        <td class="ctr">Senate</td>
+        <td class="ctr">33</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Ronald Sorvaag</td>
+        <td class="ctr">Senate</td>
+        <td class="ctr">45</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num">$400</td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num">$300</td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="dollar">$700</span></td>
+        <td class="ctr"><span class="nay-pill">✗ NAY</span></td>
+      </tr>
+      <tr>
+        <td class="name">Kelly Spilman</td>
+        <td class="ctr">Senate</td>
+        <td class="ctr">31</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Tim Spilman</td>
+        <td class="ctr">House</td>
+        <td class="ctr">31</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Michael A Steele</td>
+        <td class="ctr">House</td>
+        <td class="ctr">23</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Vicky Steiner</td>
+        <td class="ctr">House</td>
+        <td class="ctr">37</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num">$300</td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="dollar">$300</span></td>
+        <td class="ctr"><span class="yea-pill">✓ YEA</span></td>
+      </tr>
+      <tr>
+        <td class="name">Greg Stemen</td>
+        <td class="ctr">House</td>
+        <td class="ctr">27</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num">$300</td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="dollar">$300</span></td>
+        <td class="ctr"><span class="nay-pill">✗ NAY</span></td>
+      </tr>
+      <tr>
+        <td class="name">Michael Thiesen</td>
+        <td class="ctr">Senate</td>
+        <td class="ctr">3</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Jason Thoms</td>
+        <td class="ctr">House</td>
+        <td class="ctr">7</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Steve Thoring</td>
+        <td class="ctr">House</td>
+        <td class="ctr">1</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Chris Tiongson</td>
+        <td class="ctr">House</td>
+        <td class="ctr">41</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Bill Tveit</td>
+        <td class="ctr">House</td>
+        <td class="ctr">33</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="nay-pill">✗ NAY</span></td>
+      </tr>
+      <tr>
+        <td class="name">Greg Vetter</td>
+        <td class="ctr">House</td>
+        <td class="ctr">7</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Scott Wagner</td>
+        <td class="ctr">House</td>
+        <td class="ctr">45</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="nay-pill">✗ NAY</span></td>
+      </tr>
+      <tr>
+        <td class="name">Terry M Wanzek</td>
+        <td class="ctr">Senate</td>
+        <td class="ctr">29</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num">$400</td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num">$400</td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="dollar">$800</span></td>
+        <td class="ctr"><span class="nay-pill">✗ NAY</span></td>
+      </tr>
+      <tr>
+        <td class="name">Kent Weston</td>
+        <td class="ctr">Senate</td>
+        <td class="ctr">15</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><strong style="color:#0D7377">★</strong></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="yea-pill">✓ YEA</span></td>
+      </tr>
+      <tr>
+        <td class="name">Rissa M Williams</td>
+        <td class="ctr">House</td>
+        <td class="ctr">31</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Tiffany Williams-Rice</td>
+        <td class="ctr">House</td>
+        <td class="ctr">7</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Kevin Wolsky</td>
+        <td class="ctr">House</td>
+        <td class="ctr">29</td>
+        <td class="ctr">R</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
+      </tr>
+      <tr>
+        <td class="name">Tyler York</td>
+        <td class="ctr">House</td>
+        <td class="ctr">43</td>
+        <td class="ctr">D</td>
+        <td class="ctr"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">—</span></td>
+        <td class="num"><span class="muted">$0</span></td>
+        <td class="ctr"><span class="muted">—</span></td>
       </tr>
     </tbody>
   </table>

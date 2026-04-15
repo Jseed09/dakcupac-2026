@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>DakCUPAC 2026 Legislative Intelligence</title>
 <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<!-- xlsx-js-style — styled Excel export for Bob Report download -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js" defer></script>
 <style>
 :root {
   /* ── Color System ── */
@@ -664,6 +666,9 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
 .bob-report-search:focus{border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-dim)}
 .bob-report-btn{padding:9px 13px;border:1px solid var(--border);background:var(--surface-2);color:var(--ink);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s,color .15s,border .15s}
 .bob-report-btn:hover{background:var(--teal);color:#fff;border-color:var(--teal)}
+.bob-report-btn.primary{background:var(--teal);color:#fff;border-color:var(--teal);box-shadow:0 2px 6px rgba(13,115,119,0.25)}
+.bob-report-btn.primary:hover{background:var(--teal-dark);border-color:var(--teal-dark)}
+.bob-report-btn:disabled{opacity:.5;cursor:not-allowed}
 .bob-report-count{font-size:11px;color:var(--text-muted);margin-left:auto;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
 .bob-report-table-wrap{max-height:calc(100vh - 260px);overflow-y:auto;border:1px solid var(--border);border-radius:10px;background:var(--white)}
 .bob-report-table{width:100%;border-collapse:collapse;font-size:12px}
@@ -2037,8 +2042,9 @@ body.bob-mode .pcard.bob-filtered-out{display:none !important}
     <div class="br-sub"><strong style="color:var(--teal-dark)">2026 ballot only</strong> — every candidate on the odd-district 2026 ballot (ND SOS Apr 6 filings) with their DakCUPAC donation history and SB 2266 (Field of Membership) vote. Per Bob Herrington's request. YEA = supported credit unions. NAY = opposed.</div>
     <div class="bob-report-controls">
       <input id="bob-report-search" class="bob-report-search" type="text" placeholder="Search by name, district, or chamber…" oninput="renderBobReport(this.value)">
-      <button id="bob-report-copy-btn" class="bob-report-btn" onclick="copyBobReportCSV()">📋 Copy CSV</button>
-      <button class="bob-report-btn" onclick="printBobReport()">🖨️ Print / PDF</button>
+      <button id="bob-report-excel-btn" class="bob-report-btn primary" onclick="downloadBobExcel()" title="Download a styled Excel workbook (.xlsx) with frozen header, autofilter, year-by-year columns, and a summary sheet">📥 Download Excel</button>
+      <button class="bob-report-btn" onclick="printBobReport()" title="Open a print-ready report — use your browser's Print → Save as PDF">🖨️ Print / PDF</button>
+      <button id="bob-report-copy-btn" class="bob-report-btn" onclick="copyBobReportCSV()" title="Copy CSV text to clipboard for quick paste into a spreadsheet">📋 Copy CSV</button>
       <span id="bob-report-count" class="bob-report-count"></span>
     </div>
     <div class="bob-report-table-wrap">
@@ -10259,6 +10265,265 @@ function renderBobReport(query){
   tbody.innerHTML = html;
   if(count) count.textContent = filtered.length + (filtered.length === 1 ? ' person' : ' people');
 }
+// ───────── Styled Excel download ─────────
+// Builds a properly formatted .xlsx workbook client-side using xlsx-js-style.
+// Two sheets: "2026 Candidates" (data with year columns, color-coded vote,
+// frozen header, autofilter) and "Summary & Legend" (stats + sources).
+function _bobParseCycles(years){
+  var out = {2016:null,2018:null,2020:null,2022:null,2024:null};
+  if(!years) return out;
+  var re = /\$([\d,]+)\s*\((\d{4})/g, m;
+  while((m = re.exec(years)) !== null){
+    var y = parseInt(m[2],10);
+    var amt = parseInt(m[1].replace(/,/g,''),10);
+    if(out[y] !== undefined) out[y] = amt;
+  }
+  return out;
+}
+function downloadBobExcel(){
+  if(typeof XLSX === 'undefined' || !XLSX.utils){
+    alert('Excel library is still loading. Please wait a moment and try again.');
+    return;
+  }
+  var rows = buildBobReportData();
+  if(!rows.length){ alert('No data to export.'); return; }
+
+  // Color palette (hex, no #)
+  var TEAL='0D7377', TEAL_DARK='085155', TEAL_LIGHT='EAF4F4';
+  var GREEN_DARK='15803D', GREEN_LIGHT='DCFCE7';
+  var RED_DARK='B91C1C', RED_LIGHT='FEF2F2';
+  var INK='0A1628', BORDER='D1D9E4', ZEBRA='FAFBFC', MUTED='7A94B0';
+
+  var headers = ['Candidate','Chamber','District','Party','Incumbent',
+                 '2016','2018','2020','2022','2024','CUPAC Total',
+                 'SB 2266 FOM Vote','Direction'];
+
+  var aoa = [headers];
+  rows.forEach(function(r){
+    var cycles = _bobParseCycles(r.donationYears);
+    var total = r.donationTotal ? parseInt(String(r.donationTotal).replace(/[^\d]/g,''),10) : 0;
+    aoa.push([
+      r.name,
+      r.ch || '',
+      r.dist ? Number(r.dist) : '',
+      r.party || '',
+      r.incumbent ? 'Incumbent' : '',
+      cycles[2016] || '',
+      cycles[2018] || '',
+      cycles[2020] || '',
+      cycles[2022] || '',
+      cycles[2024] || '',
+      total || '',
+      r.vote || '',
+      r.vote === 'YEA' ? 'Pro-CU' : r.vote === 'NAY' ? 'Anti-CU' : ''
+    ]);
+  });
+
+  var ws = XLSX.utils.aoa_to_sheet(aoa);
+  ws['!cols'] = [
+    {wch:30},{wch:10},{wch:10},{wch:7},{wch:13},
+    {wch:10},{wch:10},{wch:10},{wch:10},{wch:10},{wch:13},
+    {wch:18},{wch:11}
+  ];
+  ws['!rows'] = [{hpt:28}];
+  ws['!freeze'] = {xSplit:1,ySplit:1};
+  ws['!views'] = [{state:'frozen',xSplit:1,ySplit:1,topLeftCell:'B2'}];
+  var lastCol = XLSX.utils.encode_col(headers.length - 1);
+  ws['!autofilter'] = {ref:'A1:'+lastCol+(rows.length+1)};
+
+  var borderThin = {
+    top:{style:'thin',color:{rgb:BORDER}},
+    bottom:{style:'thin',color:{rgb:BORDER}},
+    left:{style:'thin',color:{rgb:BORDER}},
+    right:{style:'thin',color:{rgb:BORDER}}
+  };
+  var headerStyle = {
+    font:{bold:true,color:{rgb:'FFFFFF'},sz:11,name:'Calibri'},
+    fill:{patternType:'solid',fgColor:{rgb:TEAL}},
+    alignment:{horizontal:'center',vertical:'center',wrapText:true},
+    border:{
+      top:{style:'medium',color:{rgb:TEAL_DARK}},
+      bottom:{style:'medium',color:{rgb:TEAL_DARK}},
+      left:{style:'thin',color:{rgb:TEAL_DARK}},
+      right:{style:'thin',color:{rgb:TEAL_DARK}}
+    }
+  };
+  function cellRef(r,c){return XLSX.utils.encode_cell({r:r,c:c});}
+
+  headers.forEach(function(_,c){
+    var addr = cellRef(0,c);
+    if(ws[addr]) ws[addr].s = headerStyle;
+  });
+
+  rows.forEach(function(r,i){
+    var R = i + 1;
+    var zebra = i % 2 === 1;
+    var baseFill = zebra ? {patternType:'solid',fgColor:{rgb:ZEBRA}} : null;
+    function apply(C, overrides){
+      var addr = cellRef(R,C);
+      if(!ws[addr]) ws[addr] = {t:'s',v:aoa[R][C]==null?'':aoa[R][C]};
+      var s = {
+        font:{sz:10,color:{rgb:INK},name:'Calibri'},
+        alignment:{vertical:'center',horizontal:'left'},
+        border:borderThin
+      };
+      if(baseFill) s.fill = baseFill;
+      if(overrides){
+        if(overrides.font) s.font = Object.assign({},s.font,overrides.font);
+        if(overrides.alignment) s.alignment = Object.assign({},s.alignment,overrides.alignment);
+        if(overrides.fill) s.fill = overrides.fill;
+        if(overrides.numFmt) s.numFmt = overrides.numFmt;
+      }
+      ws[addr].s = s;
+    }
+    apply(0, {font:{bold:true,sz:10,color:{rgb:INK}}});
+    [1,2,3,4].forEach(function(C){ apply(C, {alignment:{horizontal:'center'}}); });
+    [5,6,7,8,9].forEach(function(C){
+      apply(C, {alignment:{horizontal:'right'},numFmt:'"$"#,##0;;"—"'});
+    });
+    apply(10, {
+      font:{bold:true,sz:10,color:{rgb:TEAL_DARK}},
+      alignment:{horizontal:'right'},
+      numFmt:'"$"#,##0;;"$0"'
+    });
+    if(r.vote === 'YEA'){
+      apply(11, {font:{bold:true,sz:10,color:{rgb:GREEN_DARK}},alignment:{horizontal:'center'},fill:{patternType:'solid',fgColor:{rgb:GREEN_LIGHT}}});
+      apply(12, {font:{sz:10,color:{rgb:GREEN_DARK}},alignment:{horizontal:'center'}});
+    } else if(r.vote === 'NAY'){
+      apply(11, {font:{bold:true,sz:10,color:{rgb:RED_DARK}},alignment:{horizontal:'center'},fill:{patternType:'solid',fgColor:{rgb:RED_LIGHT}}});
+      apply(12, {font:{sz:10,color:{rgb:RED_DARK}},alignment:{horizontal:'center'}});
+    } else {
+      apply(11, {font:{italic:true,sz:10,color:{rgb:MUTED}},alignment:{horizontal:'center'}});
+      apply(12, {font:{italic:true,sz:10,color:{rgb:MUTED}},alignment:{horizontal:'center'}});
+    }
+  });
+
+  // Force numeric type on currency cells so Excel treats them as numbers
+  for(var R = 1; R <= rows.length; R++){
+    [5,6,7,8,9,10].forEach(function(C){
+      var addr = cellRef(R,C);
+      var cell = ws[addr];
+      if(cell && typeof cell.v === 'number') cell.t = 'n';
+    });
+  }
+
+  // Summary sheet
+  var totalGiven = rows.reduce(function(s,r){
+    return s + (r.donationTotal ? parseInt(String(r.donationTotal).replace(/[^\d]/g,''),10) : 0);
+  }, 0);
+  var sen = rows.filter(function(r){return r.ch==='Senate';}).length;
+  var hou = rows.filter(function(r){return r.ch==='House';}).length;
+  var inc = rows.filter(function(r){return r.incumbent;}).length;
+  var withDon = rows.filter(function(r){return r.donationTotal;}).length;
+  var yea = rows.filter(function(r){return r.vote==='YEA';}).length;
+  var nay = rows.filter(function(r){return r.vote==='NAY';}).length;
+
+  var summary = [
+    ['DakCUPAC — 2026 Balloted Candidates · FOM × Donation Report'],
+    [''],
+    ['Generated', new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})],
+    ['Prepared for', 'Bob Herrington · North Star Community CU · DakCUPAC Committee'],
+    ['Confidentiality', 'Committee Use Only — Not for Public Distribution'],
+    [''],
+    ['SCOPE', ''],
+    ['Candidates on 2026 ballot', rows.length],
+    ['Senate / House split', sen + ' Senate / ' + hou + ' House'],
+    ['Incumbents running', inc],
+    ['Challengers / open seats', rows.length - inc],
+    [''],
+    ['DONATION HISTORY (2016–2024)', ''],
+    ['Candidates with prior CUPAC giving', withDon],
+    ['Candidates with no CUPAC history', rows.length - withDon],
+    ['Total CUPAC given to this ballot', totalGiven],
+    [''],
+    ['SB 2266 · FIELD OF MEMBERSHIP (FOM) — 68TH ASSEMBLY', ''],
+    ['YEA — Supported credit unions', yea],
+    ['NAY — Opposed credit unions', nay],
+    ['No prior FOM vote (new candidate)', rows.length - yea - nay],
+    [''],
+    ['LEGEND', ''],
+    ['YEA', 'Supported the Field of Membership expansion — aligned with credit unions'],
+    ['NAY', 'Opposed the Field of Membership expansion — anti-credit-union'],
+    ['— (blank)', 'New candidate or did not serve in the 68th Assembly'],
+    ['Incumbent', 'Currently holds the seat; filed for re-election in 2026'],
+    [''],
+    ['SOURCES', ''],
+    ['2026 ballot', 'ND Secretary of State filings, closed April 6, 2026'],
+    ['Donation history', 'DakCUPAC cycles 2016, 2018, 2020, 2022, 2024'],
+    ['SB 2266 roll call', 'ND 68th Assembly — ndlegis.gov/assembly/68-2023/regular/bill-actions/ba2266.html']
+  ];
+  var sws = XLSX.utils.aoa_to_sheet(summary);
+  sws['!cols'] = [{wch:42},{wch:72}];
+  sws['!merges'] = [{s:{r:0,c:0},e:{r:0,c:1}}];
+  sws['!rows'] = [{hpt:26}];
+  if(sws['A1']) sws['A1'].s = {
+    font:{bold:true,sz:16,color:{rgb:TEAL_DARK},name:'Calibri'},
+    alignment:{horizontal:'left',vertical:'center'}
+  };
+  var sectionRows = [];
+  summary.forEach(function(row,idx){
+    if(/^(SCOPE|DONATION|SB 2266|LEGEND|SOURCES)/.test(row[0]||'')) sectionRows.push(idx);
+  });
+  sectionRows.forEach(function(rIdx){
+    var a = XLSX.utils.encode_cell({r:rIdx,c:0});
+    var b = XLSX.utils.encode_cell({r:rIdx,c:1});
+    if(sws[a]) sws[a].s = {
+      font:{bold:true,sz:11,color:{rgb:TEAL_DARK},name:'Calibri'},
+      fill:{patternType:'solid',fgColor:{rgb:TEAL_LIGHT}},
+      alignment:{horizontal:'left',vertical:'center'},
+      border:{bottom:{style:'medium',color:{rgb:TEAL}}}
+    };
+    if(!sws[b]) sws[b] = {t:'s',v:''};
+    sws[b].s = {
+      fill:{patternType:'solid',fgColor:{rgb:TEAL_LIGHT}},
+      border:{bottom:{style:'medium',color:{rgb:TEAL}}}
+    };
+  });
+  summary.forEach(function(row,rIdx){
+    if(rIdx === 0) return;
+    if(sectionRows.indexOf(rIdx) >= 0) return;
+    if(!row[0]) return;
+    var a = XLSX.utils.encode_cell({r:rIdx,c:0});
+    var b = XLSX.utils.encode_cell({r:rIdx,c:1});
+    if(sws[a]) sws[a].s = {
+      font:{bold:true,sz:10,color:{rgb:INK},name:'Calibri'},
+      alignment:{horizontal:'left',vertical:'center'}
+    };
+    if(sws[b]){
+      sws[b].s = {
+        font:{sz:10,color:{rgb:INK},name:'Calibri'},
+        alignment:{horizontal:'left',vertical:'center'}
+      };
+      if(row[0] === 'Total CUPAC given to this ballot'){
+        sws[b].t = 'n';
+        sws[b].s.numFmt = '"$"#,##0';
+        sws[b].s.alignment = {horizontal:'right',vertical:'center'};
+        sws[b].s.font = Object.assign({},sws[b].s.font,{bold:true,color:{rgb:TEAL_DARK}});
+      }
+    }
+  });
+
+  var wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, '2026 Candidates');
+  XLSX.utils.book_append_sheet(wb, sws, 'Summary & Legend');
+  wb.Props = {
+    Title: 'DakCUPAC 2026 FOM × Donation Report',
+    Subject: 'Bob Herrington · 2026 Balloted Candidates · CUPAC Donation History · SB 2266 Field of Membership Vote',
+    Author: 'DakCUPAC Committee',
+    CreatedDate: new Date()
+  };
+
+  var today = new Date().toISOString().split('T')[0];
+  XLSX.writeFile(wb, 'DakCUPAC-2026-FOM-Report-' + today + '.xlsx');
+
+  var btn = document.getElementById('bob-report-excel-btn');
+  if(btn){
+    var t = btn.innerHTML;
+    btn.innerHTML = '✓ Downloaded!';
+    setTimeout(function(){ btn.innerHTML = t; }, 1800);
+  }
+}
+
 function copyBobReportCSV(){
   var rows = buildBobReportData();
   function q(v){
@@ -10407,42 +10672,146 @@ function bobModeFilter(){
 }
 function printBobReport(){
   var rows = buildBobReportData();
-  var w = window.open('','','width=1000,height=800');
+  var w = window.open('','','width=1100,height=850');
   if(!w) return;
   var esc = _bobEscHtml;
-  var html = '<html><head><title>DakCUPAC — Donation History × FOM Vote Report</title><style>'
-    + 'body{font-family:-apple-system,Segoe UI,Helvetica,sans-serif;padding:24px;font-size:11px;max-width:960px;margin:0 auto;color:#0A1628}'
-    + 'h1{font-size:18px;margin:0 0 4px;font-family:Georgia,serif}'
-    + '.sub{color:#4A6080;font-size:11px;margin-bottom:16px}'
+  // Aggregate stats for the header strip
+  var stats = {
+    total: rows.length,
+    senate: rows.filter(function(r){return r.ch==='Senate';}).length,
+    house:  rows.filter(function(r){return r.ch==='House';}).length,
+    incumbents: rows.filter(function(r){return r.incumbent;}).length,
+    withDonation: rows.filter(function(r){return r.donationTotal;}).length,
+    yea: rows.filter(function(r){return r.vote==='YEA';}).length,
+    nay: rows.filter(function(r){return r.vote==='NAY';}).length,
+    totalGiven: rows.reduce(function(s,r){
+      return s + (r.donationTotal ? parseInt(String(r.donationTotal).replace(/[^\d]/g,''),10) : 0);
+    }, 0)
+  };
+  stats.noVote = rows.length - stats.yea - stats.nay;
+  var today = new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+  var html = ''
+    + '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">'
+    + '<title>DakCUPAC — 2026 FOM × Donation Report</title>'
+    + '<style>'
+    + '@page{size:letter landscape;margin:0.4in}'
+    + 'body{font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;padding:16px 24px;font-size:10px;color:#0A1628;max-width:1100px;margin:0 auto;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+    + '.hdr{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:12px;border-bottom:3px solid #0D7377;margin-bottom:14px}'
+    + 'h1{font-family:Georgia,serif;font-size:20px;margin:0 0 4px;color:#0A1628;letter-spacing:-.01em}'
+    + '.sub{font-size:11px;color:#4A6080;line-height:1.4;max-width:720px}'
+    + '.stamp{text-align:right;font-size:9px;color:#7A94B0;line-height:1.5}'
+    + '.stats{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;margin-bottom:10px}'
+    + '.stat{background:#F7F8FA;border:1px solid #D1D9E4;border-radius:7px;padding:6px 8px;text-align:center}'
+    + '.stat .val{font-size:16px;font-weight:800;color:#0D7377;font-family:Georgia,serif;line-height:1.1}'
+    + '.stat .lbl{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#4A6080;margin-top:2px}'
+    + '.note{background:#EAF4F4;border-left:3px solid #0D7377;padding:6px 10px;font-size:9.5px;color:#085155;margin-bottom:10px;line-height:1.5}'
     + 'table{width:100%;border-collapse:collapse}'
-    + 'th{padding:7px 9px;text-align:left;font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:#4A6080;border-bottom:2px solid #0D7377;background:#F7F8FA}'
-    + 'td{padding:7px 9px;border-bottom:1px solid #EEF0F4;vertical-align:top}'
-    + '.yea{color:#15803D;font-weight:700}'
-    + '.nay{color:#B91C1C;font-weight:700}'
-    + '.absent{color:#C17D0E;font-weight:700}'
-    + '.none{color:#7A94B0}'
-    + '.muted{color:#7A94B0;font-size:10px}'
-    + '@media print{body{padding:0}tr{page-break-inside:avoid}}'
+    + 'thead{display:table-header-group}'
+    + 'tr{page-break-inside:avoid}'
+    + 'th{background:#0D7377;color:#fff;padding:7px 6px;text-align:left;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.3px;border-right:1px solid #085155}'
+    + 'th.num{text-align:right}th.ctr{text-align:center}'
+    + 'td{padding:5px 6px;border-bottom:1px solid #EEF0F4;vertical-align:middle;font-size:9.5px}'
+    + 'td.name{font-weight:700;color:#0A1628}'
+    + 'td.num{text-align:right;font-variant-numeric:tabular-nums}'
+    + 'td.ctr{text-align:center}'
+    + 'tbody tr:nth-child(even){background:#FAFBFC}'
+    + '.yea{background:#DCFCE7;color:#15803D;font-weight:800;text-align:center;border-radius:4px}'
+    + '.nay{background:#FEF2F2;color:#B91C1C;font-weight:800;text-align:center;border-radius:4px}'
+    + '.muted{color:#7A94B0;font-style:italic}'
+    + '.dollar{color:#085155;font-weight:700}'
+    + '.total{color:#085155;font-weight:800}'
+    + '.footer{margin-top:14px;padding-top:8px;border-top:1px solid #D1D9E4;font-size:8.5px;color:#7A94B0;text-align:center;line-height:1.6}'
+    + '@media print{body{padding:0}}'
     + '</style></head><body>';
-  html += '<h1>DakCUPAC — Donation History × FOM Vote</h1>';
-  html += '<div class="sub">Candidate, CUPAC donation history, and SB 2266 (Field of Membership) vote · Generated ' + new Date().toLocaleDateString() + ' · ' + rows.length + ' records</div>';
-  html += '<table><thead><tr><th>Candidate</th><th>Chamber/Dist</th><th>CUPAC Donation History</th><th>SB 2266 (FOM)</th></tr></thead><tbody>';
+
+  html += '<div class="hdr">'
+    + '<div>'
+    +   '<h1>DakCUPAC — 2026 Balloted Candidates × FOM Vote</h1>'
+    +   '<div class="sub">Every candidate on the 2026 ballot (ND SOS · Apr 6 filings) with their DakCUPAC donation history by cycle and Field of Membership (SB 2266) vote. Prepared for Bob Herrington.</div>'
+    + '</div>'
+    + '<div class="stamp">DakCUPAC<br>Confidential · Committee Use Only<br>Generated '+esc(today)+'</div>'
+    + '</div>';
+
+  html += '<div class="stats">'
+    + '<div class="stat"><div class="val">'+stats.total+'</div><div class="lbl">2026 Candidates</div></div>'
+    + '<div class="stat"><div class="val">'+stats.senate+' / '+stats.house+'</div><div class="lbl">Senate / House</div></div>'
+    + '<div class="stat"><div class="val">'+stats.incumbents+'</div><div class="lbl">Incumbents</div></div>'
+    + '<div class="stat"><div class="val">'+stats.withDonation+'</div><div class="lbl">With CUPAC</div></div>'
+    + '<div class="stat"><div class="val" style="color:#15803D">'+stats.yea+'</div><div class="lbl">SB 2266 YEA</div></div>'
+    + '<div class="stat"><div class="val" style="color:#B91C1C">'+stats.nay+'</div><div class="lbl">SB 2266 NAY</div></div>'
+    + '<div class="stat"><div class="val" style="color:#7A94B0">'+stats.noVote+'</div><div class="lbl">No FOM Vote</div></div>'
+    + '<div class="stat"><div class="val">$'+stats.totalGiven.toLocaleString()+'</div><div class="lbl">Total Given</div></div>'
+    + '</div>';
+
+  html += '<div class="note"><strong>Reading this report:</strong> '
+    + '<span class="yea" style="padding:1px 6px;border-radius:4px">YEA</span> = supported credit unions on the Field of Membership expansion. '
+    + '<span class="nay" style="padding:1px 6px;border-radius:4px">NAY</span> = opposed. '
+    + 'Blank FOM column = new candidate or did not serve in the 68th Assembly. '
+    + 'Cycle columns show DakCUPAC donations for each 2-year cycle.</div>';
+
+  html += '<table><thead><tr>'
+    + '<th>Candidate</th>'
+    + '<th class="ctr">Chamber</th>'
+    + '<th class="ctr">Dist.</th>'
+    + '<th class="ctr">Party</th>'
+    + '<th class="ctr">Inc.</th>'
+    + '<th class="num">2016</th>'
+    + '<th class="num">2018</th>'
+    + '<th class="num">2020</th>'
+    + '<th class="num">2022</th>'
+    + '<th class="num">2024</th>'
+    + '<th class="num">Total</th>'
+    + '<th class="ctr">SB 2266 · FOM</th>'
+    + '</tr></thead><tbody>';
+
+  function parseCycles(years){
+    var out = {2016:0,2018:0,2020:0,2022:0,2024:0};
+    if(!years) return out;
+    var re = /\$([\d,]+)\s*\((\d{4})/g, m;
+    while((m = re.exec(years)) !== null){
+      var y = parseInt(m[2],10);
+      var amt = parseInt(m[1].replace(/,/g,''),10);
+      if(out[y] !== undefined) out[y] = amt;
+    }
+    return out;
+  }
+  function fmt(v){ return v ? '$'+v.toLocaleString() : '<span class="muted">—</span>'; }
+
   rows.forEach(function(r){
-    var voteCls = r.vote === 'YEA' ? 'yea' : (r.vote === 'NAY' ? 'nay' : (r.vote === 'ABSENT' ? 'absent' : 'none'));
-    var voteTxt = r.vote || '—';
-    var chLbl = r.ch === 'Senate' ? 'Sen' : (r.ch === 'House' ? 'Rep' : '');
-    var chDist = chLbl && r.dist ? (chLbl + ' D' + r.dist) : (chLbl || (r.dist ? 'D' + r.dist : '—'));
-    var don = r.donationTotal
-      ? '<strong>'+esc(r.donationTotal)+'</strong>' + (r.donationYears ? '<div class="muted">'+esc(r.donationYears)+'</div>' : '')
-      : '<span class="muted">No CUPAC history</span>';
-    html += '<tr><td><strong>'+esc(r.name)+'</strong>'+(r.party?' ('+esc(r.party)+')':'')+'</td><td>'+esc(chDist)+'</td><td>'+don+'</td><td class="'+voteCls+'">'+esc(voteTxt)+'</td></tr>';
+    var cycles = parseCycles(r.donationYears);
+    var total = r.donationTotal ? parseInt(String(r.donationTotal).replace(/[^\d]/g,''),10) : 0;
+    var voteCell = r.vote === 'YEA' ? '<span class="yea" style="padding:2px 10px;display:inline-block">✓ YEA</span>'
+                : r.vote === 'NAY' ? '<span class="nay" style="padding:2px 10px;display:inline-block">✗ NAY</span>'
+                : '<span class="muted">—</span>';
+    html += '<tr>'
+      + '<td class="name">'+esc(r.name)+'</td>'
+      + '<td class="ctr">'+esc(r.ch||'—')+'</td>'
+      + '<td class="ctr">'+esc(r.dist||'—')+'</td>'
+      + '<td class="ctr">'+esc(r.party||'—')+'</td>'
+      + '<td class="ctr">'+(r.incumbent?'<strong style="color:#0D7377">★</strong>':'<span class="muted">—</span>')+'</td>'
+      + '<td class="num">'+fmt(cycles[2016])+'</td>'
+      + '<td class="num">'+fmt(cycles[2018])+'</td>'
+      + '<td class="num">'+fmt(cycles[2020])+'</td>'
+      + '<td class="num">'+fmt(cycles[2022])+'</td>'
+      + '<td class="num">'+fmt(cycles[2024])+'</td>'
+      + '<td class="num total">'+(total?'$'+total.toLocaleString():'<span class="muted">$0</span>')+'</td>'
+      + '<td class="ctr">'+voteCell+'</td>'
+      + '</tr>';
   });
+
   html += '</tbody></table>';
-  html += '<div style="margin-top:20px;padding-top:10px;border-top:1px solid #D1D9E4;font-size:9px;color:#7A94B0">DakCUPAC — Confidential Committee Use Only — Not for Public Distribution</div>';
+  html += '<div class="footer">'
+    + 'DakCUPAC · 2026 BALLOTED ONLY · '+stats.total+' candidates ('+stats.senate+' Senate · '+stats.house+' House · '+stats.incumbents+' incumbents) · '
+    + stats.withDonation+' with prior CUPAC history · '+stats.yea+' YEA / '+stats.nay+' NAY on SB 2266 (FOM)<br>'
+    + 'Source: ND SOS Apr 6 2026 filings · DakCUPAC cycles 2016–2024 · ND 68th Assembly SB 2266 roll call<br>'
+    + '<strong>Confidential — Committee Use Only — Not for Public Distribution</strong>'
+    + '</div>';
   html += '</body></html>';
+
   w.document.write(html);
   w.document.close();
-  setTimeout(function(){ try { w.print(); } catch(e){} }, 250);
+  setTimeout(function(){ try { w.print(); } catch(e){} }, 350);
 }
 function renderGlobalSearch(q) {
   var box = document.getElementById('gs-results');
