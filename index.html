@@ -681,19 +681,32 @@ tr.not-running td{background:#FDF5F5!important;color:var(--text-muted)} tr.not-r
 .bob-report-close:hover{color:var(--ink);background:var(--surface-2)}
 /* ── BOB MODE — whole-dashboard simplified view (cards kept) ── */
 body.bob-mode .site-header{display:none !important}
-body.bob-mode .nav-bar{display:none !important}
+/* Keep nav bar visible so Bob can click any tab */
+body.bob-mode .nav-bar{display:flex !important;position:sticky;top:48px;z-index:180}
 body.bob-mode #tier-filter-bar{display:none !important}
 body.bob-mode .budget-sidebar,
 body.bob-mode .budget-sidebar-tab{display:none !important}
 body.bob-mode #cupac-cake-modal,
 body.bob-mode #gac-modal{display:none !important}
-/* Only the candidates panel is visible */
-body.bob-mode .panel:not(#panel-candidates){display:none !important}
-body.bob-mode #panel-candidates.panel{display:block !important;padding-top:8px}
-/* Inside candidates panel, hide everything except the card grid */
-body.bob-mode #panel-candidates > *{display:none !important}
-body.bob-mode #panel-candidates > #cand-tbody{display:grid !important}
-body.bob-mode #panel-candidates > .bob-mode-notice{display:block !important}
+/* All panels follow normal active/inactive rules — Bob navigates freely */
+body.bob-mode .panel.active{padding-top:14px}
+/* Inside whichever panel is active, hide all direct children except card grids & the Bob empty-notice */
+body.bob-mode .panel.active > *{display:none !important}
+body.bob-mode .panel.active > .person-card-grid{display:grid !important}
+body.bob-mode .panel.active > #cand-tbody,
+body.bob-mode .panel.active > #vote-body,
+body.bob-mode .panel.active > #wp-card-grid{display:grid !important}
+body.bob-mode .panel.active > .bob-mode-empty-notice{display:flex !important}
+/* Bob-mode empty notice (hidden outside Bob mode, shown per active panel via JS) */
+.bob-mode-empty-notice{display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 30px;margin:20px auto;max-width:560px;background:linear-gradient(135deg,#fff 0%,var(--teal-light) 100%);border:2px dashed var(--teal);border-radius:16px;gap:14px}
+.bob-mode-empty-notice .emoji{font-size:48px;line-height:1}
+.bob-mode-empty-notice .title{font-family:var(--font-display);font-size:20px;font-weight:800;color:var(--teal-dark);margin:0}
+.bob-mode-empty-notice .desc{font-size:13px;color:var(--text-muted);line-height:1.55;max-width:420px;margin:0}
+.bob-mode-empty-notice .btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:6px}
+.bob-mode-empty-notice button{padding:10px 18px;border-radius:9px;background:var(--teal);color:#fff;border:none;font-weight:800;font-size:12px;cursor:pointer;font-family:inherit;text-transform:uppercase;letter-spacing:.4px}
+.bob-mode-empty-notice button:hover{background:var(--teal-dark)}
+.bob-mode-empty-notice button.secondary{background:#fff;color:var(--teal-dark);border:1.5px solid var(--teal)}
+.bob-mode-empty-notice button.secondary:hover{background:var(--teal-light)}
 /* Bob mode persistent top banner */
 #bob-mode-banner{display:none;position:sticky;top:0;z-index:210;background:linear-gradient(90deg,#085155 0%,#0D7377 100%);color:#fff;padding:10px 20px;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;box-shadow:0 2px 12px rgba(0,0,0,0.25);font-family:var(--font-body)}
 body.bob-mode #bob-mode-banner{display:flex}
@@ -4093,6 +4106,11 @@ function showPanel(id, el){
   if(id==='leadership' && typeof buildProfiles === 'function') setTimeout(buildProfiles, 50);
   // Apply tier filter state to newly rendered tab
   setTimeout(function(){ if(typeof applyTierFilter==='function') applyTierFilter(); }, 200);
+  // If Bob Mode is on, reapply the Bob filter after the new panel renders
+  // so fresh cards pick up search/vote chip state.
+  if(document.body.classList.contains('bob-mode')){
+    setTimeout(function(){ if(typeof bobModeFilter === 'function') bobModeFilter(); }, 220);
+  }
 }
 
 // ════ HELPERS ════
@@ -10296,9 +10314,59 @@ function copyBobReportCSV(){
 // ──────────────────────────────────────────────────────────────
 // BOB MODE — whole-dashboard simplified view that keeps the cards
 // ──────────────────────────────────────────────────────────────
+// Panels that don't have candidate cards — show a friendly redirect notice
+var _BOB_MODE_EMPTY_PANELS = {
+  'panel-leadership': {
+    title: 'No candidate cards on Leadership Profiles',
+    desc: 'This tab uses a different card layout for the Senate / House leadership roster. For the simplified view (candidate · donation · FOM), switch to one of the tabs below.'
+  },
+  'panel-history': {
+    title: 'No candidate cards on DakCUPAC History',
+    desc: 'This tab shows multi-year charts and campaign totals — not candidate cards. Switch to a tab with cards for the simplified view.'
+  },
+  'panel-committee': {
+    title: 'No candidate cards on Committee & Overview',
+    desc: 'This tab shows committee members and the ND legislative district map. Switch to a tab with candidate cards for the simplified view.'
+  },
+  'panel-strategy': {
+    title: 'No candidate cards on Strategy Room',
+    desc: 'This tab is narrative strategy and committee prep packets. Switch to a tab with cards for the simplified view.'
+  }
+};
+function _ensureBobEmptyNotice(panelId){
+  var panel = document.getElementById(panelId);
+  if(!panel) return;
+  var existing = panel.querySelector(':scope > .bob-mode-empty-notice');
+  if(existing) return existing;
+  var cfg = _BOB_MODE_EMPTY_PANELS[panelId];
+  if(!cfg) return;
+  var notice = document.createElement('div');
+  notice.className = 'bob-mode-empty-notice';
+  notice.innerHTML =
+      '<div class="emoji">🪄</div>'
+    + '<div class="title">'+cfg.title+'</div>'
+    + '<div class="desc">'+cfg.desc+'</div>'
+    + '<div class="btns">'
+    +   '<button onclick="_bobJumpTab(\'candidates\')">🗳️ Candidates</button>'
+    +   '<button class="secondary" onclick="_bobJumpTab(\'sb2266\')">📜 Voting History</button>'
+    +   '<button class="secondary" onclick="_bobJumpTab(\'winprob\')">📐 Win Probability</button>'
+    +   '<button class="secondary" onclick="exitBobMode()">✕ Exit Bob Mode</button>'
+    + '</div>';
+  panel.appendChild(notice);
+  return notice;
+}
+function _bobJumpTab(id){
+  var order = ['leadership','sb2266','history','candidates','committee','winprob','strategy'];
+  var idx = order.indexOf(id);
+  var tabs = document.querySelectorAll('.nav-tab');
+  if(tabs[idx] && typeof showPanel === 'function') showPanel(id, tabs[idx]);
+  setTimeout(function(){ window.scrollTo({top:0,behavior:'smooth'}); bobModeFilter(); }, 80);
+}
 function enterBobMode(){
   document.body.classList.add('bob-mode');
-  // Force-switch to candidates tab — that's where the cards live.
+  // Pre-inject the empty-state notices for panels without candidate cards
+  Object.keys(_BOB_MODE_EMPTY_PANELS).forEach(_ensureBobEmptyNotice);
+  // Force-switch to candidates tab — that's where the main card grid lives.
   try {
     var tabs = document.querySelectorAll('.nav-tab');
     var order = ['leadership','sb2266','history','candidates','committee','winprob','strategy'];
@@ -10311,17 +10379,16 @@ function enterBobMode(){
   _bobModeVoteFilter = 'all';
   var chips = document.querySelectorAll('#bob-mode-banner .bmb-chip');
   chips.forEach(function(c){ c.classList.toggle('active', c.getAttribute('data-bob-filter') === 'all'); });
-  // Scroll to top of cards
   setTimeout(function(){ window.scrollTo({top:0, behavior:'smooth'}); }, 60);
-  // Apply filter (reveals all by default)
   bobModeFilter();
 }
 function exitBobMode(){
   document.body.classList.remove('bob-mode');
-  // Clear any Bob-mode hide flags so cards come back normally
   document.querySelectorAll('.pcard.bob-filtered-out').forEach(function(el){
     el.classList.remove('bob-filtered-out');
   });
+  // Clean up the injected empty-state notices so they don't clutter normal view
+  document.querySelectorAll('.bob-mode-empty-notice').forEach(function(n){ n.remove(); });
 }
 function toggleBobMode(){
   if(document.body.classList.contains('bob-mode')) exitBobMode();
@@ -10337,7 +10404,8 @@ function setBobModeVoteFilter(which, btn){
 }
 function bobModeFilter(){
   var q = (document.getElementById('bob-mode-search') || {value:''}).value.toLowerCase().trim();
-  var cards = document.querySelectorAll('#panel-candidates .pcard');
+  // Scope to whichever panel is active so filter works on every tab
+  var cards = document.querySelectorAll('.panel.active .pcard');
   cards.forEach(function(card){
     var nameEl = card.querySelector('.pcard-name');
     var name = nameEl ? nameEl.textContent.trim() : '';
