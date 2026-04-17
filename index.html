@@ -2972,7 +2972,43 @@ async function initSharedNotes(){
     _supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   } catch(e){ console.warn('Supabase init failed:', e); return; }
 
-  // 1) Pull every remote note into local tracker
+  // Snapshot every local note BEFORE touching remote. We always migrate
+  // this snapshot up with a merge strategy so nothing already written
+  // locally can be overwritten by the remote pull later.
+  var _localSnapshot = [];
+  try {
+    var _trk0 = loadTracker();
+    Object.keys(_trk0).forEach(function(k){
+      var n = _trk0[k] && _trk0[k].notes;
+      if(n && n.trim()) _localSnapshot.push({candidate_key:k, notes:n});
+    });
+  } catch(e){}
+
+  // 1) Migration FIRST — push local notes up, merging with any remote
+  //    content so two users with notes on the same candidate both keep
+  //    their work. Runs on every load until the migration key is set;
+  //    idempotent because a note identical to the remote is a no-op upsert.
+  if(_localSnapshot.length && !localStorage.getItem(NOTES_MIGRATED_KEY)){
+    try {
+      const keys = _localSnapshot.map(function(r){return r.candidate_key;});
+      const { data: existing } = await _supa.from('candidate_notes').select('candidate_key,notes').in('candidate_key', keys);
+      const rMap = {};
+      (existing||[]).forEach(function(r){ rMap[r.candidate_key] = r.notes || ''; });
+      const toUpsert = _localSnapshot.map(function(r){
+        const remote = rMap[r.candidate_key] || '';
+        if(remote.trim() && remote.trim() !== r.notes.trim()){
+          return { candidate_key:r.candidate_key, notes: remote + '\n\n— merged —\n' + r.notes, updated_at: new Date().toISOString() };
+        }
+        return { candidate_key:r.candidate_key, notes: r.notes, updated_at: new Date().toISOString() };
+      });
+      await _supa.from('candidate_notes').upsert(toUpsert, { onConflict:'candidate_key' });
+      localStorage.setItem(NOTES_MIGRATED_KEY, new Date().toISOString());
+    } catch(e){ console.warn('Notes migration failed:', e); return; /* bail before pull so local stays intact */ }
+  } else if(!localStorage.getItem(NOTES_MIGRATED_KEY)){
+    localStorage.setItem(NOTES_MIGRATED_KEY, new Date().toISOString());
+  }
+
+  // 2) Pull every remote note into local tracker (now safe — local was just pushed up)
   try {
     const { data, error } = await _supa.from('candidate_notes').select('candidate_key,notes');
     if(!error && Array.isArray(data)){
@@ -2992,33 +3028,6 @@ async function initSharedNotes(){
       }
     }
   } catch(e){ console.warn('Notes pull failed:', e); }
-
-  // 2) One-time migration: push any local notes up, merging with any remote content
-  if(!localStorage.getItem(NOTES_MIGRATED_KEY)){
-    try {
-      const trk = loadTracker();
-      const localRows = [];
-      Object.keys(trk).forEach(function(k){
-        var n = trk[k] && trk[k].notes;
-        if(n && n.trim()) localRows.push({candidate_key:k, notes:n});
-      });
-      if(localRows.length){
-        const keys = localRows.map(function(r){return r.candidate_key;});
-        const { data: existing } = await _supa.from('candidate_notes').select('candidate_key,notes').in('candidate_key', keys);
-        const rMap = {};
-        (existing||[]).forEach(function(r){ rMap[r.candidate_key] = r.notes || ''; });
-        const toUpsert = localRows.map(function(r){
-          const remote = rMap[r.candidate_key] || '';
-          if(remote.trim() && remote.trim() !== r.notes.trim()){
-            return { candidate_key:r.candidate_key, notes: remote + '\n\n— merged —\n' + r.notes, updated_at: new Date().toISOString() };
-          }
-          return { candidate_key:r.candidate_key, notes: r.notes, updated_at: new Date().toISOString() };
-        });
-        await _supa.from('candidate_notes').upsert(toUpsert, { onConflict:'candidate_key' });
-      }
-      localStorage.setItem(NOTES_MIGRATED_KEY, new Date().toISOString());
-    } catch(e){ console.warn('Notes migration failed:', e); }
-  }
 
   // 3) Live subscription: any remote change → update local + UI
   _supa.channel('candidate_notes_live')
