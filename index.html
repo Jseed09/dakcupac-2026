@@ -7196,6 +7196,7 @@ function openPersonCard(name, dist){
 var _comparePersonA = null; // name of first person in panel
 
 function closePersonPanel(){
+  ppFlushNote(false); // flush any pending note before we clear _ppKey
   document.getElementById('person-panel').classList.remove('open');
   document.getElementById('pp-overlay').classList.remove('open');
   // Only unlock scroll if compare panel isn't also open
@@ -7205,6 +7206,13 @@ function closePersonPanel(){
   _ppKey=null;
   _comparePersonA=null;
 }
+// Tab hidden or page unloading — flush with keepalive so the remote
+// push survives the tab closing.
+window.addEventListener('visibilitychange', function(){
+  if(document.hidden) ppFlushNote(true);
+});
+window.addEventListener('pagehide', function(){ ppFlushNote(true); });
+window.addEventListener('beforeunload', function(){ ppFlushNote(true); });
 // Safety: if body is locked and nothing is open, unlock it
 setInterval(function(){
   var pp = document.getElementById('person-panel');
@@ -7301,7 +7309,47 @@ function ppSaveNote(){
     const v=document.getElementById('pp-notes').value;
     const d=loadTracker(); if(!d[_ppKey]) d[_ppKey]={status:'none',amt:0}; d[_ppKey].notes=v; saveTracker(d); ppShowSync();
     pushRemoteNote(_ppKey, v);
+    _ppNoteTimer = null;
   },600);
+}
+// Force any pending debounced note save to flush immediately.
+// Called when the panel closes, the tab is hidden, or the page unloads,
+// so work in the 600ms debounce window is never lost. `useKeepalive`
+// routes the remote push through fetch({keepalive:true}) so it survives
+// a tab-close event that would otherwise abort a normal xhr.
+function ppFlushNote(useKeepalive){
+  if(!_ppKey) return;
+  var ta = document.getElementById('pp-notes');
+  if(!ta) return;
+  clearTimeout(_ppNoteTimer); _ppNoteTimer = null;
+  var v = ta.value;
+  var d = loadTracker();
+  if(!d[_ppKey]) d[_ppKey] = {status:'none', amt:0};
+  if((d[_ppKey].notes || '') === (v || '')) return; // nothing pending
+  d[_ppKey].notes = v;
+  try { localStorage.setItem(TRACKER_KEY, JSON.stringify(d)); } catch(e){}
+  if(useKeepalive){
+    // Direct fetch with keepalive — survives page unload
+    try {
+      fetch(SUPABASE_URL + '/rest/v1/candidate_notes', {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+          'Content-Type': 'application/json',
+          'Prefer': 'resolution=merge-duplicates,return=minimal'
+        },
+        body: JSON.stringify({
+          candidate_key: _ppKey,
+          notes: v,
+          updated_at: new Date().toISOString()
+        }),
+        keepalive: true
+      });
+    } catch(e){}
+  } else {
+    pushRemoteNote(_ppKey, v);
+  }
 }
 function ppShowSync(){
   const s=document.getElementById('pp-sync-indicator'); s.classList.add('show'); setTimeout(()=>s.classList.remove('show'),2500);
