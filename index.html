@@ -2955,7 +2955,48 @@ const TRACKER_KEY = 'cupac_tracker_2026_v4';
 const SUPABASE_URL = 'https://niprjiofszgjhcrbjpmd.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_55p8vcdVnFcws-S3FXeIbg_1aYtEWUA';
 const NOTES_MIGRATED_KEY = 'cupac_notes_migrated_v1';
+const NOTES_BACKUP_KEY = 'cupac_notes_backup_pre_sync_v1'; // never cleared by sync code
 var _supa = null;
+
+// Write an untouched copy of all local notes to a separate localStorage
+// key. Only writes once (never overwrites an existing backup). If anything
+// goes wrong with sync, the original content is recoverable from DevTools.
+function backupLocalNotes(){
+  try {
+    if(localStorage.getItem(NOTES_BACKUP_KEY)) return; // already backed up
+    const trk = JSON.parse(localStorage.getItem(TRACKER_KEY) || '{}');
+    const notesOnly = {};
+    Object.keys(trk).forEach(function(k){
+      if(trk[k] && trk[k].notes && trk[k].notes.trim()) notesOnly[k] = trk[k].notes;
+    });
+    localStorage.setItem(NOTES_BACKUP_KEY, JSON.stringify({
+      created_at: new Date().toISOString(),
+      count: Object.keys(notesOnly).length,
+      notes: notesOnly
+    }));
+  } catch(e){ console.warn('Local backup failed:', e); }
+}
+
+// Also prompt the browser to download a physical JSON file of the user's
+// existing notes on first load — an offline artifact the user can keep.
+function downloadBackupFile(){
+  try {
+    const raw = localStorage.getItem(NOTES_BACKUP_KEY);
+    if(!raw) return;
+    const parsed = JSON.parse(raw);
+    if(!parsed || !parsed.count) return; // nothing to back up
+    const blob = new Blob([JSON.stringify(parsed, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const stamp = new Date().toISOString().replace(/[:.]/g,'-').slice(0,19);
+    a.href = url;
+    a.download = 'dakcupac-notes-backup-' + stamp + '.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+  } catch(e){ console.warn('Backup download failed:', e); }
+}
 
 function _rerenderAll(){
   try { if(typeof filterCandidates==='function') filterCandidates(); } catch(e){}
@@ -2967,14 +3008,16 @@ function _rerenderAll(){
 }
 
 async function initSharedNotes(){
+  // ALWAYS back up local notes to a separate key first — this happens
+  // even if Supabase is unreachable, so nothing is ever at risk.
+  backupLocalNotes();
+
   if(!window.supabase || _supa) return;
   try {
     _supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   } catch(e){ console.warn('Supabase init failed:', e); return; }
 
-  // Snapshot every local note BEFORE touching remote. We always migrate
-  // this snapshot up with a merge strategy so nothing already written
-  // locally can be overwritten by the remote pull later.
+  // Snapshot every local note BEFORE touching remote.
   var _localSnapshot = [];
   try {
     var _trk0 = loadTracker();
@@ -2984,27 +3027,43 @@ async function initSharedNotes(){
     });
   } catch(e){}
 
-  // 1) Migration FIRST — push local notes up, merging with any remote
-  //    content so two users with notes on the same candidate both keep
-  //    their work. Runs on every load until the migration key is set;
-  //    idempotent because a note identical to the remote is a no-op upsert.
-  if(_localSnapshot.length && !localStorage.getItem(NOTES_MIGRATED_KEY)){
+  // 1) Migration FIRST — push local notes up via an atomic DB-level
+  //    merge RPC. The stored function appends rather than overwrites
+  //    when the row already has different content, so simultaneous
+  //    migrations from two users cannot clobber each other.
+  const isFirstRun = !localStorage.getItem(NOTES_MIGRATED_KEY);
+  if(_localSnapshot.length && isFirstRun){
     try {
-      const keys = _localSnapshot.map(function(r){return r.candidate_key;});
-      const { data: existing } = await _supa.from('candidate_notes').select('candidate_key,notes').in('candidate_key', keys);
-      const rMap = {};
-      (existing||[]).forEach(function(r){ rMap[r.candidate_key] = r.notes || ''; });
-      const toUpsert = _localSnapshot.map(function(r){
-        const remote = rMap[r.candidate_key] || '';
-        if(remote.trim() && remote.trim() !== r.notes.trim()){
-          return { candidate_key:r.candidate_key, notes: remote + '\n\n— merged —\n' + r.notes, updated_at: new Date().toISOString() };
-        }
-        return { candidate_key:r.candidate_key, notes: r.notes, updated_at: new Date().toISOString() };
-      });
-      await _supa.from('candidate_notes').upsert(toUpsert, { onConflict:'candidate_key' });
+      let migratedCount = 0;
+      for(let i = 0; i < _localSnapshot.length; i++){
+        const r = _localSnapshot[i];
+        const { error } = await _supa.rpc('upsert_note_merged', { p_key: r.candidate_key, p_notes: r.notes });
+        if(error) throw error;
+        migratedCount++;
+      }
       localStorage.setItem(NOTES_MIGRATED_KEY, new Date().toISOString());
-    } catch(e){ console.warn('Notes migration failed:', e); return; /* bail before pull so local stays intact */ }
-  } else if(!localStorage.getItem(NOTES_MIGRATED_KEY)){
+      // Download physical backup file only after we know the remote
+      // received everything — this is the user's offline artifact.
+      downloadBackupFile();
+      if(typeof showToast === 'function'){
+        showToast({
+          type:'success',
+          title:'Notes synced',
+          msg: migratedCount + ' note' + (migratedCount===1?'':'s') + ' uploaded to shared store. Local backup file downloaded.'
+        });
+      }
+    } catch(e){
+      console.warn('Notes migration failed:', e);
+      if(typeof showToast === 'function'){
+        showToast({
+          type:'warning',
+          title:'Note sync paused',
+          msg:'Your notes are safe in this browser. The app will retry on next load.'
+        });
+      }
+      return; // bail before pull so local stays intact
+    }
+  } else if(isFirstRun){
     localStorage.setItem(NOTES_MIGRATED_KEY, new Date().toISOString());
   }
 
