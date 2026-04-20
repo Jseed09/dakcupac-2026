@@ -6443,6 +6443,14 @@ function updateCandChipCounts(allCands){
   set('cchip-d-ct', d);
 }
 function filterCandidates(){
+  // Preserve scroll + active focus so inline edits (dollar input, status
+  // toggle) or live realtime updates from other users don't yank the
+  // viewport back to the top while you're mid-edit.
+  var _scrollY = window.scrollY || window.pageYOffset || 0;
+  var _active = document.activeElement;
+  var _activeId = _active && _active.id ? _active.id : null;
+  var _activeSel = _active && typeof _active.selectionStart === 'number'
+    ? { start:_active.selectionStart, end:_active.selectionEnd } : null;
   const q   = document.getElementById('cand-search').value.toLowerCase();
   const ch  = document.getElementById('cand-chamber').value;
   const cup = document.getElementById('cand-cupac-f').value;
@@ -6490,6 +6498,20 @@ function filterCandidates(){
 
   updateCandChipCounts(CANDIDATES);
   renderCandidates(f);
+  // Restore scroll and focus/selection — next tick so the browser has
+  // finished laying out the re-rendered grid.
+  setTimeout(function(){
+    try { window.scrollTo(0, _scrollY); } catch(e){}
+    if(_activeId){
+      var el = document.getElementById(_activeId);
+      if(el){
+        try { el.focus({preventScroll:true}); } catch(e){ try{ el.focus(); }catch(e2){} }
+        if(_activeSel && typeof el.setSelectionRange === 'function'){
+          try { el.setSelectionRange(_activeSel.start, _activeSel.end); } catch(e){}
+        }
+      }
+    }
+  }, 0);
 }
 function resetCandidates(){
   activeCandChip=null;
