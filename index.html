@@ -4906,11 +4906,18 @@ function updateBudgetSidebar() {
     var t = tracker[k];
     var amt = parseInt(t && t.amt) || 0;
     if(amt <= 0 && (!t || !t.status || t.status === 'none')) return;
-    totalAlloc += amt;
+    // Status counters track every decision regardless of dollars
     if(t.status === 'approved') approved++;
     if(t.status === 'review') review++;
     if(t.status === 'contributed') contributed++;
     if(t.status === 'pass') pass++;
+
+    // Allocated dollars = only what the export will actually send as
+    // checks: approved (committee yes) + contributed (check on its way).
+    // Review / pass / none amounts are speculative and do not count.
+    var countsForAlloc = (t.status === 'approved' || t.status === 'contributed');
+    if(!countsForAlloc) return;
+    totalAlloc += amt;
 
     var c = _trackerByKey[k];
     var inPrimary = false;
