@@ -3299,9 +3299,15 @@ function distPrimaryBadge(dist){
   return '<span class="dist-primary-badge">⚔ PRIMARY · ' + contested.join(' + ') + '</span>';
 }
 
+// Tracker key convention: person_{firstname}_{lastname}_{district}
+// First + last + district is always used so candidates sharing a last
+// name (Johnson, Becker, Vetter, Kessel, ...) never collide. Middle
+// names, suffixes, and parenthetical aliases are ignored.
 function personKey(name, dist){
-  const last = name.trim().split(/\s+/).pop().toLowerCase().replace(/[^a-z]/g,'');
-  return 'person_' + last + '_' + (dist||0);
+  const parts = name.trim().split(/\s+/).filter(p => !/^\(.*\)$/.test(p));
+  const first = (parts[0] || '').toLowerCase().replace(/[^a-z]/g,'');
+  const last = (parts[parts.length - 1] || '').toLowerCase().replace(/[^a-z]/g,'');
+  return 'person_' + first + '_' + last + '_' + (dist||0);
 }
 function getSaved(name, dist){
   const d = loadTracker();
@@ -4906,11 +4912,18 @@ function updateBudgetSidebar() {
     var t = tracker[k];
     var amt = parseInt(t && t.amt) || 0;
     if(amt <= 0 && (!t || !t.status || t.status === 'none')) return;
-    totalAlloc += amt;
+    // Status counters track every decision regardless of dollars
     if(t.status === 'approved') approved++;
     if(t.status === 'review') review++;
     if(t.status === 'contributed') contributed++;
     if(t.status === 'pass') pass++;
+
+    // Allocated dollars = only what the export will actually send as
+    // checks: approved (committee yes) + contributed (check on its way).
+    // Review / pass / none amounts are speculative and do not count.
+    var countsForAlloc = (t.status === 'approved' || t.status === 'contributed');
+    if(!countsForAlloc) return;
+    totalAlloc += amt;
 
     var c = _trackerByKey[k];
     var inPrimary = false;
@@ -4973,8 +4986,8 @@ setTimeout(function(){
   // Pre-seed confirmed contributions (Dawson Holle + Karen Rohr — committee approved)
   var _preSeeded = false;
   var _confirmed = [
-    {key:'person_holle_31', name:'Dawson Holle', amt:500, status:'contributed'},
-    {key:'person_rohr_31', name:'Karen Rohr', amt:500, status:'contributed'}
+    {key:'person_dawson_holle_31', name:'Dawson Holle', amt:500, status:'contributed'},
+    {key:'person_karen_rohr_31', name:'Karen Rohr', amt:500, status:'contributed'}
   ];
   _confirmed.forEach(function(c){
     if(!_tracker[c.key] || (!_tracker[c.key].amt && _tracker[c.key].status==='none')){
@@ -4983,6 +4996,60 @@ setTimeout(function(){
     }
   });
   if(_preSeeded) saveTracker(_tracker);
+
+  // One-time migration: legacy tracker keys used person_{last}_{dist}.
+  // Rekey them to the current person_{first}_{last}_{dist} convention
+  // using CANDIDATES + LEADERS as the source of truth for first names.
+  // New-format keys always win if both exist for the same person.
+  var _nameLookup = {};
+  CANDIDATES.forEach(function(c){
+    var slug = (c.name.trim().split(/\s+/).pop().toLowerCase().replace(/[^a-z]/g,''))
+             + '_' + (c.dist||0);
+    if(!_nameLookup[slug]) _nameLookup[slug] = c.name;
+  });
+  if(typeof LEADERS !== 'undefined') {
+    LEADERS.forEach(function(l){
+      var slug = (l.name.trim().split(/\s+/).pop().toLowerCase().replace(/[^a-z]/g,''))
+               + '_' + (l.distNum||0);
+      if(!_nameLookup[slug]) _nameLookup[slug] = l.name;
+    });
+  }
+  var _migrated = false;
+  Object.keys(_tracker).forEach(function(k){
+    // Legacy keys match person_{slug}_{dist} with no inner underscore
+    // between word parts. New keys contain TWO underscores between
+    // 'person' and the district. Detect by counting segments.
+    if(!/^person_/.test(k)) return;
+    var body = k.replace(/^person_/, '');
+    var segs = body.split('_');
+    if(segs.length !== 2) return; // already first_last_dist or longer
+    var lastSlug = segs[0];
+    var dist = segs[1];
+    var lookupKey = lastSlug + '_' + dist;
+    var fullName = _nameLookup[lookupKey];
+    if(!fullName) return; // no candidate / leader with this last+dist, leave as-is
+    var newKey = personKey(fullName, parseInt(dist, 10));
+    if(newKey === k) return;
+    // Merge: prefer newKey entry if already present
+    if(!_tracker[newKey]) _tracker[newKey] = _tracker[k];
+    delete _tracker[k];
+    _migrated = true;
+  });
+  if(_migrated) saveTracker(_tracker);
+
+  // One-time backfill: rows accepted via "Accept rec" before this release
+  // saved an amount but left status = 'none', which caused them to be
+  // omitted from the check-request export (e.g. Craig Headland, Jeff Barta).
+  // Promote any tracker entry with amt > 0 and status 'none' to 'approved'.
+  var _backfilled = false;
+  Object.keys(_tracker).forEach(function(k){
+    var t = _tracker[k];
+    if(t && parseInt(t.amt) > 0 && (!t.status || t.status === 'none')) {
+      t.status = 'approved';
+      _backfilled = true;
+    }
+  });
+  if(_backfilled) saveTracker(_tracker);
 
   // Broadcast to all components
   broadcastBudget(savedBgt);
@@ -5019,18 +5086,74 @@ function sendToJessica() {
   var approved = [];
   var totalAmt = 0;
 
+  // Slug helpers matching personKey's normalization.
+  function _slugify(s) { return (s||'').toLowerCase().replace(/[^a-z]/g,''); }
+  function _firstSlug(name) {
+    var parts = name.trim().split(/\s+/).filter(function(p){ return !/^\(.*\)$/.test(p); });
+    return _slugify(parts[0] || '');
+  }
+  function _lastSlug(name) {
+    var parts = name.trim().split(/\s+/).filter(function(p){ return !/^\(.*\)$/.test(p); });
+    return _slugify(parts[parts.length - 1] || '');
+  }
+
   Object.keys(tracker).forEach(function(k) {
     var t = tracker[k];
     if((t.status === 'approved' || t.status === 'contributed') && t.amt > 0) {
-      var namePart = k.replace(/^person_/, '').replace(/_\d+$/, '');
+      // Tracker keys are person_{first}_{last}_{dist}. Parse all three so
+      // candidates who share a last name (Johnson, Becker, Vetter, Kessel...)
+      // resolve to the correct CANDIDATES record. Legacy person_{last}_{dist}
+      // keys are tolerated as a fallback.
+      var body = k.replace(/^person_/, '');
+      var segs = body.split('_');
+      var firstPart = null, lastPart = null, distPart = null;
+      if(segs.length >= 3) {
+        distPart = parseInt(segs[segs.length - 1], 10);
+        lastPart = segs[segs.length - 2];
+        firstPart = segs.slice(0, segs.length - 2).join('');
+      } else if(segs.length === 2) {
+        lastPart = segs[0];
+        distPart = parseInt(segs[1], 10);
+      } else {
+        return;
+      }
+
       var cand = CANDIDATES.find(function(c) {
-        var last = c.name.trim().split(/\s+/).pop().toLowerCase().replace(/[^a-z]/g,'');
-        return last === namePart;
+        if(firstPart && _firstSlug(c.name) !== firstPart) return false;
+        if(_lastSlug(c.name) !== lastPart) return false;
+        if(distPart != null && parseInt(c.dist,10) !== distPart) return false;
+        return true;
       });
+      // Fallback: last name + district (handles CANDIDATES entries whose
+      // first name differs slightly from how the key was built)
+      if(!cand) {
+        cand = CANDIDATES.find(function(c) {
+          if(_lastSlug(c.name) !== lastPart) return false;
+          if(distPart != null && parseInt(c.dist,10) !== distPart) return false;
+          return true;
+        });
+      }
+      // Last resort: any last-name match
+      if(!cand) {
+        cand = CANDIDATES.find(function(c){ return _lastSlug(c.name) === lastPart; });
+      }
       if(!cand) return;
-      var addr = SOS_ADDRESSES[cand.name] || cand.email || 'ADDRESS NEEDED';
+
+      // Contact info comes from the candidate profile; fall back to LEADERS
+      // for legislators whose record lives there instead of CANDIDATES.
+      var email = cand.email || '';
+      var phone = cand.phone || '';
+      if((!email || !phone) && typeof LEADERS !== 'undefined') {
+        var ldr = LEADERS.find(function(l){ return l.name === cand.name; });
+        if(ldr) {
+          if(!email && ldr.email) email = ldr.email;
+          if(!phone && ldr.phone) phone = ldr.phone;
+        }
+      }
+
+      var addr = SOS_ADDRESSES[cand.name] || email || 'ADDRESS NEEDED';
       var payable = PAC_NAMES[cand.name] || cand.name;
-      approved.push({name:cand.name, payable:payable, amt:t.amt, status:t.status, dist:cand.dist, ch:cand.ch, party:cand.party, addr:addr, notes:t.notes||''});
+      approved.push({name:cand.name, payable:payable, amt:t.amt, status:t.status, dist:cand.dist, ch:cand.ch, party:cand.party, addr:addr, email:email, phone:phone, notes:t.notes||''});
       totalAmt += t.amt;
     }
   });
@@ -5047,6 +5170,8 @@ function sendToJessica() {
   approved.forEach(function(a,i){
     bodyLines.push((i+1)+'. '+a.payable+' - $'+a.amt+' ('+a.ch+' District '+a.dist+', '+a.party+')');
     bodyLines.push('   Address: '+a.addr);
+    if(a.email) bodyLines.push('   Email: '+a.email);
+    if(a.phone) bodyLines.push('   Phone: '+a.phone);
     if(a.notes) bodyLines.push('   Note: '+a.notes);
   });
   bodyLines.push('');
@@ -5086,6 +5211,40 @@ function sendToJessica() {
     var templateCols = [{wch:22},{wch:28},{wch:14}];
     var today = new Date().toLocaleDateString('en-US');
 
+    // Summary sheet — approved candidate roster with contact info + address
+    var summaryRows = [
+      ['CUPAC 2026 Approved Check Requests — ' + today + ' (v2 · includes email + phone)'],
+      ['Total: $' + totalAmt.toLocaleString() + ' across ' + approved.length + ' candidates'],
+      [],
+      ['#','Candidate','Payable To','Chamber','District','Party','Amount','Email','Phone','Address','Status','Notes']
+    ];
+    approved.forEach(function(a, i){
+      summaryRows.push([
+        i+1,
+        a.name,
+        a.payable,
+        a.ch,
+        a.dist,
+        a.party==='R'?'Republican':a.party==='D'?'Dem-NPL':a.party,
+        a.amt,
+        a.email||'',
+        a.phone||'',
+        a.addr,
+        a.status==='contributed'?'Contributed':'Approved',
+        a.notes||''
+      ]);
+    });
+    var wsSummary = XLSX.utils.aoa_to_sheet(summaryRows);
+    wsSummary['!cols'] = [{wch:4},{wch:22},{wch:24},{wch:8},{wch:9},{wch:11},{wch:10},{wch:30},{wch:16},{wch:48},{wch:12},{wch:40}];
+    if(!wsSummary['!merges']) wsSummary['!merges'] = [];
+    wsSummary['!merges'].push({s:{r:0,c:0},e:{r:0,c:11}});
+    wsSummary['!merges'].push({s:{r:1,c:0},e:{r:1,c:11}});
+    for(var _i=0; _i<approved.length; _i++){
+      var _cell = XLSX.utils.encode_cell({r:4+_i, c:6});
+      if(wsSummary[_cell]) wsSummary[_cell].z = '"$"#,##0';
+    }
+    XLSX.utils.book_append_sheet(xlwb, wsSummary, 'Summary');
+
     // One tab per candidate — exact match to Check Request Form-New.xlsx
     approved.forEach(function(a){
       // Build sheet as array-of-arrays matching exact row positions from template
@@ -5096,7 +5255,8 @@ function sendToJessica() {
       // Row 5: A5 = "Payable to:" B5 = name
       // Row 6: A6 = "Attention:" B6 = name
       // Row 7: A7 = "Address:" B7 = address
-      // Row 8-9: blank
+      // Row 8: A8 = "Email:" B8 = email
+      // Row 9: A9 = "Phone:" B9 = phone
       // Row 10: A10 = "Description:" B10 = "PAC check"
       // Row 11: blank
       // Row 12: A12 = "Amount:" B12 = dollar amount
@@ -5117,8 +5277,8 @@ function sendToJessica() {
         ['Payable to:', a.payable],                  // Row 5
         ['Attention:', a.name],                      // Row 6
         ['Address:', a.addr],                        // Row 7
-        [],                                          // Row 8
-        [],                                          // Row 9
+        ['Email:', a.email||''],                     // Row 8
+        ['Phone:', a.phone||''],                     // Row 9
         ['Description:', 'PAC check'],               // Row 10
         [],                                          // Row 11
         ['Amount:', a.amt],                          // Row 12
@@ -5154,12 +5314,23 @@ function sendToJessica() {
     });
 
     // Download the .xlsx file
-    XLSX.writeFile(xlwb, 'CUPAC_2026_Check_Requests.xlsx');
+    var _withContactCount = approved.filter(function(a){ return a.email || a.phone; }).length;
+    XLSX.writeFile(xlwb, 'CUPAC_2026_Check_Requests_with_contacts.xlsx');
 
     // Open email after short delay
     setTimeout(function(){
       window.open('mailto:jgabriel@dakcu.org?subject='+encodeURIComponent(subject)+'&body='+mailBody);
     }, 500);
+
+    if(typeof showToast === 'function') {
+      showToast({
+        type:'success', icon:'📥',
+        title:'Excel downloaded — '+approved.length+' candidates',
+        msg:'Contact info included on '+_withContactCount+' of '+approved.length+' sheets (email + phone rows 8 & 9).'
+      });
+    } else {
+      alert('Downloaded CUPAC_2026_Check_Requests_with_contacts.xlsx — '+approved.length+' candidates, contact info on '+_withContactCount+' sheets.');
+    }
   });
 
 }
@@ -6582,8 +6753,11 @@ function setCandAmt(ck,ukey,val){
   const v=parseInt(val)||0; const d=loadBudget(); d['amt_'+ck]=v||''; saveCandBudget(d);
   const inp=document.getElementById('ca_'+ck); if(inp){ inp.value=v||''; inp.style.borderColor=v>0?'var(--teal)':'var(--border)'; }
   [200,300,400,500].forEach(n=>{ const b=document.getElementById('qbc_'+ck+'_'+n); if(b) b.className='quick-amt-btn'+(v===n?' active':''); });
-  const td=loadTracker(); if(!td[ukey]) td[ukey]={status:'none',notes:''}; td[ukey].amt=v; saveTracker(td);
+  const td=loadTracker(); if(!td[ukey]) td[ukey]={status:'none',notes:''}; td[ukey].amt=v;
+  if(typeof _autoApproveIfAmt === 'function') _autoApproveIfAmt(td[ukey]);
+  saveTracker(td);
   calcBudget();
+  if(typeof _syncTrackerViews === 'function') _syncTrackerViews();
 }
 function exportBudgetCSV(){
   const d=loadBudget(); const rows=[['Name','Chamber','Dist','Party','Amount','Status','Prior DakCUPAC']];
@@ -6600,22 +6774,45 @@ function clearBudget(){
 }
 
 // ════ UNIVERSAL SAVE FUNCTIONS ════
+// After any tracker mutation we re-render the 💰 sidebar and the Budget
+// Plan view so the dashboard reflects the change immediately instead of
+// waiting for a page reload. Any row with a dollar value gets promoted
+// to status='approved' so the money-bag total and the check-request
+// export stay in sync with the user's visible selection.
+function _syncTrackerViews(){
+  if(typeof updateBudgetSidebar === 'function') updateBudgetSidebar();
+  if(typeof renderBudgetPlan === 'function') renderBudgetPlan();
+  if(typeof updateStrategyTotals === 'function') updateStrategyTotals();
+  if(typeof calcBudget === 'function') calcBudget();
+}
+function _autoApproveIfAmt(row){
+  if(!row) return;
+  var amt = parseInt(row.amt) || 0;
+  if(amt > 0 && (!row.status || row.status === 'none')) row.status = 'approved';
+}
 function saveDecision(sel, ukey){
   sel.className='tracker-select status-'+sel.value;
   const d=loadTracker(); if(!d[ukey]) d[ukey]={notes:'',amt:0}; d[ukey].status=sel.value; saveTracker(d);
+  _syncTrackerViews();
 }
 function saveNotes(ta,ukey){
   const d=loadTracker(); if(!d[ukey]) d[ukey]={status:'none',amt:0}; d[ukey].notes=ta.value; saveTracker(d);
   const ind=document.getElementById('ns_'+ukey); if(ind){ ind.classList.add('show'); setTimeout(()=>ind.classList.remove('show'),2000); }
 }
 function saveAmtQuick(ukey,val){
-  const d=loadTracker(); if(!d[ukey]) d[ukey]={status:'none',notes:''}; d[ukey].amt=val; saveTracker(d);
+  const d=loadTracker(); if(!d[ukey]) d[ukey]={status:'none',notes:''}; d[ukey].amt=val;
+  _autoApproveIfAmt(d[ukey]);
+  saveTracker(d);
   const inp=document.getElementById('amt_'+ukey); if(inp) inp.value=val;
   [200,300,400,500].forEach(v=>{ const b=document.getElementById('qb_'+ukey+'_'+v); if(b) b.className='quick-amt-btn'+(val===v?' active':''); });
+  _syncTrackerViews();
 }
 function saveAmtInput(ukey,val){
-  const v=parseInt(val)||0; const d=loadTracker(); if(!d[ukey]) d[ukey]={status:'none',notes:''}; d[ukey].amt=v; saveTracker(d);
+  const v=parseInt(val)||0; const d=loadTracker(); if(!d[ukey]) d[ukey]={status:'none',notes:''}; d[ukey].amt=v;
+  _autoApproveIfAmt(d[ukey]);
+  saveTracker(d);
   [200,300,400,500].forEach(n=>{ const b=document.getElementById('qb_'+ukey+'_'+n); if(b) b.className='quick-amt-btn'+(v===n?' active':''); });
+  _syncTrackerViews();
 }
 
 // ════ TAB 5 — COMMITTEE GEO ════
@@ -12137,11 +12334,21 @@ function bpSetAmt(name, dist, val) {
 }
 
 function bpAcceptRec(name, dist, recAmt) {
-  bpSetAmt(name, dist, recAmt);
+  // Clicking "Accept rec" is a committee-approval action: promote status
+  // to 'approved' so the candidate appears in the check-request export.
+  // Leave 'contributed' alone (check already written) and don't downgrade.
+  var key = personKey(name, dist);
+  var tracker = loadTracker();
+  if(!tracker[key]) tracker[key] = {status:'none', notes:'', amt:0};
+  tracker[key].amt = recAmt;
+  if(tracker[key].status !== 'contributed') tracker[key].status = 'approved';
+  saveTracker(tracker);
+  renderBudgetPlan();
+  if(typeof updateBudgetSidebar === 'function') updateBudgetSidebar();
   if(typeof showToast === 'function') showToast({
     type:'success', icon:'✓',
-    title:'Accepted $'+recAmt+' for '+name,
-    msg:'Saved to your decision tracker'
+    title:'Approved $'+recAmt+' for '+name,
+    msg:'Saved to tracker · added to check-request export'
   });
 }
 
@@ -12161,6 +12368,7 @@ function bpApplyAll() {
     if(cur > 0) return; // don't overwrite manual decisions
     if(!tracker[key]) tracker[key] = {status:'none', notes:'', amt:0};
     tracker[key].amt = r.recAmt;
+    if(tracker[key].status !== 'contributed') tracker[key].status = 'approved';
     count++;
     totalDollars += r.recAmt;
   });
