@@ -4027,6 +4027,55 @@ const CANDIDATES = [
   {ch:'Senate', dist:9,  name:'Jayme Davis',          party:'D', incumbent:false, email:'jayme.m.davis@gmail.com',     phone:'(701) 202-8700', runningForSenate:true, formerHouse:true, currentHouseMember:true, legHistory:'Current House Rep D9 (69th Assembly, serving 2025). Voted YEA on SB 2266 and YEA on SB 2217. Running for Senate D9 in 2026.', ndlegisUrl:'https://ndlegis.gov/biography/jayme-davis', news:'CURRENT HOUSE REP D9 — running for Senate D9 in 2026. CONTESTED D PRIMARY: Gathered signatures to challenge Dem-NPL endorsed incumbent Sen. Marcellais. Both Turtle Mountain Band of Chippewa members. Davis calls 2026 a change election — says strong voices needed for Native communities. Voted YEA on SB 2266 and YEA on SB 2217 as House Rep. (ND Monitor Apr 6 2026; KFGO Apr 7 2026)'},
 
 ];
+// ════════════════════════════════════════════════════════════════
+// SYNCHRONOUS TRACKER KEY MIGRATION
+// Runs at script-load time, *before* any UI code reads the tracker,
+// so every render sees keys in the current person_{first}_{last}_{dist}
+// format. The previous version of this block ran inside a
+// setTimeout(..., 500), which meant the first render hit the tracker
+// with old keys and every getSaved() missed — the dashboard showed
+// $0 allocated for half a second until the migration caught up.
+// ════════════════════════════════════════════════════════════════
+(function _migrateTrackerKeysSync(){
+  try {
+    var _t = loadTracker();
+    var _lookup = {};
+    CANDIDATES.forEach(function(c){
+      var slug = (c.name.trim().split(/\s+/).pop().toLowerCase().replace(/[^a-z]/g,''))
+               + '_' + (c.dist||0);
+      if(!_lookup[slug]) _lookup[slug] = c.name;
+    });
+    if(typeof LEADERS !== 'undefined') {
+      LEADERS.forEach(function(l){
+        var slug = (l.name.trim().split(/\s+/).pop().toLowerCase().replace(/[^a-z]/g,''))
+                 + '_' + (l.distNum||0);
+        if(!_lookup[slug]) _lookup[slug] = l.name;
+      });
+    }
+    var _dirty = false;
+    Object.keys(_t).forEach(function(k){
+      if(!/^person_/.test(k)) return;
+      var body = k.replace(/^person_/, '');
+      var segs = body.split('_');
+      if(segs.length !== 2) return;
+      var fullName = _lookup[segs[0] + '_' + segs[1]];
+      if(!fullName) return;
+      var newKey = personKey(fullName, parseInt(segs[1], 10));
+      if(newKey === k) return;
+      if(!_t[newKey]) _t[newKey] = _t[k];
+      delete _t[k];
+      _dirty = true;
+    });
+    Object.keys(_t).forEach(function(k){
+      var r = _t[k];
+      if(r && parseInt(r.amt) > 0 && (!r.status || r.status === 'none')) {
+        r.status = 'approved';
+        _dirty = true;
+      }
+    });
+    if(_dirty) saveTracker(_t);
+  } catch(e) { /* migration is best-effort; never block page load */ }
+})();
 // POOLS — aligned with the Budget Plan tier framework.
 // CHAMPIONS (floor $500) → PROTECT (double pro-CU) → MAINTAIN (IBL/leadership)
 // → BUILD (FOM supporters). Incumbent-floor catch-all absorbs HOLD + NOT REC.
@@ -5151,7 +5200,9 @@ function sendToJessica() {
         }
       }
 
-      var addr = SOS_ADDRESSES[cand.name] || email || 'ADDRESS NEEDED';
+      // Address column is the physical mailing address only — email has
+      // its own column now, so don't fall back to the email address here.
+      var addr = SOS_ADDRESSES[cand.name] || 'ADDRESS NEEDED';
       var payable = PAC_NAMES[cand.name] || cand.name;
       approved.push({name:cand.name, payable:payable, amt:t.amt, status:t.status, dist:cand.dist, ch:cand.ch, party:cand.party, addr:addr, email:email, phone:phone, notes:t.notes||''});
       totalAmt += t.amt;
