@@ -6753,8 +6753,11 @@ function setCandAmt(ck,ukey,val){
   const v=parseInt(val)||0; const d=loadBudget(); d['amt_'+ck]=v||''; saveCandBudget(d);
   const inp=document.getElementById('ca_'+ck); if(inp){ inp.value=v||''; inp.style.borderColor=v>0?'var(--teal)':'var(--border)'; }
   [200,300,400,500].forEach(n=>{ const b=document.getElementById('qbc_'+ck+'_'+n); if(b) b.className='quick-amt-btn'+(v===n?' active':''); });
-  const td=loadTracker(); if(!td[ukey]) td[ukey]={status:'none',notes:''}; td[ukey].amt=v; saveTracker(td);
+  const td=loadTracker(); if(!td[ukey]) td[ukey]={status:'none',notes:''}; td[ukey].amt=v;
+  if(typeof _autoApproveIfAmt === 'function') _autoApproveIfAmt(td[ukey]);
+  saveTracker(td);
   calcBudget();
+  if(typeof _syncTrackerViews === 'function') _syncTrackerViews();
 }
 function exportBudgetCSV(){
   const d=loadBudget(); const rows=[['Name','Chamber','Dist','Party','Amount','Status','Prior DakCUPAC']];
@@ -6771,22 +6774,45 @@ function clearBudget(){
 }
 
 // ════ UNIVERSAL SAVE FUNCTIONS ════
+// After any tracker mutation we re-render the 💰 sidebar and the Budget
+// Plan view so the dashboard reflects the change immediately instead of
+// waiting for a page reload. Any row with a dollar value gets promoted
+// to status='approved' so the money-bag total and the check-request
+// export stay in sync with the user's visible selection.
+function _syncTrackerViews(){
+  if(typeof updateBudgetSidebar === 'function') updateBudgetSidebar();
+  if(typeof renderBudgetPlan === 'function') renderBudgetPlan();
+  if(typeof updateStrategyTotals === 'function') updateStrategyTotals();
+  if(typeof calcBudget === 'function') calcBudget();
+}
+function _autoApproveIfAmt(row){
+  if(!row) return;
+  var amt = parseInt(row.amt) || 0;
+  if(amt > 0 && (!row.status || row.status === 'none')) row.status = 'approved';
+}
 function saveDecision(sel, ukey){
   sel.className='tracker-select status-'+sel.value;
   const d=loadTracker(); if(!d[ukey]) d[ukey]={notes:'',amt:0}; d[ukey].status=sel.value; saveTracker(d);
+  _syncTrackerViews();
 }
 function saveNotes(ta,ukey){
   const d=loadTracker(); if(!d[ukey]) d[ukey]={status:'none',amt:0}; d[ukey].notes=ta.value; saveTracker(d);
   const ind=document.getElementById('ns_'+ukey); if(ind){ ind.classList.add('show'); setTimeout(()=>ind.classList.remove('show'),2000); }
 }
 function saveAmtQuick(ukey,val){
-  const d=loadTracker(); if(!d[ukey]) d[ukey]={status:'none',notes:''}; d[ukey].amt=val; saveTracker(d);
+  const d=loadTracker(); if(!d[ukey]) d[ukey]={status:'none',notes:''}; d[ukey].amt=val;
+  _autoApproveIfAmt(d[ukey]);
+  saveTracker(d);
   const inp=document.getElementById('amt_'+ukey); if(inp) inp.value=val;
   [200,300,400,500].forEach(v=>{ const b=document.getElementById('qb_'+ukey+'_'+v); if(b) b.className='quick-amt-btn'+(val===v?' active':''); });
+  _syncTrackerViews();
 }
 function saveAmtInput(ukey,val){
-  const v=parseInt(val)||0; const d=loadTracker(); if(!d[ukey]) d[ukey]={status:'none',notes:''}; d[ukey].amt=v; saveTracker(d);
+  const v=parseInt(val)||0; const d=loadTracker(); if(!d[ukey]) d[ukey]={status:'none',notes:''}; d[ukey].amt=v;
+  _autoApproveIfAmt(d[ukey]);
+  saveTracker(d);
   [200,300,400,500].forEach(n=>{ const b=document.getElementById('qb_'+ukey+'_'+n); if(b) b.className='quick-amt-btn'+(v===n?' active':''); });
+  _syncTrackerViews();
 }
 
 // ════ TAB 5 — COMMITTEE GEO ════
