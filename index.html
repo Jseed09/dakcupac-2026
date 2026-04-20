@@ -3067,18 +3067,36 @@ async function initSharedNotes(){
     localStorage.setItem(NOTES_MIGRATED_KEY, new Date().toISOString());
   }
 
-  // 2) Pull every remote note into local tracker (now safe — local was just pushed up)
+  // 1b) Push local tracker STATUS + AMT up so the committee's approvals
+  //     and dollar assignments are visible on every other device. Running
+  //     every load (not gated by NOTES_MIGRATED_KEY) keeps devices that
+  //     made local edits before sync was available from getting stuck.
   try {
-    const { data, error } = await _supa.from('candidate_notes').select('candidate_key,notes');
+    var _trk1 = loadTracker();
+    for (var _pkey in _trk1) {
+      var _row = _trk1[_pkey];
+      if(!_row) continue;
+      var _amt = parseInt(_row.amt, 10) || 0;
+      var _st  = _row.status || 'none';
+      if(_amt === 0 && _st === 'none' && !(_row.notes || '').trim()) continue;
+      await pushRemoteTracker(_pkey, { status: _st, amt: _amt, notes: _row.notes || '' });
+    }
+  } catch(e){ console.warn('Tracker push-up failed:', e); }
+
+  // 2) Pull every remote row into local tracker (notes + status + amt)
+  try {
+    const { data, error } = await _supa.from('candidate_notes').select('candidate_key,notes,status,amt');
     if(!error && Array.isArray(data)){
       const trk = loadTracker();
       let touched = false;
       data.forEach(function(row){
         if(!trk[row.candidate_key]) trk[row.candidate_key] = {status:'none', amt:0, notes:''};
-        if((trk[row.candidate_key].notes || '') !== (row.notes || '')){
-          trk[row.candidate_key].notes = row.notes || '';
-          touched = true;
-        }
+        var cur = trk[row.candidate_key];
+        if((cur.notes || '') !== (row.notes || '')) { cur.notes = row.notes || ''; touched = true; }
+        var rStatus = row.status || 'none';
+        if((cur.status || 'none') !== rStatus) { cur.status = rStatus; touched = true; }
+        var rAmt = parseInt(row.amt, 10) || 0;
+        if((parseInt(cur.amt, 10) || 0) !== rAmt) { cur.amt = rAmt; touched = true; }
       });
       if(touched) { try{ localStorage.setItem(TRACKER_KEY, JSON.stringify(trk)); }catch(e){} _rerenderAll(); }
       if(_ppKey && trk[_ppKey]){
@@ -3086,7 +3104,7 @@ async function initSharedNotes(){
         if(ta && document.activeElement !== ta) ta.value = trk[_ppKey].notes || '';
       }
     }
-  } catch(e){ console.warn('Notes pull failed:', e); }
+  } catch(e){ console.warn('Tracker pull failed:', e); }
 
   // 3) Live subscription: any remote change → update local + UI
   _supa.channel('candidate_notes_live')
@@ -3095,7 +3113,12 @@ async function initSharedNotes(){
       if(!row || !row.candidate_key) return;
       var trk = loadTracker();
       if(!trk[row.candidate_key]) trk[row.candidate_key] = {status:'none', amt:0, notes:''};
-      trk[row.candidate_key].notes = payload.new ? (payload.new.notes || '') : '';
+      var newRow = payload.new;
+      if(newRow) {
+        trk[row.candidate_key].notes  = newRow.notes  || '';
+        trk[row.candidate_key].status = newRow.status || 'none';
+        trk[row.candidate_key].amt    = parseInt(newRow.amt, 10) || 0;
+      }
       try { localStorage.setItem(TRACKER_KEY, JSON.stringify(trk)); } catch(e){}
       if(_ppKey === row.candidate_key){
         var ta = document.getElementById('pp-notes');
@@ -3107,13 +3130,28 @@ async function initSharedNotes(){
 }
 
 async function pushRemoteNote(key, text){
-  if(!_supa) return;
+  return pushRemoteTracker(key, { notes: text || '' });
+}
+
+// Push any subset of tracker fields for a candidate to Supabase so other
+// devices / users see the same status + amount + notes. Fields not
+// provided are left untouched on the remote row.
+async function pushRemoteTracker(key, fields){
+  if(!_supa || !key) return;
   try {
-    await _supa.from('candidate_notes').upsert(
-      { candidate_key:key, notes:text || '', updated_at: new Date().toISOString() },
-      { onConflict:'candidate_key' }
-    );
-  } catch(e){ console.warn('Note push failed:', e); }
+    // Fill gaps from the local tracker so an upsert never clobbers
+    // another field with an empty default.
+    var local = loadTracker()[key] || {};
+    var payload = {
+      candidate_key: key,
+      notes:  (fields && 'notes'  in fields) ? (fields.notes  || '') : (local.notes || ''),
+      status: (fields && 'status' in fields) ? (fields.status || 'none') : (local.status || 'none'),
+      amt:    (fields && 'amt'    in fields) ? (parseInt(fields.amt, 10) || 0)
+                                             : (parseInt(local.amt, 10) || 0),
+      updated_at: new Date().toISOString()
+    };
+    await _supa.from('candidate_notes').upsert(payload, { onConflict:'candidate_key' });
+  } catch(e){ console.warn('Tracker push failed:', e); }
 }
 
 // Kick off shared-notes sync once the Supabase script + DOM are ready
@@ -6807,6 +6845,7 @@ function setCandAmt(ck,ukey,val){
   const td=loadTracker(); if(!td[ukey]) td[ukey]={status:'none',notes:''}; td[ukey].amt=v;
   if(typeof _autoApproveIfAmt === 'function') _autoApproveIfAmt(td[ukey]);
   saveTracker(td);
+  if(typeof pushRemoteTracker === 'function') pushRemoteTracker(ukey, { amt: v, status: td[ukey].status });
   calcBudget();
   if(typeof _syncTrackerViews === 'function') _syncTrackerViews();
 }
@@ -6844,6 +6883,7 @@ function _autoApproveIfAmt(row){
 function saveDecision(sel, ukey){
   sel.className='tracker-select status-'+sel.value;
   const d=loadTracker(); if(!d[ukey]) d[ukey]={notes:'',amt:0}; d[ukey].status=sel.value; saveTracker(d);
+  if(typeof pushRemoteTracker === 'function') pushRemoteTracker(ukey, { status: sel.value });
   _syncTrackerViews();
 }
 function saveNotes(ta,ukey){
@@ -6854,6 +6894,7 @@ function saveAmtQuick(ukey,val){
   const d=loadTracker(); if(!d[ukey]) d[ukey]={status:'none',notes:''}; d[ukey].amt=val;
   _autoApproveIfAmt(d[ukey]);
   saveTracker(d);
+  if(typeof pushRemoteTracker === 'function') pushRemoteTracker(ukey, { amt: val, status: d[ukey].status });
   const inp=document.getElementById('amt_'+ukey); if(inp) inp.value=val;
   [200,300,400,500].forEach(v=>{ const b=document.getElementById('qb_'+ukey+'_'+v); if(b) b.className='quick-amt-btn'+(val===v?' active':''); });
   _syncTrackerViews();
@@ -6862,6 +6903,7 @@ function saveAmtInput(ukey,val){
   const v=parseInt(val)||0; const d=loadTracker(); if(!d[ukey]) d[ukey]={status:'none',notes:''}; d[ukey].amt=v;
   _autoApproveIfAmt(d[ukey]);
   saveTracker(d);
+  if(typeof pushRemoteTracker === 'function') pushRemoteTracker(ukey, { amt: v, status: d[ukey].status });
   [200,300,400,500].forEach(n=>{ const b=document.getElementById('qb_'+ukey+'_'+n); if(b) b.className='quick-amt-btn'+(v===n?' active':''); });
   _syncTrackerViews();
 }
@@ -12380,7 +12422,9 @@ function bpSetAmt(name, dist, val) {
   var tracker = loadTracker();
   if(!tracker[key]) tracker[key] = {status:'none', notes:'', amt:0};
   tracker[key].amt = amt;
+  if(amt > 0 && (!tracker[key].status || tracker[key].status === 'none')) tracker[key].status = 'approved';
   saveTracker(tracker);
+  if(typeof pushRemoteTracker === 'function') pushRemoteTracker(key, { amt: amt, status: tracker[key].status });
   renderBudgetPlan();
 }
 
@@ -12394,6 +12438,7 @@ function bpAcceptRec(name, dist, recAmt) {
   tracker[key].amt = recAmt;
   if(tracker[key].status !== 'contributed') tracker[key].status = 'approved';
   saveTracker(tracker);
+  if(typeof pushRemoteTracker === 'function') pushRemoteTracker(key, { amt: recAmt, status: tracker[key].status });
   renderBudgetPlan();
   if(typeof updateBudgetSidebar === 'function') updateBudgetSidebar();
   if(typeof showToast === 'function') showToast({
@@ -12422,6 +12467,7 @@ function bpApplyAll() {
     if(tracker[key].status !== 'contributed') tracker[key].status = 'approved';
     count++;
     totalDollars += r.recAmt;
+    if(typeof pushRemoteTracker === 'function') pushRemoteTracker(key, { amt: r.recAmt, status: tracker[key].status });
   });
   saveTracker(tracker);
   refreshAllocations();
