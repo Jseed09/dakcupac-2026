@@ -1,0 +1,41 @@
+{
+  "snapshot_taken_at": "2026-04-20T13:35:00Z",
+  "source": "Supabase candidate_notes table (project niprjiofszgjhcrbjpmd)",
+  "count": 27,
+  "diff_vs_previous": {
+    "previous_backup": "shared-notes-2026-04-19T17-05Z.json",
+    "previous_count": 24,
+    "added": ["person_axtman_7", "person_schauer_13", "person_vetter_7"],
+    "updated_content": [],
+    "touched_timestamp_only": ["person_holle_31", "person_rohr_31"]
+  },
+  "notes": [
+    { "candidate_key": "person_allex_27",       "notes": "Probably not going to win. trn", "updated_at": "2026-04-17T16:20:14.767676Z" },
+    { "candidate_key": "person_axtman_7",       "notes": "Would recommend supporting. ", "updated_at": "2026-04-20T12:14:10.988Z" },
+    { "candidate_key": "person_beard_23",       "notes": "Todd supported our FOM Bill. Has attended Pints and Politics in past years. He is supportive of cooperative issues. I feel support is important.", "updated_at": "2026-04-19T17:03:31.444454Z" },
+    { "candidate_key": "person_bekkedahl_1",    "notes": "More support here in the general, he has tenure and I think we can get him - TRN\n\n— merged —\nbarry head of ICBA is his cousin so that's why he said no. we need to reach out now. \n\n— merged —\nBrad has been in the Senate for quite some time and is well respected. I believe we need to support him. He also personally approached me in Williston after the FOM bill and somewhat apologized for not supporting our bill due to Barry being his cousin.", "updated_at": "2026-04-19T17:03:31.444454Z" },
+    { "candidate_key": "person_brabandt_5",     "notes": "I would support Roger in the General. \n\n— merged —\nhttps://ndlegis.gov/biography/roger-brabandt", "updated_at": "2026-04-17T16:24:57.841859Z" },
+    { "candidate_key": "person_deslauriers_3",  "notes": "Do not support, they have over $50k so far. Gov is backing them - trn", "updated_at": "2026-04-17T16:20:14.920437Z" },
+    { "candidate_key": "person_erickson_5",     "notes": "Not going to win", "updated_at": "2026-04-17T16:20:15.911578Z" },
+    { "candidate_key": "person_fisher_5",       "notes": "He was going to support our bill until the bankers got to him. TRN", "updated_at": "2026-04-17T16:20:15.672547Z" },
+    { "candidate_key": "person_garbel_1",       "notes": "I would support something here in the general. TRN\n\n— merged —\nI have known Laurie for years and we were on various committees and organizations together. I feel that she would be supportive of credit union issues and I would have no problem visiting with her about any issues.", "updated_at": "2026-04-19T17:03:31.444454Z" },
+    { "candidate_key": "person_hendrickson_3",  "notes": "She's not going to win.  - trn", "updated_at": "2026-04-17T16:20:15.075891Z" },
+    { "candidate_key": "person_hiatt_3",        "notes": "Not going to win", "updated_at": "2026-04-17T16:20:15.530094Z" },
+    { "candidate_key": "person_holle_31",       "notes": "Committee approved — Phase 1 contested primary", "updated_at": "2026-04-20T13:30:07.132137Z" },
+    { "candidate_key": "person_hoverson_3",     "notes": "Do not support, hes the worst. TRN", "updated_at": "2026-04-17T16:20:14.685398Z" },
+    { "candidate_key": "person_johnson_23",     "notes": "I would suggest we back Corey Johnson. TRN\n\n\n— merged —\nD23 general: I do not know much of anything on the other candidates and the incumbent for House. I do know Corey Johnson was recently appointed as the new Fire Chief in Williston.", "updated_at": "2026-04-19T17:03:31.444454Z" },
+    { "candidate_key": "person_kessel_27",      "notes": "Used to be with the Department of Commerce.  Could be an ally. TRN", "updated_at": "2026-04-17T16:20:14.841543Z" },
+    { "candidate_key": "person_louser_5",       "notes": "Hes didnt vote for us last time, however we have to support him in the general with his role on House IBL. ", "updated_at": "2026-04-17T16:20:15.749061Z" },
+    { "candidate_key": "person_mclaughlin_3",   "notes": "Not going to win", "updated_at": "2026-04-17T16:20:15.601768Z" },
+    { "candidate_key": "person_mihalick_3",     "notes": "Do not support, they have over $50k so far.  Gov is backing them. ", "updated_at": "2026-04-17T16:20:15.002823Z" },
+    { "candidate_key": "person_mohr_23",        "notes": "Do not support - TRN", "updated_at": "2026-04-17T16:20:14.535876Z" },
+    { "candidate_key": "person_nehring_23",     "notes": "Not sure where he stands on FOM - TRN", "updated_at": "2026-04-17T16:20:14.612435Z" },
+    { "candidate_key": "person_paulson_3",      "notes": "Have to support in the General.  He stood up for us on the floor and spoke.  He now has tenure.  Probably more than $500", "updated_at": "2026-04-17T16:20:15.372701Z" },
+    { "candidate_key": "person_raknerud_5",     "notes": "Not going to win.", "updated_at": "2026-04-17T16:20:15.991179Z" },
+    { "candidate_key": "person_richter_1",      "notes": "Do not support. I dont think he will ever support us. He is friends with Bankers Mihalik and Deslauries in D3 - TRN\n\n— merged —\nI know Dave fairly well. His wife worked at a credit union and they conducted business with WCCU. At the time of our FOM vote, his wife was the Marketing Director at the local bank. She is now retired. I believe he possibly would have supported the bill if not for that fact. Some type of support would be nice.", "updated_at": "2026-04-19T17:03:31.444454Z" },
+    { "candidate_key": "person_rohr_31",        "notes": "Committee approved — Phase 1 contested primary", "updated_at": "2026-04-20T13:30:07.257749Z" },
+    { "candidate_key": "person_schauer_13",     "notes": "Would recommend, Doug and Jon have worked hard building a relationship with him.  He has learned a lot about Credit Unions over the last couple of years.", "updated_at": "2026-04-20T12:15:33.706Z" },
+    { "candidate_key": "person_thiesen_3",      "notes": "Not going to win. ", "updated_at": "2026-04-17T16:20:15.460243Z" },
+    { "candidate_key": "person_vetter_7",       "notes": "Banker but would recommend donating to.", "updated_at": "2026-04-20T12:13:11.516Z" }
+  ]
+}
