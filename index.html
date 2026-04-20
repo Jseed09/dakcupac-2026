@@ -5040,18 +5040,48 @@ function sendToJessica() {
   var approved = [];
   var totalAmt = 0;
 
+  // Helper: lower-cased last-name-only slug for a candidate name
+  function _lastSlug(name) {
+    return name.trim().split(/\s+/).pop().toLowerCase().replace(/[^a-z]/g,'');
+  }
+
   Object.keys(tracker).forEach(function(k) {
     var t = tracker[k];
     if((t.status === 'approved' || t.status === 'contributed') && t.amt > 0) {
-      var namePart = k.replace(/^person_/, '').replace(/_\d+$/, '');
+      // Parse both last name and district out of the tracker key so candidates
+      // that share a last name (Johnson, Becker, Vetter, Kessel...) don't
+      // collapse to the first match in CANDIDATES.
+      var keyBody = k.replace(/^person_/, '');
+      var _km = keyBody.match(/^(.+)_(\d+)$/);
+      var namePart = _km ? _km[1] : keyBody;
+      var distPart = _km ? parseInt(_km[2], 10) : null;
+
       var cand = CANDIDATES.find(function(c) {
-        var last = c.name.trim().split(/\s+/).pop().toLowerCase().replace(/[^a-z]/g,'');
-        return last === namePart;
+        if(_lastSlug(c.name) !== namePart) return false;
+        if(distPart != null && parseInt(c.dist,10) !== distPart) return false;
+        return true;
       });
+      // Legacy keys without a district — fall back to first last-name match
+      if(!cand) {
+        cand = CANDIDATES.find(function(c){ return _lastSlug(c.name) === namePart; });
+      }
       if(!cand) return;
-      var addr = SOS_ADDRESSES[cand.name] || cand.email || 'ADDRESS NEEDED';
+
+      // Contact info comes from the candidate profile; fall back to LEADERS
+      // for legislators whose record lives there instead of CANDIDATES.
+      var email = cand.email || '';
+      var phone = cand.phone || '';
+      if((!email || !phone) && typeof LEADERS !== 'undefined') {
+        var ldr = LEADERS.find(function(l){ return l.name === cand.name; });
+        if(ldr) {
+          if(!email && ldr.email) email = ldr.email;
+          if(!phone && ldr.phone) phone = ldr.phone;
+        }
+      }
+
+      var addr = SOS_ADDRESSES[cand.name] || email || 'ADDRESS NEEDED';
       var payable = PAC_NAMES[cand.name] || cand.name;
-      approved.push({name:cand.name, payable:payable, amt:t.amt, status:t.status, dist:cand.dist, ch:cand.ch, party:cand.party, addr:addr, email:cand.email||'', phone:cand.phone||'', notes:t.notes||''});
+      approved.push({name:cand.name, payable:payable, amt:t.amt, status:t.status, dist:cand.dist, ch:cand.ch, party:cand.party, addr:addr, email:email, phone:phone, notes:t.notes||''});
       totalAmt += t.amt;
     }
   });
@@ -5111,7 +5141,7 @@ function sendToJessica() {
 
     // Summary sheet — approved candidate roster with contact info + address
     var summaryRows = [
-      ['CUPAC 2026 Approved Check Requests — ' + today],
+      ['CUPAC 2026 Approved Check Requests — ' + today + ' (v2 · includes email + phone)'],
       ['Total: $' + totalAmt.toLocaleString() + ' across ' + approved.length + ' candidates'],
       [],
       ['#','Candidate','Payable To','Chamber','District','Party','Amount','Email','Phone','Address','Status','Notes']
