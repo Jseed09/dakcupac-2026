@@ -4984,6 +4984,20 @@ setTimeout(function(){
   });
   if(_preSeeded) saveTracker(_tracker);
 
+  // One-time backfill: rows accepted via "Accept rec" before this release
+  // saved an amount but left status = 'none', which caused them to be
+  // omitted from the check-request export (e.g. Craig Headland, Jeff Barta).
+  // Promote any tracker entry with amt > 0 and status 'none' to 'approved'.
+  var _backfilled = false;
+  Object.keys(_tracker).forEach(function(k){
+    var t = _tracker[k];
+    if(t && parseInt(t.amt) > 0 && (!t.status || t.status === 'none')) {
+      t.status = 'approved';
+      _backfilled = true;
+    }
+  });
+  if(_backfilled) saveTracker(_tracker);
+
   // Broadcast to all components
   broadcastBudget(savedBgt);
   if(typeof updateBudgetSidebar==='function') updateBudgetSidebar();
@@ -5030,7 +5044,7 @@ function sendToJessica() {
       if(!cand) return;
       var addr = SOS_ADDRESSES[cand.name] || cand.email || 'ADDRESS NEEDED';
       var payable = PAC_NAMES[cand.name] || cand.name;
-      approved.push({name:cand.name, payable:payable, amt:t.amt, status:t.status, dist:cand.dist, ch:cand.ch, party:cand.party, addr:addr, notes:t.notes||''});
+      approved.push({name:cand.name, payable:payable, amt:t.amt, status:t.status, dist:cand.dist, ch:cand.ch, party:cand.party, addr:addr, email:cand.email||'', phone:cand.phone||'', notes:t.notes||''});
       totalAmt += t.amt;
     }
   });
@@ -5085,6 +5099,40 @@ function sendToJessica() {
     // Match exact template: A=22.14, B=28.43, C=13.71
     var templateCols = [{wch:22},{wch:28},{wch:14}];
     var today = new Date().toLocaleDateString('en-US');
+
+    // Summary sheet — approved candidate roster with contact info + address
+    var summaryRows = [
+      ['CUPAC 2026 Approved Check Requests — ' + today],
+      ['Total: $' + totalAmt.toLocaleString() + ' across ' + approved.length + ' candidates'],
+      [],
+      ['#','Candidate','Payable To','Chamber','District','Party','Amount','Email','Phone','Address','Status','Notes']
+    ];
+    approved.forEach(function(a, i){
+      summaryRows.push([
+        i+1,
+        a.name,
+        a.payable,
+        a.ch,
+        a.dist,
+        a.party==='R'?'Republican':a.party==='D'?'Dem-NPL':a.party,
+        a.amt,
+        a.email||'',
+        a.phone||'',
+        a.addr,
+        a.status==='contributed'?'Contributed':'Approved',
+        a.notes||''
+      ]);
+    });
+    var wsSummary = XLSX.utils.aoa_to_sheet(summaryRows);
+    wsSummary['!cols'] = [{wch:4},{wch:22},{wch:24},{wch:8},{wch:9},{wch:11},{wch:10},{wch:30},{wch:16},{wch:48},{wch:12},{wch:40}];
+    if(!wsSummary['!merges']) wsSummary['!merges'] = [];
+    wsSummary['!merges'].push({s:{r:0,c:0},e:{r:0,c:11}});
+    wsSummary['!merges'].push({s:{r:1,c:0},e:{r:1,c:11}});
+    for(var _i=0; _i<approved.length; _i++){
+      var _cell = XLSX.utils.encode_cell({r:4+_i, c:6});
+      if(wsSummary[_cell]) wsSummary[_cell].z = '"$"#,##0';
+    }
+    XLSX.utils.book_append_sheet(xlwb, wsSummary, 'Summary');
 
     // One tab per candidate — exact match to Check Request Form-New.xlsx
     approved.forEach(function(a){
@@ -12137,11 +12185,21 @@ function bpSetAmt(name, dist, val) {
 }
 
 function bpAcceptRec(name, dist, recAmt) {
-  bpSetAmt(name, dist, recAmt);
+  // Clicking "Accept rec" is a committee-approval action: promote status
+  // to 'approved' so the candidate appears in the check-request export.
+  // Leave 'contributed' alone (check already written) and don't downgrade.
+  var key = personKey(name, dist);
+  var tracker = loadTracker();
+  if(!tracker[key]) tracker[key] = {status:'none', notes:'', amt:0};
+  tracker[key].amt = recAmt;
+  if(tracker[key].status !== 'contributed') tracker[key].status = 'approved';
+  saveTracker(tracker);
+  renderBudgetPlan();
+  if(typeof updateBudgetSidebar === 'function') updateBudgetSidebar();
   if(typeof showToast === 'function') showToast({
     type:'success', icon:'✓',
-    title:'Accepted $'+recAmt+' for '+name,
-    msg:'Saved to your decision tracker'
+    title:'Approved $'+recAmt+' for '+name,
+    msg:'Saved to tracker · added to check-request export'
   });
 }
 
@@ -12161,6 +12219,7 @@ function bpApplyAll() {
     if(cur > 0) return; // don't overwrite manual decisions
     if(!tracker[key]) tracker[key] = {status:'none', notes:'', amt:0};
     tracker[key].amt = r.recAmt;
+    if(tracker[key].status !== 'contributed') tracker[key].status = 'approved';
     count++;
     totalDollars += r.recAmt;
   });
