@@ -5068,6 +5068,8 @@ function sendToJessica() {
   approved.forEach(function(a,i){
     bodyLines.push((i+1)+'. '+a.payable+' - $'+a.amt+' ('+a.ch+' District '+a.dist+', '+a.party+')');
     bodyLines.push('   Address: '+a.addr);
+    if(a.email) bodyLines.push('   Email: '+a.email);
+    if(a.phone) bodyLines.push('   Phone: '+a.phone);
     if(a.notes) bodyLines.push('   Note: '+a.notes);
   });
   bodyLines.push('');
@@ -5151,7 +5153,8 @@ function sendToJessica() {
       // Row 5: A5 = "Payable to:" B5 = name
       // Row 6: A6 = "Attention:" B6 = name
       // Row 7: A7 = "Address:" B7 = address
-      // Row 8-9: blank
+      // Row 8: A8 = "Email:" B8 = email
+      // Row 9: A9 = "Phone:" B9 = phone
       // Row 10: A10 = "Description:" B10 = "PAC check"
       // Row 11: blank
       // Row 12: A12 = "Amount:" B12 = dollar amount
@@ -5172,8 +5175,8 @@ function sendToJessica() {
         ['Payable to:', a.payable],                  // Row 5
         ['Attention:', a.name],                      // Row 6
         ['Address:', a.addr],                        // Row 7
-        [],                                          // Row 8
-        [],                                          // Row 9
+        ['Email:', a.email||''],                     // Row 8
+        ['Phone:', a.phone||''],                     // Row 9
         ['Description:', 'PAC check'],               // Row 10
         [],                                          // Row 11
         ['Amount:', a.amt],                          // Row 12
