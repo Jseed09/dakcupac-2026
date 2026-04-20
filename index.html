@@ -5314,12 +5314,23 @@ function sendToJessica() {
     });
 
     // Download the .xlsx file
-    XLSX.writeFile(xlwb, 'CUPAC_2026_Check_Requests.xlsx');
+    var _withContactCount = approved.filter(function(a){ return a.email || a.phone; }).length;
+    XLSX.writeFile(xlwb, 'CUPAC_2026_Check_Requests_with_contacts.xlsx');
 
     // Open email after short delay
     setTimeout(function(){
       window.open('mailto:jgabriel@dakcu.org?subject='+encodeURIComponent(subject)+'&body='+mailBody);
     }, 500);
+
+    if(typeof showToast === 'function') {
+      showToast({
+        type:'success', icon:'📥',
+        title:'Excel downloaded — '+approved.length+' candidates',
+        msg:'Contact info included on '+_withContactCount+' of '+approved.length+' sheets (email + phone rows 8 & 9).'
+      });
+    } else {
+      alert('Downloaded CUPAC_2026_Check_Requests_with_contacts.xlsx — '+approved.length+' candidates, contact info on '+_withContactCount+' sheets.');
+    }
   });
 
 }
