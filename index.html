@@ -3299,9 +3299,15 @@ function distPrimaryBadge(dist){
   return '<span class="dist-primary-badge">⚔ PRIMARY · ' + contested.join(' + ') + '</span>';
 }
 
+// Tracker key convention: person_{firstname}_{lastname}_{district}
+// First + last + district is always used so candidates sharing a last
+// name (Johnson, Becker, Vetter, Kessel, ...) never collide. Middle
+// names, suffixes, and parenthetical aliases are ignored.
 function personKey(name, dist){
-  const last = name.trim().split(/\s+/).pop().toLowerCase().replace(/[^a-z]/g,'');
-  return 'person_' + last + '_' + (dist||0);
+  const parts = name.trim().split(/\s+/).filter(p => !/^\(.*\)$/.test(p));
+  const first = (parts[0] || '').toLowerCase().replace(/[^a-z]/g,'');
+  const last = (parts[parts.length - 1] || '').toLowerCase().replace(/[^a-z]/g,'');
+  return 'person_' + first + '_' + last + '_' + (dist||0);
 }
 function getSaved(name, dist){
   const d = loadTracker();
@@ -4980,8 +4986,8 @@ setTimeout(function(){
   // Pre-seed confirmed contributions (Dawson Holle + Karen Rohr — committee approved)
   var _preSeeded = false;
   var _confirmed = [
-    {key:'person_holle_31', name:'Dawson Holle', amt:500, status:'contributed'},
-    {key:'person_rohr_31', name:'Karen Rohr', amt:500, status:'contributed'}
+    {key:'person_dawson_holle_31', name:'Dawson Holle', amt:500, status:'contributed'},
+    {key:'person_karen_rohr_31', name:'Karen Rohr', amt:500, status:'contributed'}
   ];
   _confirmed.forEach(function(c){
     if(!_tracker[c.key] || (!_tracker[c.key].amt && _tracker[c.key].status==='none')){
@@ -4990,6 +4996,46 @@ setTimeout(function(){
     }
   });
   if(_preSeeded) saveTracker(_tracker);
+
+  // One-time migration: legacy tracker keys used person_{last}_{dist}.
+  // Rekey them to the current person_{first}_{last}_{dist} convention
+  // using CANDIDATES + LEADERS as the source of truth for first names.
+  // New-format keys always win if both exist for the same person.
+  var _nameLookup = {};
+  CANDIDATES.forEach(function(c){
+    var slug = (c.name.trim().split(/\s+/).pop().toLowerCase().replace(/[^a-z]/g,''))
+             + '_' + (c.dist||0);
+    if(!_nameLookup[slug]) _nameLookup[slug] = c.name;
+  });
+  if(typeof LEADERS !== 'undefined') {
+    LEADERS.forEach(function(l){
+      var slug = (l.name.trim().split(/\s+/).pop().toLowerCase().replace(/[^a-z]/g,''))
+               + '_' + (l.distNum||0);
+      if(!_nameLookup[slug]) _nameLookup[slug] = l.name;
+    });
+  }
+  var _migrated = false;
+  Object.keys(_tracker).forEach(function(k){
+    // Legacy keys match person_{slug}_{dist} with no inner underscore
+    // between word parts. New keys contain TWO underscores between
+    // 'person' and the district. Detect by counting segments.
+    if(!/^person_/.test(k)) return;
+    var body = k.replace(/^person_/, '');
+    var segs = body.split('_');
+    if(segs.length !== 2) return; // already first_last_dist or longer
+    var lastSlug = segs[0];
+    var dist = segs[1];
+    var lookupKey = lastSlug + '_' + dist;
+    var fullName = _nameLookup[lookupKey];
+    if(!fullName) return; // no candidate / leader with this last+dist, leave as-is
+    var newKey = personKey(fullName, parseInt(dist, 10));
+    if(newKey === k) return;
+    // Merge: prefer newKey entry if already present
+    if(!_tracker[newKey]) _tracker[newKey] = _tracker[k];
+    delete _tracker[k];
+    _migrated = true;
+  });
+  if(_migrated) saveTracker(_tracker);
 
   // One-time backfill: rows accepted via "Accept rec" before this release
   // saved an amount but left status = 'none', which caused them to be
@@ -5040,30 +5086,56 @@ function sendToJessica() {
   var approved = [];
   var totalAmt = 0;
 
-  // Helper: lower-cased last-name-only slug for a candidate name
+  // Slug helpers matching personKey's normalization.
+  function _slugify(s) { return (s||'').toLowerCase().replace(/[^a-z]/g,''); }
+  function _firstSlug(name) {
+    var parts = name.trim().split(/\s+/).filter(function(p){ return !/^\(.*\)$/.test(p); });
+    return _slugify(parts[0] || '');
+  }
   function _lastSlug(name) {
-    return name.trim().split(/\s+/).pop().toLowerCase().replace(/[^a-z]/g,'');
+    var parts = name.trim().split(/\s+/).filter(function(p){ return !/^\(.*\)$/.test(p); });
+    return _slugify(parts[parts.length - 1] || '');
   }
 
   Object.keys(tracker).forEach(function(k) {
     var t = tracker[k];
     if((t.status === 'approved' || t.status === 'contributed') && t.amt > 0) {
-      // Parse both last name and district out of the tracker key so candidates
-      // that share a last name (Johnson, Becker, Vetter, Kessel...) don't
-      // collapse to the first match in CANDIDATES.
-      var keyBody = k.replace(/^person_/, '');
-      var _km = keyBody.match(/^(.+)_(\d+)$/);
-      var namePart = _km ? _km[1] : keyBody;
-      var distPart = _km ? parseInt(_km[2], 10) : null;
+      // Tracker keys are person_{first}_{last}_{dist}. Parse all three so
+      // candidates who share a last name (Johnson, Becker, Vetter, Kessel...)
+      // resolve to the correct CANDIDATES record. Legacy person_{last}_{dist}
+      // keys are tolerated as a fallback.
+      var body = k.replace(/^person_/, '');
+      var segs = body.split('_');
+      var firstPart = null, lastPart = null, distPart = null;
+      if(segs.length >= 3) {
+        distPart = parseInt(segs[segs.length - 1], 10);
+        lastPart = segs[segs.length - 2];
+        firstPart = segs.slice(0, segs.length - 2).join('');
+      } else if(segs.length === 2) {
+        lastPart = segs[0];
+        distPart = parseInt(segs[1], 10);
+      } else {
+        return;
+      }
 
       var cand = CANDIDATES.find(function(c) {
-        if(_lastSlug(c.name) !== namePart) return false;
+        if(firstPart && _firstSlug(c.name) !== firstPart) return false;
+        if(_lastSlug(c.name) !== lastPart) return false;
         if(distPart != null && parseInt(c.dist,10) !== distPart) return false;
         return true;
       });
-      // Legacy keys without a district — fall back to first last-name match
+      // Fallback: last name + district (handles CANDIDATES entries whose
+      // first name differs slightly from how the key was built)
       if(!cand) {
-        cand = CANDIDATES.find(function(c){ return _lastSlug(c.name) === namePart; });
+        cand = CANDIDATES.find(function(c) {
+          if(_lastSlug(c.name) !== lastPart) return false;
+          if(distPart != null && parseInt(c.dist,10) !== distPart) return false;
+          return true;
+        });
+      }
+      // Last resort: any last-name match
+      if(!cand) {
+        cand = CANDIDATES.find(function(c){ return _lastSlug(c.name) === lastPart; });
       }
       if(!cand) return;
 
