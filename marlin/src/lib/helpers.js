@@ -42,6 +42,25 @@ export function delayUpdate(boatName, newWindow) {
   return `Quick heads up on "${boatName}": a part we were waiting on slipped, so we moved your service to ${newWindow.toLowerCase()}. Nothing you need to do, we will keep you posted.`;
 }
 
+// Hours-based service math. currentHours wins over the boat's seeded hours so a
+// freshly logged reading re-evaluates what is due right away.
+export function hoursDue(b, currentHours) {
+  const hours = currentHours ?? b.hours;
+  const dueAt = (b.lastServiceHours ?? 0) + (b.hoursInterval ?? Infinity);
+  const remaining = dueAt - hours;
+  return { hours, dueAt, remaining, due: remaining <= 0, soon: remaining > 0 && remaining <= 10 };
+}
+
+// Months from NOW.month to a campaign's opening month, wrapping the year.
+export function monthsUntil(opensMonth, nowMonth) {
+  return (opensMonth - nowMonth + 12) % 12;
+}
+
+// Auto-drafted confirmation when a tech is dispatched to the boat's location.
+export function dispatchUpdate(boatName, tech, location, window) {
+  return `Booked. ${tech} will meet "${boatName}" at ${location} during ${window.toLowerCase()}. We come to you, no haul-out needed. We will text the morning of.`;
+}
+
 // On-brand recovery message. Boat name in quotes, one ask, a reason to act now, no pressure.
 export function recoveryMessage(b, item) {
   // Greet by the first name. For joint owners ("Tom & Sue Albright") that is

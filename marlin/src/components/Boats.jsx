@@ -5,7 +5,7 @@ import { owner } from "../lib/helpers.js";
 import { BOATS } from "../data/seed.js";
 import ListHeader from "./ListHeader.jsx";
 
-export default function Boats({ openRecord }) {
+export default function Boats({ boatHours = {}, openRecord }) {
   const cols = ["Boat", "Owner", "Engine", "Hours", "Next service", "Membership", "Health"];
   return (
     <div>
@@ -31,7 +31,7 @@ export default function Boats({ openRecord }) {
                 </td>
                 <td className="px-4 py-3 text-[#3a3a3a]">{owner(b.id).name}</td>
                 <td className="px-4 py-3 text-[#3a3a3a]">{b.engine}</td>
-                <td className="px-4 py-3 text-[#3a3a3a]">{b.hours} hrs</td>
+                <td className="px-4 py-3 text-[#3a3a3a]">{boatHours[b.id] ?? b.hours} hrs</td>
                 <td className="px-4 py-3">
                   {["Due now", "Overdue"].includes(b.nextService)
                     ? <Pill bg="#fde7e7" fg="#b42121">{b.nextService}</Pill>

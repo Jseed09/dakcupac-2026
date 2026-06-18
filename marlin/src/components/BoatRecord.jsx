@@ -1,13 +1,14 @@
 import React from "react";
-import { Ship, Anchor, ArrowLeft, Phone, Wrench, Users, DollarSign, BadgeCheck, Star, MessageSquare, MapPin, Droplets, Snowflake, Gauge, Package, Send } from "lucide-react";
-import { ObjIcon, Pill, HealthPill, Card } from "../lib/ui.jsx";
+import { Ship, Anchor, ArrowLeft, Phone, Wrench, Users, DollarSign, BadgeCheck, Star, MessageSquare, MapPin, Droplets, Snowflake, Gauge, Package, Send, Navigation } from "lucide-react";
+import { ObjIcon, Pill, HealthPill, Card, Path } from "../lib/ui.jsx";
 import { boat, owner, money, TIER, PART_STATE } from "../lib/helpers.js";
-import { CONTACTS, FORECAST, HISTORY, DEFERRED } from "../data/seed.js";
+import { CONTACTS, FORECAST, HISTORY, DEFERRED, STAGES } from "../data/seed.js";
 import LiveStatus from "./LiveStatus.jsx";
 
-export default function BoatRecord({ id, recordTab, setRecordTab, work, parts = [], updates = [], onBack, onCall, onDraft, advance }) {
+export default function BoatRecord({ id, recordTab, setRecordTab, work, parts = [], updates = [], hours, onBack, onCall, onDraft, advance, onDispatch }) {
   const b = boat(id);
   const o = owner(id);
+  const hrs = hours ?? b.hours;
   const job = work.find((w) => w.boatId === id);
   // Related data is keyed by boat id. Default to empty so a boat without a
   // forecast / history / contacts row renders instead of throwing.
@@ -41,13 +42,18 @@ export default function BoatRecord({ id, recordTab, setRecordTab, work, parts = 
             <button onClick={() => onCall(id)} className="flex items-center gap-1.5 border border-[#d0d0d0] text-[#0a6e8c] text-sm font-semibold rounded-md px-3 h-8 hover:bg-[#f7fbfd]">
               <Phone size={14} /> Log call
             </button>
+            {onDispatch && (
+              <button onClick={() => onDispatch(id)} className="flex items-center gap-1.5 border border-[#d0d0d0] text-[#0a6e8c] text-sm font-semibold rounded-md px-3 h-8 hover:bg-[#f7fbfd]">
+                <Navigation size={14} /> Dispatch tech
+              </button>
+            )}
             <button className="flex items-center gap-1.5 bg-[#1aa0c4] hover:bg-[#1690b0] text-white text-sm font-semibold rounded-md px-3 h-8">
               <Wrench size={14} /> New work order
             </button>
           </div>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-px bg-[#eef0f2] mt-4 rounded-md overflow-hidden border border-[#eef0f2]">
-          {[["Owner", o.name], ["HIN", b.hin], ["Engine hours", b.hours + " hrs"], ["Next service", b.nextService], ["Last service", b.lastService]].map(([k, v]) => (
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-px bg-[#eef0f2] mt-4 rounded-md overflow-hidden border border-[#eef0f2]">
+          {[["Owner", o.name], ["HIN", b.hin], ["Engine hours", hrs + " hrs"], ["Location", b.location], ["Next service", b.nextService], ["Last service", b.lastService]].map(([k, v]) => (
             <div key={k} className="bg-white px-3 py-2">
               <div className="text-[11px] text-[#9aa0a6] font-medium">{k}</div>
               <div className="text-[13px] font-semibold text-[#3a3a3a] truncate">{v}</div>
@@ -55,6 +61,12 @@ export default function BoatRecord({ id, recordTab, setRecordTab, work, parts = 
           ))}
         </div>
       </div>
+
+      {job && (
+        <div className="bg-white rounded-lg border border-[#e5e5e5] shadow-sm p-3 mb-4">
+          <Path stages={STAGES} current={job.stage} onAdvance={job.stage < STAGES.length - 1 ? () => advance(job.id) : undefined} />
+        </div>
+      )}
 
       <div className="grid lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2 space-y-4">
@@ -69,7 +81,7 @@ export default function BoatRecord({ id, recordTab, setRecordTab, work, parts = 
               <div className="p-4 grid sm:grid-cols-2 gap-4">
                 {[
                   [MapPin, "Storage", b.storage], [Droplets, "Water type", b.water], [Snowflake, "Climate", b.climate],
-                  [Gauge, "Engine hours", b.hours + " hrs"], [Ship, "Year / make", `${b.year} ${b.engine.split(" ")[0]}`], [Anchor, "HIN", b.hin],
+                  [Gauge, "Engine hours", hrs + " hrs"], [Ship, "Year / make", `${b.year} ${b.engine.split(" ")[0]}`], [Anchor, "HIN", b.hin],
                 ].map(([Icon, k, v]) => (
                   <div key={k} className="flex items-start gap-2">
                     <Icon size={16} className="text-[#9aa0a6] mt-0.5" />

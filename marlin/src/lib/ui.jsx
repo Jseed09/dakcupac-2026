@@ -23,6 +23,42 @@ export function HealthPill({ h }) {
   return <Pill bg={s.bg} fg={s.fg}>{s.label}</Pill>;
 }
 
+// Salesforce-style Path: chevron segments for a record's stages. Completed are
+// filled in the link teal, the current stage is the deep hull, the rest are grey.
+export function Path({ stages, current, onAdvance, advanceLabel }) {
+  const clipFor = (i) => {
+    const last = i === stages.length - 1;
+    if (i === 0) return "polygon(0 0, calc(100% - 13px) 0, 100% 50%, calc(100% - 13px) 100%, 0 100%)";
+    if (last) return "polygon(0 0, 100% 0, 100% 100%, 0 100%, 13px 50%)";
+    return "polygon(0 0, calc(100% - 13px) 0, 100% 50%, calc(100% - 13px) 100%, 0 100%, 13px 50%)";
+  };
+  return (
+    <div className="flex items-stretch gap-2">
+      <div className="flex-1 flex items-stretch min-w-0">
+        {stages.map((s, i) => {
+          const done = i < current, active = i === current;
+          const bg = done ? "#0a6e8c" : active ? "#032d3d" : "#e8eaec";
+          const fg = done || active ? "#ffffff" : "#5f6368";
+          return (
+            <div key={s} className="relative flex-1 min-w-0" style={{ marginLeft: i === 0 ? 0 : -13 }}>
+              <div className="h-9 flex items-center justify-center text-[11px] font-semibold px-3 truncate"
+                style={{ background: bg, color: fg, clipPath: clipFor(i), paddingLeft: i === 0 ? 12 : 18 }}
+                title={s}>
+                {s}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      {onAdvance && current < stages.length - 1 && (
+        <button onClick={onAdvance} className="shrink-0 border border-[#d0d0d0] text-[#0a6e8c] text-[12px] font-semibold rounded-md px-3 h-9 hover:bg-[#f7fbfd] whitespace-nowrap">
+          {advanceLabel || `Mark ${stages[current + 1]}`}
+        </button>
+      )}
+    </div>
+  );
+}
+
 export function Card({ title, action, children, icon: Icon }) {
   return (
     <div className="bg-white rounded-lg border border-[#e5e5e5] shadow-sm">

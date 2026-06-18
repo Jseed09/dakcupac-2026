@@ -13,13 +13,15 @@ export const OWNERS = {
   o6: { name: "Marcus Lee", phone: "(434) 555-0150", since: "2022" },
 };
 
+// hoursInterval + lastServiceHours drive the hours-based service-due math.
+// location is where a mobile tech meets the boat (dock, slip, or ramp).
 export const BOATS = [
-  { id: "b1", name: "Reel Therapy", ownerId: "o1", hin: "YAM12345K819", year: 2019, engine: "Yamaha F250 4-stroke", hours: 98, storage: "In-water slip", water: "Salt", climate: "Hard freeze", membership: "Concierge Care", health: "Attention", nextService: "Due now", lastService: "Oct 12, 2025", hue: "#0b7285" },
-  { id: "b2", name: "Second Wind", ownerId: "o2", hin: "MER88210L221", year: 2021, engine: "Mercury 300 V8 Verado", hours: 142, storage: "Dry stack", water: "Brackish", climate: "Light freeze", membership: "Concierge Care", health: "Watch", nextService: "Jul 2026", lastService: "May 2, 2026", hue: "#1971c2" },
-  { id: "b3", name: "Knot Working", ownerId: "o3", hin: "MCR55019H517", year: 2017, engine: "MerCruiser 5.0 MPI", hours: 320, storage: "Trailered", water: "Fresh", climate: "Hard freeze", membership: "None", health: "Attention", nextService: "Overdue", lastService: "Aug 9, 2024", hue: "#e8590c" },
-  { id: "b4", name: "Jenny", ownerId: "o4", hin: "YJW20FX0J920", year: 2020, engine: "Yamaha FX Cruiser (x2 skis)", hours: 60, storage: "Trailered", water: "Fresh", climate: "Light freeze", membership: "Concierge Care", health: "Good", nextService: "Sep 2026", lastService: "Apr 18, 2026", hue: "#2f9e44" },
-  { id: "b5", name: "Wet Dream", ownerId: "o5", hin: "VLP44D40F015", year: 2015, engine: "Volvo Penta D4-300", hours: 510, storage: "In-water slip", water: "Salt", climate: "Light freeze", membership: "Concierge Care", health: "Watch", nextService: "Aug 2026", lastService: "Mar 21, 2026", hue: "#5f3dc4" },
-  { id: "b6", name: "Gail Force", ownerId: "o6", hin: "SEA22RXT2K22", year: 2022, engine: "Sea-Doo RXT-X 300", hours: 22, storage: "Trailered", water: "Salt", climate: "Hard freeze", membership: "None", health: "Good", nextService: "Oct 2026", lastService: "Apr 30, 2026", hue: "#c2255c" },
+  { id: "b1", name: "Reel Therapy", ownerId: "o1", hin: "YAM12345K819", year: 2019, engine: "Yamaha F250 4-stroke", hours: 98, hoursInterval: 100, lastServiceHours: 0, location: "Bluewater Marina, Slip C7", storage: "In-water slip", water: "Salt", climate: "Hard freeze", membership: "Concierge Care", health: "Attention", nextService: "Due now", lastService: "Oct 12, 2025", hue: "#0b7285" },
+  { id: "b2", name: "Second Wind", ownerId: "o2", hin: "MER88210L221", year: 2021, engine: "Mercury 300 V8 Verado", hours: 142, hoursInterval: 100, lastServiceHours: 100, location: "Harborside Dry Stack, Bay 14", storage: "Dry stack", water: "Brackish", climate: "Light freeze", membership: "Concierge Care", health: "Watch", nextService: "Jul 2026", lastService: "May 2, 2026", hue: "#1971c2" },
+  { id: "b3", name: "Knot Working", ownerId: "o3", hin: "MCR55019H517", year: 2017, engine: "MerCruiser 5.0 MPI", hours: 320, hoursInterval: 100, lastServiceHours: 220, location: "Lake Anna ramp, Sturgeon Creek", storage: "Trailered", water: "Fresh", climate: "Hard freeze", membership: "None", health: "Attention", nextService: "Overdue", lastService: "Aug 9, 2024", hue: "#e8590c" },
+  { id: "b4", name: "Jenny", ownerId: "o4", hin: "YJW20FX0J920", year: 2020, engine: "Yamaha FX Cruiser (x2 skis)", hours: 60, hoursInterval: 50, lastServiceHours: 50, location: "Smith Mountain Lake ramp", storage: "Trailered", water: "Fresh", climate: "Light freeze", membership: "Concierge Care", health: "Good", nextService: "Sep 2026", lastService: "Apr 18, 2026", hue: "#2f9e44" },
+  { id: "b5", name: "Wet Dream", ownerId: "o5", hin: "VLP44D40F015", year: 2015, engine: "Volvo Penta D4-300", hours: 510, hoursInterval: 250, lastServiceHours: 250, location: "Tidewater Yacht Marina, Slip A22", storage: "In-water slip", water: "Salt", climate: "Light freeze", membership: "Concierge Care", health: "Watch", nextService: "Aug 2026", lastService: "Mar 21, 2026", hue: "#5f3dc4" },
+  { id: "b6", name: "Gail Force", ownerId: "o6", hin: "SEA22RXT2K22", year: 2022, engine: "Sea-Doo RXT-X 300", hours: 22, hoursInterval: 50, lastServiceHours: 0, location: "Rudee Inlet ramp", storage: "Trailered", water: "Salt", climate: "Hard freeze", membership: "None", health: "Good", nextService: "Oct 2026", lastService: "Apr 30, 2026", hue: "#c2255c" },
 ];
 
 export const CONTACTS = {
@@ -125,6 +127,20 @@ export const INITIAL_PARTS = [
 export const UPDATES_SEED = [
   { id: "u1", boatId: "b1", text: 'The lower unit seal kit for "Reel Therapy" just arrived at the shop. We can slot the work in now.', when: "1h", channel: "SMS" },
   { id: "u2", boatId: "b5", text: 'We have ordered the raw water pump for "Wet Dream". We will let you know the moment it ships.', when: "3h", channel: "SMS" },
+];
+
+// The shop's roster of mobile techs.
+export const TECHS = ["Mike Alvarez", "Carlos Mendez"];
+
+// Where "today" sits for the seasonal engine. month is 1-12. Keeping this in
+// the seam makes the demo deterministic instead of depending on the clock.
+export const NOW = { month: 6, label: "June 2026" };
+
+// Seasonal campaigns the shop already knows are coming. opensMonth is when the
+// booking window opens. applies decides which boats it is relevant to.
+export const SEASON_CAMPAIGNS = [
+  { id: "winterize", name: "Winterization and shrink-wrap", window: "Sep to Nov", opensMonth: 9, applies: (b) => b.climate.includes("freeze"), why: "Cold season is coming. Freeze damage is the costliest repair we see, and the wrap calendar fills fast." },
+  { id: "spring", name: "Spring commissioning", window: "Mar to Apr", opensMonth: 3, applies: () => true, why: "The first warm weekends book out. Reserving now smooths the spring rush." },
 ];
 
 // Home dashboard activity feed. Most recent first.
