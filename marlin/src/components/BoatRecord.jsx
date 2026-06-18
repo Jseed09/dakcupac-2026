@@ -1,11 +1,11 @@
 import React from "react";
-import { Ship, Anchor, ArrowLeft, Phone, Wrench, Users, DollarSign, BadgeCheck, Star, MessageSquare, MapPin, Droplets, Snowflake, Gauge } from "lucide-react";
+import { Ship, Anchor, ArrowLeft, Phone, Wrench, Users, DollarSign, BadgeCheck, Star, MessageSquare, MapPin, Droplets, Snowflake, Gauge, Package, Send } from "lucide-react";
 import { ObjIcon, Pill, HealthPill, Card } from "../lib/ui.jsx";
-import { boat, owner, money, TIER } from "../lib/helpers.js";
-import { CONTACTS, FORECAST, HISTORY, DEFERRED, MEMBERSHIPS } from "../data/seed.js";
+import { boat, owner, money, TIER, PART_STATE } from "../lib/helpers.js";
+import { CONTACTS, FORECAST, HISTORY, DEFERRED } from "../data/seed.js";
 import LiveStatus from "./LiveStatus.jsx";
 
-export default function BoatRecord({ id, recordTab, setRecordTab, work, onBack, onCall, onDraft, advance }) {
+export default function BoatRecord({ id, recordTab, setRecordTab, work, parts = [], updates = [], onBack, onCall, onDraft, advance }) {
   const b = boat(id);
   const o = owner(id);
   const job = work.find((w) => w.boatId === id);
@@ -14,7 +14,8 @@ export default function BoatRecord({ id, recordTab, setRecordTab, work, onBack, 
   const contacts = CONTACTS[id] ?? [];
   const forecast = FORECAST[id] ?? [];
   const history = HISTORY[id] ?? [];
-  const plan = MEMBERSHIPS.find((m) => m.boatId === id);
+  const boatParts = parts.filter((p) => p.boatId === id);
+  const boatUpdates = updates.filter((u) => u.boatId === id);
   const deferred = DEFERRED.filter((d) => d.boatId === id);
   const deferredTotal = deferred.reduce((s, d) => s + d.amount, 0);
 
@@ -161,6 +162,28 @@ export default function BoatRecord({ id, recordTab, setRecordTab, work, onBack, 
               ))}
           </Card>
 
+          {(boatParts.length > 0 || boatUpdates.length > 0) && (
+            <Card title={`Parts and updates (${boatParts.length})`} icon={Package}>
+              {boatParts.map((p) => (
+                <div key={p.id} className="flex items-center gap-2 px-4 py-2.5 border-b border-[#f4f4f4]">
+                  <div className="flex-1">
+                    <div className="text-[13px] font-semibold text-[#3a3a3a]">{p.name}</div>
+                    <div className="text-[11px] text-[#9aa0a6]">{p.supplier} · ETA {p.eta}</div>
+                  </div>
+                  <Pill bg={PART_STATE[p.status].bg} fg={PART_STATE[p.status].fg}>{PART_STATE[p.status].label}</Pill>
+                </div>
+              ))}
+              {boatUpdates.length > 0 && (
+                <div className="px-4 py-2.5">
+                  <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-[#0a6e8c] mb-1">
+                    <Send size={12} /> Last update sent
+                  </div>
+                  <div className="text-[12px] text-[#5f6368]">{boatUpdates[0].text}</div>
+                </div>
+              )}
+            </Card>
+          )}
+
           {b.membership !== "None" && (
             <Card title="Membership" icon={BadgeCheck}>
               <div className="px-4 py-3 flex items-center gap-2">
@@ -169,7 +192,6 @@ export default function BoatRecord({ id, recordTab, setRecordTab, work, onBack, 
                   <div className="text-[13px] font-semibold text-[#3a3a3a]">{b.membership}</div>
                   <div className="text-[11px] text-[#9aa0a6]">Annual plan · renews automatically</div>
                 </div>
-                {plan && <span className="font-bold text-[#3a3a3a]">{money(plan.price)}/yr</span>}
               </div>
             </Card>
           )}

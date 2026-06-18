@@ -1,10 +1,10 @@
 import React from "react";
-import { DollarSign, AlertTriangle, Wrench, BadgeCheck, Ship, ChevronRight, TrendingUp, Clock } from "lucide-react";
+import { DollarSign, AlertTriangle, Wrench, Truck, Ship, ChevronRight, TrendingUp, Clock } from "lucide-react";
 import { ObjIcon, Pill, HealthPill, Card } from "../lib/ui.jsx";
 import { boat, owner, money } from "../lib/helpers.js";
-import { BOATS, DEFERRED, MEMBERSHIPS, RECENT_ACTIVITY } from "../data/seed.js";
+import { BOATS, DEFERRED, RECENT_ACTIVITY } from "../data/seed.js";
 
-export default function Home({ recoverable, dueSoon, arr, work, openRecord }) {
+export default function Home({ recoverable, dueSoon, partsInbound, work, openRecord }) {
   const byBoat = Object.values(DEFERRED.reduce((acc, d) => {
     acc[d.boatId] = acc[d.boatId] || { boatId: d.boatId, amount: 0, count: 0 };
     acc[d.boatId].amount += d.amount; acc[d.boatId].count += 1; return acc;
@@ -14,7 +14,7 @@ export default function Home({ recoverable, dueSoon, arr, work, openRecord }) {
     { label: "Recoverable deferred work", val: money(recoverable), sub: `${DEFERRED.length} open items`, icon: DollarSign, hue: "#1b6b34" },
     { label: "Boats due now", val: dueSoon.length, sub: "needs scheduling", icon: AlertTriangle, hue: "#b42121" },
     { label: "Active work orders", val: work.length, sub: "in the shop", icon: Wrench, hue: "#1971c2" },
-    { label: "Membership ARR", val: money(arr), sub: `${MEMBERSHIPS.length} plans`, icon: BadgeCheck, hue: "#5f3dc4" },
+    { label: "Parts inbound", val: partsInbound, sub: "ordered or shipping", icon: Truck, hue: "#9a5b00" },
   ];
   return (
     <div className="space-y-5">

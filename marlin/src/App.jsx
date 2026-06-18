@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { Grid, Search, Phone, Anchor, Bell, Settings, Ship, Users, Wrench, DollarSign, Calendar, BadgeCheck } from "lucide-react";
-import { boat, owner, recoveryMessage } from "./lib/helpers.js";
-import { BOATS, DEFERRED, STAGES, INITIAL_WORK, MEMBERSHIPS } from "./data/seed.js";
+import { Grid, Search, Phone, Anchor, Bell, Settings, Ship, Users, Wrench, DollarSign, Calendar, BadgeCheck, Package } from "lucide-react";
+import { boat, recoveryMessage, partUpdate, delayUpdate } from "./lib/helpers.js";
+import { BOATS, DEFERRED, STAGES, INITIAL_WORK, INITIAL_PARTS, UPDATES_SEED, PART_STATUS, SERVICE_WINDOWS } from "./data/seed.js";
 import Home from "./components/Home.jsx";
 import Boats from "./components/Boats.jsx";
 import Owners from "./components/Owners.jsx";
@@ -10,6 +10,7 @@ import WorkOrders from "./components/WorkOrders.jsx";
 import Deferred from "./components/Deferred.jsx";
 import Schedule from "./components/Schedule.jsx";
 import Memberships from "./components/Memberships.jsx";
+import Parts from "./components/Parts.jsx";
 import ScreenPop from "./components/ScreenPop.jsx";
 import DraftModal from "./components/DraftModal.jsx";
 
@@ -18,6 +19,7 @@ const NAV = [
   ["owners", "Owners", Users],
   ["boats", "Boats", Ship],
   ["workorders", "Work Orders", Wrench],
+  ["parts", "Parts", Package],
   ["deferred", "Deferred Work", DollarSign],
   ["schedule", "Schedule", Calendar],
   ["memberships", "Memberships", BadgeCheck],
@@ -28,18 +30,44 @@ export default function App() {
   const [openBoat, setOpenBoat] = useState(null);
   const [recordTab, setRecordTab] = useState("details");
   const [work, setWork] = useState(INITIAL_WORK);
+  const [parts, setParts] = useState(INITIAL_PARTS);
+  const [updates, setUpdates] = useState(UPDATES_SEED);
   const [pop, setPop] = useState(null);
   const [draft, setDraft] = useState(null);
   const [copied, setCopied] = useState(false);
 
   const recoverable = DEFERRED.reduce((s, d) => s + d.amount, 0);
   const dueSoon = BOATS.filter((b) => ["Due now", "Overdue"].includes(b.nextService));
-  const arr = MEMBERSHIPS.reduce((s, m) => s + m.price, 0);
+  const partsInbound = parts.filter((p) => p.status < 2).length;
 
   const go = (t) => { setTab(t); setOpenBoat(null); };
   const openRecord = (id) => { setOpenBoat(id); setRecordTab("details"); setTab("boats"); setPop(null); };
   const advance = (id) => setWork((w) => w.map((x) => (x.id === id ? { ...x, stage: Math.min(x.stage + 1, STAGES.length - 1) } : x)));
   const openDraft = (boatId, item) => { setDraft({ boatId, item, text: recoveryMessage(boat(boatId), item) }); setCopied(false); };
+
+  // Prepend a customer update to the auto-sent feed.
+  const pushUpdate = (boatId, text) => setUpdates((u) => [{ id: `u${Date.now()}`, boatId, text, when: "Just now", channel: "SMS" }, ...u]);
+
+  // Advancing a part one stage texts the owner automatically.
+  const advancePart = (id) => {
+    const p = parts.find((x) => x.id === id);
+    if (!p || p.status >= PART_STATUS.length - 1) return;
+    const next = p.status + 1;
+    setParts((ps) => ps.map((x) => (x.id === id ? { ...x, status: next, notified: true } : x)));
+    pushUpdate(p.boatId, partUpdate(boat(p.boatId).name, p.name, next, p.eta));
+  };
+
+  // A delay slips the linked job to the next window and tells the owner.
+  const reportDelay = (id) => {
+    const p = parts.find((x) => x.id === id);
+    const job = p && work.find((w) => w.id === p.workId);
+    if (!job) return;
+    const i = SERVICE_WINDOWS.indexOf(job.scheduled);
+    const next = SERVICE_WINDOWS[Math.min(i + 1, SERVICE_WINDOWS.length - 1)];
+    if (next === job.scheduled) return;
+    setWork((w) => w.map((x) => (x.id === job.id ? { ...x, scheduled: next } : x)));
+    pushUpdate(p.boatId, delayUpdate(boat(p.boatId).name, next));
+  };
 
   return (
     <div className="min-h-screen w-full bg-[#f3f3f3] text-[#181818]" style={{ fontFamily: "'Segoe UI', 'Helvetica Neue', Arial, sans-serif" }}>
@@ -79,21 +107,23 @@ export default function App() {
 
       <main className="max-w-[1180px] mx-auto px-4 py-5">
         {openBoat ? (
-          <BoatRecord id={openBoat} recordTab={recordTab} setRecordTab={setRecordTab} work={work} onBack={() => setOpenBoat(null)} onCall={setPop} onDraft={openDraft} advance={advance} />
+          <BoatRecord id={openBoat} recordTab={recordTab} setRecordTab={setRecordTab} work={work} parts={parts} updates={updates} onBack={() => setOpenBoat(null)} onCall={setPop} onDraft={openDraft} advance={advance} />
         ) : tab === "home" ? (
-          <Home recoverable={recoverable} dueSoon={dueSoon} arr={arr} work={work} openRecord={openRecord} />
+          <Home recoverable={recoverable} dueSoon={dueSoon} partsInbound={partsInbound} work={work} openRecord={openRecord} />
         ) : tab === "owners" ? (
           <Owners openRecord={openRecord} />
         ) : tab === "boats" ? (
           <Boats openRecord={openRecord} />
         ) : tab === "workorders" ? (
-          <WorkOrders work={work} advance={advance} openRecord={openRecord} />
+          <WorkOrders work={work} parts={parts} advance={advance} openRecord={openRecord} />
+        ) : tab === "parts" ? (
+          <Parts parts={parts} updates={updates} work={work} advancePart={advancePart} reportDelay={reportDelay} openRecord={openRecord} />
         ) : tab === "deferred" ? (
           <Deferred recoverable={recoverable} onDraft={openDraft} openRecord={openRecord} />
         ) : tab === "schedule" ? (
           <Schedule />
         ) : (
-          <Memberships arr={arr} openRecord={openRecord} />
+          <Memberships openRecord={openRecord} />
         )}
       </main>
 

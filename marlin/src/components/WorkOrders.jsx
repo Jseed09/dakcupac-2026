@@ -1,10 +1,10 @@
 import React from "react";
-import { Wrench } from "lucide-react";
-import { boat } from "../lib/helpers.js";
-import { STAGES } from "../data/seed.js";
+import { Wrench, CalendarClock, Package } from "lucide-react";
+import { boat, PART_STATE } from "../lib/helpers.js";
+import { STAGES, PART_STATUS } from "../data/seed.js";
 import ListHeader from "./ListHeader.jsx";
 
-export default function WorkOrders({ work, advance, openRecord }) {
+export default function WorkOrders({ work, parts = [], advance, openRecord }) {
   return (
     <div>
       <ListHeader icon={Wrench} hue="#1971c2" kind="Work Orders" sub="Service pipeline" count={work.length} />
@@ -20,10 +20,27 @@ export default function WorkOrders({ work, advance, openRecord }) {
               <div className="space-y-2 min-h-[60px] bg-[#ececec] rounded-lg p-2">
                 {cards.map((w) => {
                   const b = boat(w.boatId);
+                  // The part holding the job back is the least-advanced one not yet installed.
+                  const gating = parts
+                    .filter((p) => p.workId === w.id && p.status < PART_STATUS.length - 1)
+                    .sort((a, c) => a.status - c.status)[0];
                   return (
                     <div key={w.id} className="bg-white rounded-md border border-[#e5e5e5] shadow-sm p-2.5">
                       <button onClick={() => openRecord(w.boatId)} className="font-semibold text-[#0a6e8c] text-sm hover:underline">"{b.name}"</button>
                       <div className="text-[11px] text-[#9aa0a6] mt-0.5">{b.engine}</div>
+                      {w.scheduled && (
+                        <div className="flex items-center gap-1 text-[11px] text-[#5f6368] mt-1.5">
+                          <CalendarClock size={12} className="text-[#9aa0a6]" /> {w.scheduled}
+                        </div>
+                      )}
+                      {gating && (
+                        <div className="flex items-center gap-1 mt-1.5">
+                          <Package size={12} style={{ color: PART_STATE[gating.status].dot }} />
+                          <span className="text-[11px] font-semibold" style={{ color: PART_STATE[gating.status].fg }}>
+                            Part {PART_STATE[gating.status].label.toLowerCase()}
+                          </span>
+                        </div>
+                      )}
                       <div className="flex items-center justify-between mt-2">
                         <span className="text-[11px] text-[#5f6368]">{w.tech.split(" ")[0]} · {w.opened}</span>
                         {si < STAGES.length - 1 &&

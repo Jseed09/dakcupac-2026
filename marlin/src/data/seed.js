@@ -94,12 +94,38 @@ export const DEFERRED = [
 export const STAGES = ["Checked in", "Diagnosed", "Quote sent", "Approved", "Parts staged", "In progress", "Quality check", "Ready"];
 
 export const INITIAL_WORK = [
-  { id: "w1", boatId: "b1", stage: 5, tech: "Mike Alvarez", opened: "Jun 16" },
-  { id: "w2", boatId: "b5", stage: 2, tech: "Carlos Mendez", opened: "Jun 17" },
-  { id: "w3", boatId: "b2", stage: 0, tech: "Mike Alvarez", opened: "Jun 18" },
+  { id: "w1", boatId: "b1", stage: 5, tech: "Mike Alvarez", opened: "Jun 16", scheduled: "Week of Jun 23" },
+  { id: "w2", boatId: "b5", stage: 2, tech: "Carlos Mendez", opened: "Jun 17", scheduled: "Week of Jul 7" },
+  { id: "w3", boatId: "b2", stage: 0, tech: "Mike Alvarez", opened: "Jun 18", scheduled: "Week of Jul 14" },
 ];
 
-export const MEMBERSHIPS = BOATS.filter((b) => b.membership !== "None").map((b) => ({ boatId: b.id, plan: b.membership, price: 720 }));
+export const MEMBERSHIPS = BOATS.filter((b) => b.membership !== "None").map((b) => ({ boatId: b.id, plan: b.membership }));
+
+// Parts pipeline. Each part belongs to a work order (workId) and a boat.
+// status is an index into PART_STATUS. Advancing a part is what triggers the
+// automatic customer update, so the owner hears it from the system, not a call.
+export const PART_STATUS = ["Ordered", "Inbound", "Arrived", "Installed"];
+
+// Bookable service windows in order. A delay moves a job to the next window.
+export const SERVICE_WINDOWS = [
+  "Week of Jun 23", "Week of Jun 30", "Week of Jul 7", "Week of Jul 14",
+  "Week of Jul 21", "Week of Aug 4", "Week of Aug 18",
+];
+
+export const INITIAL_PARTS = [
+  { id: "p1", workId: "w1", boatId: "b1", name: "Water pump impeller kit", supplier: "Yamaha OEM", status: 1, eta: "Jun 20", notified: true },
+  { id: "p2", workId: "w1", boatId: "b1", name: "Lower unit seal kit", supplier: "Sierra", status: 2, eta: "Arrived Jun 18", notified: true },
+  { id: "p3", workId: "w2", boatId: "b5", name: "Raw water pump", supplier: "Volvo Penta", status: 0, eta: "Jun 24", notified: false },
+  { id: "p4", workId: "w3", boatId: "b2", name: "Reconditioned prop", supplier: "Coastal Prop", status: 1, eta: "Jun 23", notified: true },
+];
+
+// Customer updates that have already gone out. New ones get prepended as parts
+// advance or jobs slip. The whole point: the customer is kept current without
+// the shop having to stop and call.
+export const UPDATES_SEED = [
+  { id: "u1", boatId: "b1", text: 'The lower unit seal kit for "Reel Therapy" just arrived at the shop. We can slot the work in now.', when: "1h", channel: "SMS" },
+  { id: "u2", boatId: "b5", text: 'We have ordered the raw water pump for "Wet Dream". We will let you know the moment it ships.', when: "3h", channel: "SMS" },
+];
 
 // Home dashboard activity feed. Most recent first.
 export const RECENT_ACTIVITY = [
