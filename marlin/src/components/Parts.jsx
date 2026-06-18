@@ -13,7 +13,7 @@ export default function Parts({ parts, updates, work, advancePart, reportDelay, 
       <ListHeader icon={Package} hue="#0b7285" kind="Parts" sub="Inbound parts and customer updates" count={parts.length} />
 
       <div className="bg-[#f7fbfd] border border-[#dcebf1] rounded-lg p-4 mb-4 flex items-start gap-3">
-        <Send size={18} className="text-[#0a6e8c] mt-0.5 shrink-0" />
+        <Send size={18} className="text-[#0176d3] mt-0.5 shrink-0" />
         <div className="text-[13px] text-[#3a3a3a]">
           Every step here texts the owner automatically. When a part ships, lands, or a job slips, they hear it from
           the system. No stopping the job to return a call.
@@ -27,9 +27,9 @@ export default function Parts({ parts, updates, work, advancePart, reportDelay, 
             const job = work.find((w) => w.id === p.workId);
             const installed = p.status >= PART_STATUS.length - 1;
             return (
-              <div key={p.id} className="bg-white rounded-lg border border-[#e5e5e5] shadow-sm p-4">
+              <div key={p.id} className="bg-white rounded-lg border border-[#dddbda] shadow-sm p-4">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <button onClick={() => openRecord(p.boatId)} className="font-semibold text-[#0a6e8c] hover:underline">"{b.name}"</button>
+                  <button onClick={() => openRecord(p.boatId)} className="font-semibold text-[#0176d3] hover:underline">"{b.name}"</button>
                   <span className="text-[13px] text-[#3a3a3a]">· {p.name}</span>
                   <Pill bg={PART_STATE[p.status].bg} fg={PART_STATE[p.status].fg}>{PART_STATE[p.status].label}</Pill>
                   {p.notified && <span className="text-[11px] text-[#1b6b34] font-semibold">Customer notified</span>}
@@ -46,7 +46,7 @@ export default function Parts({ parts, updates, work, advancePart, reportDelay, 
                           <Icon size={16} color={reached ? PART_STATE[i].dot : "#d0d4d8"} />
                           <span className={"text-[10px] " + (reached ? "text-[#3a3a3a] font-semibold" : "text-[#9aa0a6]")}>{label}</span>
                         </div>
-                        {i < PART_STATUS.length - 1 && <span className="flex-1 h-px" style={{ background: i < p.status ? PART_STATE[i + 1].dot : "#e5e5e5" }} />}
+                        {i < PART_STATUS.length - 1 && <span className="flex-1 h-px" style={{ background: i < p.status ? PART_STATE[i + 1].dot : "#dddbda" }} />}
                       </React.Fragment>
                     );
                   })}
@@ -62,7 +62,7 @@ export default function Parts({ parts, updates, work, advancePart, reportDelay, 
                       Report delay
                     </button>
                     {!installed && (
-                      <button onClick={() => advancePart(p.id)} className="text-[12px] font-semibold text-white bg-[#1aa0c4] hover:bg-[#1690b0] rounded-md px-2.5 h-7">
+                      <button onClick={() => advancePart(p.id)} className="text-[12px] font-semibold text-white bg-[#0176d3] hover:bg-[#015fb0] rounded-md px-2.5 h-7">
                         Mark {PART_STATUS[p.status + 1]}
                       </button>
                     )}
@@ -77,7 +77,7 @@ export default function Parts({ parts, updates, work, advancePart, reportDelay, 
           {updates.map((u) => (
             <div key={u.id} className="px-4 py-3 border-b border-[#f4f4f4] last:border-0">
               <div className="flex items-center justify-between">
-                <button onClick={() => openRecord(u.boatId)} className="text-[12px] font-semibold text-[#0a6e8c] hover:underline">"{boat(u.boatId).name}"</button>
+                <button onClick={() => openRecord(u.boatId)} className="text-[12px] font-semibold text-[#0176d3] hover:underline">"{boat(u.boatId).name}"</button>
                 <span className="text-[11px] text-[#9aa0a6]">{u.channel} · {u.when}</span>
               </div>
               <div className="text-[13px] text-[#3a3a3a] mt-1">{u.text}</div>

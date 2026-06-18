@@ -22,11 +22,11 @@ export default function BoatRecord({ id, recordTab, setRecordTab, work, parts = 
 
   return (
     <div>
-      <button onClick={onBack} className="flex items-center gap-1 text-sm text-[#0a6e8c] font-semibold mb-3 hover:underline">
+      <button onClick={onBack} className="flex items-center gap-1 text-sm text-[#0176d3] font-semibold mb-3 hover:underline">
         <ArrowLeft size={15} /> Boats
       </button>
 
-      <div className="bg-white rounded-lg border border-[#e5e5e5] shadow-sm p-4 mb-4">
+      <div className="bg-white rounded-lg border border-[#dddbda] shadow-sm p-4 mb-4">
         <div className="flex items-start gap-3">
           <ObjIcon icon={Ship} hue={b.hue} size={44} />
           <div className="flex-1 min-w-0">
@@ -39,15 +39,15 @@ export default function BoatRecord({ id, recordTab, setRecordTab, work, parts = 
             <div className="text-sm text-[#706e6b] mt-0.5">{b.year} · {b.engine}</div>
           </div>
           <div className="flex gap-2">
-            <button onClick={() => onCall(id)} className="flex items-center gap-1.5 border border-[#d0d0d0] text-[#0a6e8c] text-sm font-semibold rounded-md px-3 h-8 hover:bg-[#f7fbfd]">
+            <button onClick={() => onCall(id)} className="flex items-center gap-1.5 border border-[#d0d0d0] text-[#0176d3] text-sm font-semibold rounded-md px-3 h-8 hover:bg-[#f7fbfd]">
               <Phone size={14} /> Log call
             </button>
             {onDispatch && (
-              <button onClick={() => onDispatch(id)} className="flex items-center gap-1.5 border border-[#d0d0d0] text-[#0a6e8c] text-sm font-semibold rounded-md px-3 h-8 hover:bg-[#f7fbfd]">
+              <button onClick={() => onDispatch(id)} className="flex items-center gap-1.5 border border-[#d0d0d0] text-[#0176d3] text-sm font-semibold rounded-md px-3 h-8 hover:bg-[#f7fbfd]">
                 <Navigation size={14} /> Dispatch tech
               </button>
             )}
-            <button className="flex items-center gap-1.5 bg-[#1aa0c4] hover:bg-[#1690b0] text-white text-sm font-semibold rounded-md px-3 h-8">
+            <button className="flex items-center gap-1.5 bg-[#0176d3] hover:bg-[#015fb0] text-white text-sm font-semibold rounded-md px-3 h-8">
               <Wrench size={14} /> New work order
             </button>
           </div>
@@ -63,17 +63,17 @@ export default function BoatRecord({ id, recordTab, setRecordTab, work, parts = 
       </div>
 
       {job && (
-        <div className="bg-white rounded-lg border border-[#e5e5e5] shadow-sm p-3 mb-4">
+        <div className="bg-white rounded-lg border border-[#dddbda] shadow-sm p-3 mb-4">
           <Path stages={STAGES} current={job.stage} onAdvance={job.stage < STAGES.length - 1 ? () => advance(job.id) : undefined} />
         </div>
       )}
 
       <div className="grid lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2 space-y-4">
-          <div className="bg-white rounded-lg border border-[#e5e5e5] shadow-sm">
+          <div className="bg-white rounded-lg border border-[#dddbda] shadow-sm">
             <div className="flex border-b border-[#eef0f2] px-2">
               {[["details", "Details"], ["maintenance", "Maintenance forecast"], ["history", "Service history"]].map(([k, l]) => (
-                <button key={k} onClick={() => setRecordTab(k)} className={"px-3 py-2.5 text-[13px] border-b-[3px] -mb-px " + (recordTab === k ? "border-[#1aa0c4] text-[#0a6e8c] font-semibold" : "border-transparent text-[#706e6b] hover:text-[#3a3a3a]")}>{l}</button>
+                <button key={k} onClick={() => setRecordTab(k)} className={"px-3 py-2.5 text-[13px] border-b-[3px] -mb-px " + (recordTab === k ? "border-[#0176d3] text-[#0176d3] font-semibold" : "border-transparent text-[#706e6b] hover:text-[#3a3a3a]")}>{l}</button>
               ))}
             </div>
 
@@ -121,10 +121,10 @@ export default function BoatRecord({ id, recordTab, setRecordTab, work, parts = 
             {recordTab === "history" && (
               <div className="p-4">
                 <div className="relative pl-5">
-                  <span className="absolute left-[6px] top-1 bottom-1 w-px bg-[#e5e5e5]" />
+                  <span className="absolute left-[6px] top-1 bottom-1 w-px bg-[#dddbda]" />
                   {history.map((h) => (
                     <div key={h.date} className="relative pb-4 last:pb-0">
-                      <span className="absolute -left-[15px] top-1 w-3 h-3 rounded-full bg-white border-2 border-[#1aa0c4]" />
+                      <span className="absolute -left-[15px] top-1 w-3 h-3 rounded-full bg-white border-2 border-[#0176d3]" />
                       <div className="text-[13px] font-semibold text-[#222]">{h.date}</div>
                       <div className="text-[13px] text-[#5f6368]">{h.note}</div>
                       <div className="text-[12px] text-[#9aa0a6] mt-0.5">Tech: {h.tech}</div>
@@ -166,7 +166,7 @@ export default function BoatRecord({ id, recordTab, setRecordTab, work, parts = 
                   </div>
                   <div className="flex items-center justify-between mt-1">
                     <span className="text-[11px] text-[#9aa0a6]">Quoted {d.quoted}</span>
-                    <button onClick={() => onDraft(id, d.item)} className="flex items-center gap-1 text-[12px] font-semibold text-[#0a6e8c] hover:underline">
+                    <button onClick={() => onDraft(id, d.item)} className="flex items-center gap-1 text-[12px] font-semibold text-[#0176d3] hover:underline">
                       <MessageSquare size={12} /> Draft recovery text
                     </button>
                   </div>
@@ -187,7 +187,7 @@ export default function BoatRecord({ id, recordTab, setRecordTab, work, parts = 
               ))}
               {boatUpdates.length > 0 && (
                 <div className="px-4 py-2.5">
-                  <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-[#0a6e8c] mb-1">
+                  <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-[#0176d3] mb-1">
                     <Send size={12} /> Last update sent
                   </div>
                   <div className="text-[12px] text-[#5f6368]">{boatUpdates[0].text}</div>

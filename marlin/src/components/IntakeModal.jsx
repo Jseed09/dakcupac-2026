@@ -23,7 +23,7 @@ export default function IntakeModal({ boatHours, onSubmit, onClose }) {
     <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4" onClick={onClose}>
       <div role="dialog" aria-modal="true" aria-label="Log engine hours" onClick={(e) => e.stopPropagation()} className="bg-white w-full max-w-md rounded-xl shadow-2xl overflow-hidden">
         <div className="px-4 py-3 border-b border-[#eef0f2] flex items-center gap-2">
-          <Gauge size={16} className="text-[#0a6e8c]" />
+          <Gauge size={16} className="text-[#0176d3]" />
           <span className="font-bold">Log engine hours</span>
           <button onClick={onClose} aria-label="Close" className="ml-auto p-1 rounded hover:bg-[#f3f3f3]"><X size={18} /></button>
         </div>
@@ -59,7 +59,7 @@ export default function IntakeModal({ boatHours, onSubmit, onClose }) {
           )}
 
           <div className="flex gap-2 pt-1">
-            <button disabled={!valid} onClick={() => onSubmit(boatId, entered)} className={"flex-1 text-white text-sm font-semibold rounded-md h-9 " + (valid ? "bg-[#1aa0c4] hover:bg-[#1690b0]" : "bg-[#9fd0de] cursor-not-allowed")}>
+            <button disabled={!valid} onClick={() => onSubmit(boatId, entered)} className={"flex-1 text-white text-sm font-semibold rounded-md h-9 " + (valid ? "bg-[#0176d3] hover:bg-[#015fb0]" : "bg-[#9fd0de] cursor-not-allowed")}>
               Save reading
             </button>
             <button onClick={onClose} className="border border-[#d0d0d0] text-[#5f6368] text-sm font-semibold rounded-md px-3 h-9 hover:bg-[#f7f7f7]">Cancel</button>

@@ -31,7 +31,7 @@ export default function FollowUps({ boatHours, dispatches, openRecord, onDispatc
       <div className="flex items-center gap-3 px-4 py-3 border-b border-[#f4f4f4] last:border-0">
         <ObjIcon icon={Ship} hue={b.hue} size={30} />
         <div className="flex-1 min-w-0">
-          <button onClick={() => openRecord(id)} className="font-semibold text-[#0a6e8c] hover:underline">"{b.name}"</button>
+          <button onClick={() => openRecord(id)} className="font-semibold text-[#0176d3] hover:underline">"{b.name}"</button>
           <span className="text-xs text-[#706e6b] ml-2">{owner(id).name}</span>
           <div className="text-[12px] text-[#5f6368] mt-0.5">{reason}</div>
           <div className="text-[11px] text-[#9aa0a6] mt-0.5">{b.location}</div>
@@ -40,7 +40,7 @@ export default function FollowUps({ boatHours, dispatches, openRecord, onDispatc
           {children}
           {dispatched(id)
             ? <Pill bg="#e6f4ea" fg="#1b6b34"><CheckCircle2 size={11} /> Tech dispatched</Pill>
-            : <button onClick={() => onDispatch(id, reason)} className="flex items-center gap-1.5 bg-[#1aa0c4] hover:bg-[#1690b0] text-white text-[12px] font-semibold rounded-md px-2.5 h-7">
+            : <button onClick={() => onDispatch(id, reason)} className="flex items-center gap-1.5 bg-[#0176d3] hover:bg-[#015fb0] text-white text-[12px] font-semibold rounded-md px-2.5 h-7">
                 <Navigation size={13} /> Dispatch tech
               </button>}
         </div>
@@ -92,7 +92,7 @@ export default function FollowUps({ boatHours, dispatches, openRecord, onDispatc
         <Card title="Quoted work never closed" icon={DollarSign} action={<span className="text-sm font-bold text-[#1b6b34]">{money(onTable)}</span>}>
           {deferredByBoat.map((r) => (
             <Row key={r.boatId} id={r.boatId} reason={`${r.count} quoted item${r.count > 1 ? "s" : ""} worth ${money(r.amount)}, still open.`}>
-              <button onClick={() => onDraft(r.boatId, "the quoted work we flagged")} className="flex items-center gap-1.5 border border-[#d0d0d0] text-[#0a6e8c] text-[12px] font-semibold rounded-md px-2.5 h-7 hover:bg-[#f7fbfd]">
+              <button onClick={() => onDraft(r.boatId, "the quoted work we flagged")} className="flex items-center gap-1.5 border border-[#d0d0d0] text-[#0176d3] text-[12px] font-semibold rounded-md px-2.5 h-7 hover:bg-[#f7fbfd]">
                 <MessageSquare size={13} /> Follow up
               </button>
             </Row>

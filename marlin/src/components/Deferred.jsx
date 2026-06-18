@@ -21,15 +21,15 @@ export default function Deferred({ recoverable, onDraft, openRecord }) {
       </div>
       <DataTable cols={["Boat", "Item", "Quoted", "Amount", ""]}>
         {[...DEFERRED].sort((a, b) => b.amount - a.amount).map((d) => (
-          <tr key={d.id} className="border-b border-[#e5e5e5] last:border-0 hover:bg-[#f3f2f2]">
+          <tr key={d.id} className="border-b border-[#dddbda] last:border-0 hover:bg-[#f3f2f2]">
             <td className="px-4 py-3">
-              <button onClick={() => openRecord(d.boatId)} className="font-semibold text-[#0a6e8c] hover:underline">"{boat(d.boatId).name}"</button>
+              <button onClick={() => openRecord(d.boatId)} className="font-semibold text-[#0176d3] hover:underline">"{boat(d.boatId).name}"</button>
             </td>
             <td className="px-4 py-3 text-[#3a3a3a]">{d.item}</td>
             <td className="px-4 py-3 text-[#706e6b]">{d.quoted}</td>
             <td className="px-4 py-3 font-bold text-[#1b6b34]">{money(d.amount)}</td>
             <td className="px-4 py-3 text-right">
-              <button onClick={() => onDraft(d.boatId, d.item)} className="inline-flex items-center gap-1.5 border border-[#d0d0d0] text-[#0a6e8c] text-[12px] font-semibold rounded-md px-2.5 h-7 hover:bg-[#f7fbfd]">
+              <button onClick={() => onDraft(d.boatId, d.item)} className="inline-flex items-center gap-1.5 border border-[#d0d0d0] text-[#0176d3] text-[12px] font-semibold rounded-md px-2.5 h-7 hover:bg-[#f7fbfd]">
                 <MessageSquare size={13} /> Draft recovery text
               </button>
             </td>

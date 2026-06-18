@@ -12,13 +12,13 @@ export default function Owners({ openRecord }) {
         {Object.entries(OWNERS).map(([oid, o]) => {
           const owned = BOATS.filter((b) => b.ownerId === oid);
           return (
-            <tr key={oid} className="border-b border-[#e5e5e5] last:border-0 hover:bg-[#f3f2f2]">
+            <tr key={oid} className="border-b border-[#dddbda] last:border-0 hover:bg-[#f3f2f2]">
               <td className="px-4 py-3">
                 <div className="flex items-center gap-2">
                   <span className="w-7 h-7 rounded-full bg-[#1971c2] grid place-items-center text-white text-xs font-bold">
                     {o.name.split(" ").map((n) => n[0]).slice(0, 2).join("")}
                   </span>
-                  <span className="font-semibold text-[#0a6e8c]">{o.name}</span>
+                  <span className="font-semibold text-[#0176d3]">{o.name}</span>
                 </div>
               </td>
               <td className="px-4 py-3 text-[#3a3a3a]">{o.phone}</td>
@@ -26,7 +26,7 @@ export default function Owners({ openRecord }) {
               <td className="px-4 py-3">
                 <div className="flex flex-wrap gap-1.5">
                   {owned.map((b) => (
-                    <button key={b.id} onClick={() => openRecord(b.id)} className="text-xs font-semibold text-[#0a6e8c] bg-[#e9f5f9] rounded-full px-2 py-0.5 hover:bg-[#d6edf4]">
+                    <button key={b.id} onClick={() => openRecord(b.id)} className="text-xs font-semibold text-[#0176d3] bg-[#e9f5f9] rounded-full px-2 py-0.5 hover:bg-[#d6edf4]">
                       "{b.name}"
                     </button>
                   ))}

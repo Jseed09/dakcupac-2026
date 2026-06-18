@@ -20,7 +20,7 @@ export const TIER = {
 export const PART_STATE = [
   { label: "Ordered", fg: "#5f6368", bg: "#eef0f2", dot: "#9aa0a6" },
   { label: "Inbound", fg: "#9a5b00", bg: "#fff4e0", dot: "#c47f04" },
-  { label: "Arrived", fg: "#0a6e8c", bg: "#e9f5f9", dot: "#1aa0c4" },
+  { label: "Arrived", fg: "#0176d3", bg: "#e9f5f9", dot: "#0176d3" },
   { label: "Installed", fg: "#1b6b34", bg: "#e6f4ea", dot: "#1b6b34" },
 ];
 

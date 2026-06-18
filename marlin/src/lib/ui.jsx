@@ -37,7 +37,7 @@ export function Path({ stages, current, onAdvance, advanceLabel }) {
       <div className="flex-1 flex items-stretch min-w-0">
         {stages.map((s, i) => {
           const done = i < current, active = i === current;
-          const bg = done ? "#0a6e8c" : active ? "#032d3d" : "#e8eaec";
+          const bg = done ? "#0176d3" : active ? "#16325c" : "#e8eaec";
           const fg = done || active ? "#ffffff" : "#5f6368";
           return (
             <div key={s} className="relative flex-1 min-w-0" style={{ marginLeft: i === 0 ? 0 : -13 }}>
@@ -51,7 +51,7 @@ export function Path({ stages, current, onAdvance, advanceLabel }) {
         })}
       </div>
       {onAdvance && current < stages.length - 1 && (
-        <button onClick={onAdvance} className="shrink-0 border border-[#d0d0d0] text-[#0a6e8c] text-[12px] font-semibold rounded-md px-3 h-9 hover:bg-[#f7fbfd] whitespace-nowrap">
+        <button onClick={onAdvance} className="shrink-0 border border-[#d0d0d0] text-[#0176d3] text-[12px] font-semibold rounded-md px-3 h-9 hover:bg-[#f7fbfd] whitespace-nowrap">
           {advanceLabel || `Mark ${stages[current + 1]}`}
         </button>
       )}
@@ -63,7 +63,7 @@ export function Card({ title, action, children, icon: Icon }) {
   return (
     <div className="bg-white rounded-lg border border-[#dddbda] shadow-[0_2px_2px_rgba(0,0,0,0.05)]">
       {title && (
-        <div className="flex items-center justify-between px-4 py-2.5 border-b border-[#e5e5e5]">
+        <div className="flex items-center justify-between px-4 py-2.5 border-b border-[#dddbda]">
           <div className="flex items-center gap-2 text-[#080707] font-bold text-[15px]">
             {Icon && <Icon size={15} className="text-[#706e6b]" />}{title}
           </div>

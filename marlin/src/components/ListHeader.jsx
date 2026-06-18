@@ -10,7 +10,7 @@ export default function ListHeader({ icon, hue, kind, count, sub }) {
       <ObjIcon icon={icon} hue={hue} size={36} />
       <div className="min-w-0">
         <div className="text-[12px] text-[#706e6b] font-medium leading-tight">{kind}</div>
-        <button className="flex items-center gap-1 font-bold text-[19px] leading-tight text-[#181818] hover:text-[#0a6e8c]">
+        <button className="flex items-center gap-1 font-bold text-[19px] leading-tight text-[#181818] hover:text-[#0176d3]">
           {sub} <ChevronDown size={16} className="text-[#706e6b]" />
         </button>
         <div className="text-[12px] text-[#706e6b] leading-tight">{count} items · updated a few seconds ago</div>
@@ -20,7 +20,7 @@ export default function ListHeader({ icon, hue, kind, count, sub }) {
         <button aria-label="Refresh" className="grid place-items-center w-8 h-8 rounded-md border border-[#d0d0d0] text-[#5f6368] hover:bg-[#f3f3f3]"><RefreshCw size={15} /></button>
         <button aria-label="Filters" className="grid place-items-center w-8 h-8 rounded-md border border-[#d0d0d0] text-[#5f6368] hover:bg-[#f3f3f3]"><Filter size={15} /></button>
         <button aria-label="List settings" className="grid place-items-center w-8 h-8 rounded-md border border-[#d0d0d0] text-[#5f6368] hover:bg-[#f3f3f3]"><Settings2 size={15} /></button>
-        <button className="flex items-center gap-1.5 bg-[#1aa0c4] hover:bg-[#1690b0] text-white text-sm font-semibold rounded-md px-3 h-8 ml-1">
+        <button className="flex items-center gap-1.5 bg-[#0176d3] hover:bg-[#015fb0] text-white text-sm font-semibold rounded-md px-3 h-8 ml-1">
           <Plus size={15} /> New
         </button>
       </div>

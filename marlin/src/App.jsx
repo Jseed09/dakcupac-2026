@@ -91,7 +91,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen w-full bg-[#f3f3f3] text-[#181818]" style={{ fontFamily: "'Inter', 'Salesforce Sans', -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" }}>
-      <header className="bg-[#032d3d] text-white">
+      <header className="bg-[#16325c] text-white">
         <div className="flex items-center gap-3 px-4 h-14">
           <button className="p-1.5 rounded hover:bg-white/10" title="App launcher" aria-label="App launcher"><Grid size={18} /></button>
           <div className="flex items-center gap-2 pr-3 mr-1 border-r border-white/15">
@@ -110,27 +110,28 @@ export default function App() {
           <button onClick={() => setIntake(true)} className="ml-auto flex items-center gap-2 border border-white/25 text-white text-sm font-semibold rounded-md px-3 h-9 hover:bg-white/10">
             <Gauge size={15} /> <span className="hidden sm:inline">Log hours</span>
           </button>
-          <button onClick={() => setPop("b1")} className="flex items-center gap-2 bg-[#1aa0c4] hover:bg-[#1690b0] text-white text-sm font-semibold rounded-md px-3 h-9">
+          <button onClick={() => setPop("b1")} className="flex items-center gap-2 bg-[#0176d3] hover:bg-[#015fb0] text-white text-sm font-semibold rounded-md px-3 h-9">
             <Phone size={15} /> <span className="hidden sm:inline">Simulate call</span>
           </button>
           <button className="p-1.5 rounded hover:bg-white/10" aria-label="Help"><HelpCircle size={18} /></button>
           <button className="p-1.5 rounded hover:bg-white/10" aria-label="Setup"><Settings size={18} /></button>
           <button className="p-1.5 rounded hover:bg-white/10" aria-label="Notifications"><Bell size={18} /></button>
-          <span className="w-8 h-8 rounded-full bg-[#1aa0c4] grid place-items-center text-xs font-bold">MA</span>
+          <span className="w-8 h-8 rounded-full bg-[#0176d3] grid place-items-center text-xs font-bold">MA</span>
         </div>
 
-        <nav className="flex items-stretch px-2 gap-1 bg-[#053a4e] overflow-x-auto">
-          {NAV.map(([id, label, Icon]) => {
-            const active = tab === id;
-            return (
-              <button key={id} onClick={() => go(id)} className={"group flex items-center gap-2 px-3 py-2.5 text-[13px] whitespace-nowrap border-b-[3px] " + (active ? "border-[#1aa0c4] text-white font-semibold bg-white/5" : "border-transparent text-white/70 hover:text-white hover:bg-white/5")}>
-                <Icon size={15} />{label}
-                <ChevronDown size={13} className="text-white/40 group-hover:text-white/70" />
-              </button>
-            );
-          })}
-        </nav>
       </header>
+
+      <nav className="flex items-stretch px-3 gap-1 bg-white border-b border-[#dddbda] shadow-[0_2px_2px_rgba(0,0,0,0.04)] overflow-x-auto">
+        {NAV.map(([id, label, Icon]) => {
+          const active = tab === id;
+          return (
+            <button key={id} onClick={() => go(id)} className={"group flex items-center gap-2 px-3 py-2.5 text-[13px] whitespace-nowrap border-b-[3px] " + (active ? "border-[#0176d3] text-[#0176d3] font-semibold" : "border-transparent text-[#3e3e3c] hover:text-[#0176d3] hover:bg-[#f3f3f3]")}>
+              <Icon size={15} />{label}
+              <ChevronDown size={13} className="text-[#b0adab] group-hover:text-[#706e6b]" />
+            </button>
+          );
+        })}
+      </nav>
 
       <main className="max-w-[1180px] mx-auto px-4 py-5">
         {openBoat ? (

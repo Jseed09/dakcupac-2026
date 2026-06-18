@@ -12,12 +12,12 @@ export default function Boats({ boatHours = {}, openRecord }) {
       <ListHeader icon={Ship} hue="#0b7285" kind="Boats" sub="All vessels" count={BOATS.length} />
       <DataTable cols={cols}>
         {BOATS.map((b) => (
-          <tr key={b.id} onClick={() => openRecord(b.id)} className="border-b border-[#e5e5e5] last:border-0 hover:bg-[#f3f2f2] cursor-pointer">
+          <tr key={b.id} onClick={() => openRecord(b.id)} className="border-b border-[#dddbda] last:border-0 hover:bg-[#f3f2f2] cursor-pointer">
             <td className="px-4 py-3">
               <div className="flex items-center gap-2">
                 <ObjIcon icon={Ship} hue={b.hue} size={26} />
                 <div>
-                  <div className="font-semibold text-[#0a6e8c]">"{b.name}"</div>
+                  <div className="font-semibold text-[#0176d3]">"{b.name}"</div>
                   <div className="text-[11px] text-[#9aa0a6]">{b.hin}</div>
                 </div>
               </div>
