@@ -34,7 +34,8 @@ persists and transfers. When you add features, keep the boat at the center.
   real API/database layer. Keep the shapes stable or update consumers.
 - `src/lib/helpers.js` — `boat(id)`, `owner(id)`, `money(n)`, the HEALTH and TIER
   color maps, and `recoveryMessage(boat, item)`.
-- `src/lib/ui.jsx` — shared presentational pieces: ObjIcon, Pill, HealthPill, Card.
+- `src/lib/ui.jsx` — shared presentational pieces: ObjIcon, Pill, HealthPill, Card,
+  Path (Salesforce-style chevron stage bar), DataTable (SLDS list table shell).
 - `src/components/*` — one file per view or feature. ListHeader is shared by the
   list views. LiveStatus renders inside BoatRecord.
 
@@ -59,12 +60,19 @@ overlays.
 - No em dashes. Use periods, commas, colons, or parentheses.
 - Plain, active voice. Name things by what the user controls.
 
-## Color tokens in use
+## Look and feel (Salesforce Lightning, boating brand)
+The target is to read like Salesforce Lightning Experience with a marine brand.
+Match SLDS patterns: global header + object nav, list-view headers, record
+highlights panel, Path chevrons, data tables with row-action carets.
+
+- Font: Inter (loaded in index.html), falling back to the system sans stack.
 - Brand header: #032d3d (deep hull), nav bar #053a4e, accent #1aa0c4
-- App background #f3f3f3, cards white with #e5e5e5 borders
-- Link/record text #0a6e8c
+- App background #f3f3f3, cards white with #dddbda (SLDS) borders
+- Table header #fafaf9, row hover #f3f2f2, borders #dddbda
+- Link/record text #0a6e8c (the boating spin on SLDS link blue)
 - Health: green #1b6b34, amber #9a5b00, red #b42121
 - Tier bars: Needed #b42121, Recommended #c47f04, Watch #9aa0a6
+- Part stages: Ordered grey, Inbound #c47f04, Arrived #1aa0c4, Installed #1b6b34
 
 ## Good next tasks (build order from the product ledger)
 1. Effortless ingestion: parse QuickBooks / scan paper invoices into the asset graph.

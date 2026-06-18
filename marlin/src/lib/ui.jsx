@@ -61,16 +61,35 @@ export function Path({ stages, current, onAdvance, advanceLabel }) {
 
 export function Card({ title, action, children, icon: Icon }) {
   return (
-    <div className="bg-white rounded-lg border border-[#e5e5e5] shadow-sm">
+    <div className="bg-white rounded-lg border border-[#dddbda] shadow-[0_2px_2px_rgba(0,0,0,0.05)]">
       {title && (
-        <div className="flex items-center justify-between px-4 py-2.5 border-b border-[#f0f0f0]">
-          <div className="flex items-center gap-2 text-[#181818] font-semibold text-sm">
+        <div className="flex items-center justify-between px-4 py-2.5 border-b border-[#e5e5e5]">
+          <div className="flex items-center gap-2 text-[#080707] font-bold text-[15px]">
             {Icon && <Icon size={15} className="text-[#706e6b]" />}{title}
           </div>
           {action}
         </div>
       )}
       <div>{children}</div>
+    </div>
+  );
+}
+
+// Salesforce-style data table shell: subtle header, hover rows, SLDS borders,
+// and a trailing row-action chevron column. cols is an array of header labels;
+// rows render via the children render function for full control.
+export function DataTable({ cols, children }) {
+  return (
+    <div className="bg-white rounded-lg border border-[#dddbda] shadow-[0_2px_2px_rgba(0,0,0,0.05)] overflow-hidden">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="bg-[#fafaf9] border-b border-[#dddbda] text-[#514f4d] text-[12px]">
+            {cols.map((c) => <th key={c} className="text-left font-semibold px-4 py-2.5 whitespace-nowrap">{c}</th>)}
+            <th className="w-10 px-2 py-2.5" aria-label="Row actions" />
+          </tr>
+        </thead>
+        <tbody>{children}</tbody>
+      </table>
     </div>
   );
 }

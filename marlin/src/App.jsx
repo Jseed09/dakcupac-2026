@@ -90,7 +90,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#f3f3f3] text-[#181818]" style={{ fontFamily: "'Segoe UI', 'Helvetica Neue', Arial, sans-serif" }}>
+    <div className="min-h-screen w-full bg-[#f3f3f3] text-[#181818]" style={{ fontFamily: "'Inter', 'Salesforce Sans', -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" }}>
       <header className="bg-[#032d3d] text-white">
         <div className="flex items-center gap-3 px-4 h-14">
           <button className="p-1.5 rounded hover:bg-white/10" title="App launcher" aria-label="App launcher"><Grid size={18} /></button>
