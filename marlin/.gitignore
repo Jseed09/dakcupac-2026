@@ -1,6 +1,7 @@
 node_modules
 dist
 marlin-slds-demo.html
+.smoke.cjs
 .DS_Store
 *.local
 .env
