@@ -60,7 +60,7 @@ const missingViews = views.filter((s) => !html.includes(s));
 if (missingViews.length) fail("missing view markers: " + missingViews.join(", "));
 
 // SLDS theme contract: navy header, blue accent, teal boating accent.
-const tokens = { "navy header (#16325c)": "16325c", "SLDS blue accent (#0176d3)": "0176d3", "marlin logo image": "data:image/jpeg" };
+const tokens = { "navy header (#16325c)": "16325c", "SLDS blue accent (#0176d3)": "0176d3", "marlin logo image": "data:image/png" };
 const missingTokens = Object.entries(tokens).filter(([, needle]) => !html.includes(needle)).map(([name]) => name);
 if (missingTokens.length) fail("missing theme tokens: " + missingTokens.join(", "));
 

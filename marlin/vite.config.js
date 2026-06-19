@@ -7,7 +7,7 @@ export default defineConfig({
   base: "./",
   // Inline assets up to 32kB as base64 data URIs so the logo travels inside
   // the JS bundle (keeps the single-file demo self-contained).
-  build: { assetsInlineLimit: 32768 },
+  build: { assetsInlineLimit: 262144 },
   plugins: [react()],
   server: { port: 5173, open: true },
 });
