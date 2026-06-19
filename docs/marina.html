@@ -166,4 +166,59 @@ document.querySelectorAll(".menu a").forEach(a=>a.addEventListener("click",()=>{
   document.querySelectorAll(".menu a").forEach(x=>x.classList.remove("on"));a.classList.add("on");closeCard();
   const f=a.dataset.act;els.forEach(e=>{const show=(f===undefined)|| (f==="")||(f==="fleet"&&e.dataset.fleet==="1")||(f==="svc"&&e.dataset.fleet==="0");e.style.display=show?"":"none";});
 }));
+// ===== randomized ambient event engine (dozens of one-off vignettes) =====
+let _uid=0,_collect=null;
+function akf(t){const n="z"+(_uid++);const s=document.createElement("style");s.textContent="@keyframes "+n+"{"+t+"}";document.head.appendChild(s);if(_collect)_collect.push(s);return n;}
+function anim(el,frames,dur,ease){el.style.animation=akf(frames)+" "+dur+"s "+(ease||"linear")+" forwards";}
+function E(ch,size){const d=document.createElement("div");d.style.cssText="position:absolute;left:0;top:0;line-height:1;pointer-events:none;will-change:transform;filter:drop-shadow(0 3px 3px rgba(0,0,0,.25));font-size:"+size+"px";d.textContent=ch;return d;}
+const wx=()=>R(160,1380),wy=()=>R(540,950),sxr=()=>R(80,1460),syr=()=>R(70,300);
+const EV=[];
+["⛵","🚤","🛥️","🛶","🚣","🦆","🦢","🐊","🛟","🍾","🦭","🐥","🛳️"].forEach(em=>EV.push({id:em,make:()=>{const y=wy(),dir=Math.random()<.5,x0=dir?1660:-140,x1=dir?-180:1720,f=dir?-1:1,dur=R(16,30),el=E(em,R(30,46));
+ anim(el,`0%{transform:translate(${x0}px,${y}px) scaleX(${f})}50%{transform:translate(${(x0+x1)/2}px,${y-8}px) scaleX(${f})}100%{transform:translate(${x1}px,${y}px) scaleX(${f})}`,dur);return{el,dur};}}));
+["✈️","🚁","🎈","🪁","🦅","🛸","🦋","🪂"].forEach(em=>EV.push({id:em,make:()=>{const y=syr(),dir=Math.random()<.5,x0=dir?1640:-140,x1=dir?-180:1720,f=dir?-1:1,dur=R(16,30),el=E(em,R(30,50));
+ anim(el,`0%{transform:translate(${x0}px,${y}px) scaleX(${f})}50%{transform:translate(${(x0+x1)/2}px,${y+12}px) scaleX(${f})}100%{transform:translate(${x1}px,${y}px) scaleX(${f})}`,dur);return{el,dur};}}));
+["🐬","🐟","🐠","🦈","🐸"].forEach(em=>EV.push({id:em,make:()=>{const x=wx(),y=wy(),dur=R(3,5),el=E(em,R(28,42));
+ anim(el,`0%{transform:translate(${x}px,${y}px) rotate(-25deg);opacity:0}12%{opacity:1}50%{transform:translate(${x+70}px,${y-95}px) rotate(0)}88%{opacity:1}100%{transform:translate(${x+140}px,${y}px) rotate(25deg);opacity:0}`,dur);return{el,dur};}}));
+["🐳","🦑","🧜‍♀️","🐢","🦦","🦞"].forEach(em=>EV.push({id:em,make:()=>{const x=wx(),y=wy(),dur=R(5,8),el=E(em,R(34,52));
+ anim(el,`0%{transform:translate(${x}px,${y+70}px) scale(.6);opacity:0}25%{opacity:1;transform:translate(${x}px,${y-12}px) scale(1)}72%{opacity:1;transform:translate(${x}px,${y-16}px)}100%{transform:translate(${x}px,${y+70}px) scale(.6);opacity:0}`,dur);return{el,dur};}}));
+EV.push({id:"kraken",make:()=>{const x=R(420,1080),y=R(640,880),dur=7,c=document.createElement("div");c.style.cssText="position:absolute;left:0;top:0";
+ const boat=E("🚤",40),oct=E("🐙",58);c.append(oct,boat);
+ anim(boat,`0%{transform:translate(${x-220}px,${y}px)}38%{transform:translate(${x}px,${y}px)}58%{transform:translate(${x}px,${y}px) rotate(15deg)}100%{transform:translate(${x+10}px,${y+140}px) rotate(130deg);opacity:0}`,dur);
+ anim(oct,`0%{transform:translate(${x+18}px,${y+140}px);opacity:0}45%{opacity:0}56%{transform:translate(${x+18}px,${y-14}px);opacity:1}82%{transform:translate(${x+18}px,${y+8}px);opacity:1}100%{transform:translate(${x+18}px,${y+140}px);opacity:0}`,dur);return{el:c,dur};}});
+EV.push({id:"pirates",make:()=>{const x=R(420,1020),y=R(600,860),dur=8,c=document.createElement("div");c.style.cssText="position:absolute;left:0;top:0";
+ const s1=E("⛵",46),s2=E("🏴‍☠️",40),boom=E("💥",34);c.append(s1,s2,boom);
+ anim(s1,`0%{transform:translate(${x-260}px,${y}px)}40%{transform:translate(${x-70}px,${y}px)}100%{transform:translate(${x-120}px,${y}px)}`,dur);
+ anim(s2,`0%{transform:translate(${x+240}px,${y}px) scaleX(-1)}40%{transform:translate(${x+50}px,${y}px) scaleX(-1)}100%{transform:translate(${x+100}px,${y}px) scaleX(-1)}`,dur);
+ anim(boom,`0%,40%{opacity:0;transform:translate(${x}px,${y-6}px) scale(.4)}47%{opacity:1;transform:translate(${x}px,${y-6}px) scale(1.2)}56%{opacity:0}66%{opacity:1;transform:translate(${x-12}px,${y+4}px) scale(1.1)}74%{opacity:0}100%{opacity:0}`,dur);return{el:c,dur};}});
+EV.push({id:"fireworks",make:()=>{const x=sxr(),y=R(120,320),dur=4,el=E(Math.random()<.5?"🎆":"🎇",54);
+ anim(el,`0%{transform:translate(${x}px,${y}px) scale(.2);opacity:0}30%{opacity:1;transform:translate(${x}px,${y}px) scale(1.2)}70%{opacity:1;transform:translate(${x}px,${y}px) scale(1)}100%{opacity:0;transform:translate(${x}px,${y}px) scale(1.6)}`,dur);return{el,dur};}});
+EV.push({id:"rainbow",make:()=>{const x=R(300,1100),y=R(220,440),dur=11,el=E("🌈",120);
+ anim(el,`0%{opacity:0;transform:translate(${x}px,${y}px) scale(.9)}25%{opacity:.95}75%{opacity:.95}100%{opacity:0;transform:translate(${x}px,${y}px) scale(1.05)}`,dur);return{el,dur};}});
+EV.push({id:"star",make:()=>{const x=R(200,900),y=R(60,180),dur=2.4,el=E("🌠",40);
+ anim(el,`0%{transform:translate(${x}px,${y}px) rotate(20deg);opacity:0}20%{opacity:1}100%{transform:translate(${x+520}px,${y+270}px) rotate(20deg);opacity:0}`,dur);return{el,dur};}});
+EV.push({id:"ufo",make:()=>{const x=R(400,1100),y=R(120,260),dur=9,c=document.createElement("div");c.style.cssText="position:absolute;left:0;top:0";
+ const u=E("🛸",46),cow=E("🐄",30);c.append(u,cow);
+ anim(u,`0%{transform:translate(${x-320}px,${y}px)}30%{transform:translate(${x}px,${y}px)}70%{transform:translate(${x}px,${y}px)}100%{transform:translate(${x+340}px,${y}px)}`,dur);
+ anim(cow,`0%{transform:translate(${x+6}px,${y+280}px);opacity:0}35%{opacity:1}55%{transform:translate(${x+6}px,${y+40}px);opacity:1}70%{transform:translate(${x+6}px,${y+30}px);opacity:0}100%{opacity:0}`,dur);return{el:c,dur};}});
+EV.push({id:"fisher",make:()=>{const x=wx(),y=wy(),dur=6,c=document.createElement("div");c.style.cssText="position:absolute;left:0;top:0";
+ const boat=E("🚣",40),fish=E("🐡",28);c.append(boat,fish);
+ anim(boat,`0%,100%{transform:translate(${x}px,${y}px)}50%{transform:translate(${x}px,${y-4}px)}`,dur);
+ anim(fish,`0%{transform:translate(${x+30}px,${y+30}px) scale(.6);opacity:0}55%{opacity:1}82%{transform:translate(${x+30}px,${y-32}px) scale(1);opacity:1}100%{transform:translate(${x+30}px,${y-54}px);opacity:0}`,dur);return{el:c,dur};}});
+EV.push({id:"parasail",make:()=>{const y=R(560,820),dir=Math.random()<.5,x0=dir?1640:-160,x1=dir?-200:1720,f=dir?-1:1,dur=R(16,24),c=document.createElement("div");c.style.cssText="position:absolute;left:0;top:0";
+ const b=E("🚤",38),p=E("🪂",40);c.append(b,p);const fr=t=>`0%{transform:translate(${x0}px,${t}px) scaleX(${f})}100%{transform:translate(${x1}px,${t}px) scaleX(${f})}`;
+ anim(b,fr(y),dur);anim(p,fr(y-72),dur);return{el:c,dur};}});
+EV.push({id:"seaplane",make:()=>{const y=R(560,820),dir=Math.random()<.5,x0=dir?1640:-160,x1=dir?-200:1720,f=dir?-1:1,dur=R(10,15),el=E("🛩️",46);
+ anim(el,`0%{transform:translate(${x0}px,${y-180}px) scaleX(${f})}45%{transform:translate(${(x0+x1)/2}px,${y}px) scaleX(${f})}55%{transform:translate(${(x0+x1)/2+120*f*-1}px,${y}px) scaleX(${f})}100%{transform:translate(${x1}px,${y-180}px) scaleX(${f})}`,dur);return{el,dur};}});
+EV.push({id:"storm",make:()=>{const x=sxr(),y=R(90,200),dur=6,c=document.createElement("div");c.style.cssText="position:absolute;left:0;top:0";
+ const cl=E("⛈️",54),bolt=E("⚡",30);c.append(cl,bolt);
+ anim(cl,`0%{opacity:0;transform:translate(${x}px,${y}px)}20%{opacity:1}80%{opacity:1}100%{opacity:0;transform:translate(${x+40}px,${y}px)}`,dur);
+ anim(bolt,`0%,45%{opacity:0;transform:translate(${x+16}px,${y+44}px)}50%{opacity:1}56%{opacity:0}64%{opacity:1}70%{opacity:0}100%{opacity:0}`,dur);return{el:c,dur};}});
+// scheduler — no duplicate event type on screen at once, never back-to-back
+const MAXC=8,active=new Set();let lastId=null;
+function spawnEv(e){active.add(e.id);_collect=[];const r=e.make();const st=_collect;_collect=null;fx.appendChild(r.el);
+ setTimeout(()=>{r.el.remove();st.forEach(s=>s.remove());active.delete(e.id);},r.dur*1000+400);lastId=e.id;}
+function tickEv(){if(active.size<MAXC){const c=EV.filter(e=>!active.has(e.id)&&e.id!==lastId);if(c.length)spawnEv(c[Math.floor(Math.random()*c.length)]);}
+ setTimeout(tickEv,R(1100,2700));}
+for(let i=0;i<4;i++)setTimeout(()=>{const c=EV.filter(e=>!active.has(e.id));spawnEv(c[Math.floor(Math.random()*c.length)]);},i*700);
+tickEv();
 </script></body></html>
