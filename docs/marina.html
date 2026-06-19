@@ -6,7 +6,8 @@
 <style>
   *{margin:0;box-sizing:border-box;font-family:Inter,system-ui,sans-serif;-webkit-tap-highlight-color:transparent}
   html,body{height:100%;overflow:hidden;background:#1a86b8}
-  #stage{position:fixed;inset:0;cursor:grab;overflow:hidden}
+  #stage{position:fixed;inset:0;cursor:grab;overflow:hidden;
+    background:linear-gradient(#bfe6f7 0%,#9ad6ef 22%,#4fb0dd 48%,#2a9fd6 72%,#1f86bb 100%)}
   #stage.grabbing{cursor:grabbing}
   #scene{position:absolute;top:0;left:0;width:1536px;height:1024px;transform-origin:0 0}
   #world{position:absolute;inset:0}
@@ -74,8 +75,9 @@ const els=Z.map(z=>{const e=document.createElement("div");e.className="spot";e.d
   e.addEventListener("mouseenter",()=>{if(matchMedia("(hover:hover)").matches)openCard(z,e);});
   pins.appendChild(e);return e;});
 let panX=0,panY=0,scale=1,IW=1536,IH=1024,cover=1,activeEl=null;
-function clamp(){const minX=Math.min(0,innerWidth-IW*scale),minY=Math.min(0,innerHeight-IH*scale);
-  panX=Math.max(minX,Math.min(0,panX));panY=Math.max(minY,Math.min(0,panY));}
+function clamp(){const Mx=innerWidth*0.45,My=innerHeight*0.45;
+  panX=Math.max(innerWidth-IW*scale-Mx,Math.min(Mx,panX));
+  panY=Math.max(innerHeight-IH*scale-My,Math.min(My,panY));}
 function apply(){clamp();scene.style.transform=`translate(${panX}px,${panY}px) scale(${scale})`;
   els.forEach(e=>{e.style.left=(panX+e._z.x*IW*scale)+"px";e.style.top=(panY+e._z.y*IH*scale)+"px";});
   if(activeEl)placeCard(activeEl);}
