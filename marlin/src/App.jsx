@@ -96,7 +96,7 @@ export default function App() {
         <div className="flex items-center gap-3 px-4 h-14">
           <button className="p-1.5 rounded hover:bg-white/10" title="App launcher" aria-label="App launcher"><Grid size={18} /></button>
           <div className="flex items-center pr-3 mr-1 border-r border-white/15">
-            <MarlinLogo size={22} markColor="#3ec6e0" textColor="#ffffff" />
+            <MarlinLogo height={30} textColor="#ffffff" />
           </div>
           <button className="flex items-center gap-1 text-[15px] font-bold hover:bg-white/10 rounded px-1.5 h-8">
             Service Console <ChevronDown size={15} className="text-white/70" />

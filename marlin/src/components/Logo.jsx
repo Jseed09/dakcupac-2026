@@ -1,33 +1,40 @@
 import React from "react";
+import marlinUrl from "../assets/marlin-source.jpeg";
 
-// Marlin brand mark — a sleek, minimal marlin (long bill, swept body, forked
-// tail), matching the chosen Canva concept. Single scalable SVG; pass `color`
-// to recolor (e.g. white/teal on the navy header, navy on light).
-export function MarlinMark({ size = 24, color = "#16325c", className = "" }) {
+// Source image is 571x396 with the marlin on the left and a stray "M" on the
+// right. These bounds crop tightly to just the fish (dropping the M and the
+// empty margins).
+const SRC_W = 571, SRC_H = 396;
+const CROP_X = 44, CROP_Y = 84, CROP_W = 436, CROP_H = 214;
+
+// The marlin mark — the user's actual logo image, cropped to the fish only.
+export function MarlinMark({ height = 28, rounded = true, className = "" }) {
+  const s = height / CROP_H;
   return (
-    <svg
-      viewBox="0 0 140 80"
-      width={(size * 140) / 80}
-      height={size}
+    <span
       className={className}
+      style={{
+        display: "inline-block",
+        width: CROP_W * s,
+        height,
+        backgroundImage: `url(${marlinUrl})`,
+        backgroundRepeat: "no-repeat",
+        backgroundSize: `${SRC_W * s}px ${SRC_H * s}px`,
+        backgroundPosition: `${-CROP_X * s}px ${-CROP_Y * s}px`,
+        borderRadius: rounded ? 6 : 0,
+      }}
       role="img"
       aria-label="Marlin"
-      fill={color}
-    >
-      {/* sleek body: bill (upper-left) sweeping through to a forked tail (right) */}
-      <path d="M10 32 C30 30 48 32 64 40 C70 24 80 16 92 16 C86 28 78 36 70 42 C84 44 100 46 116 42 L136 28 C128 38 124 42 120 46 L134 62 C118 52 102 52 88 54 C72 58 50 54 34 46 C24 42 16 38 10 32 Z" />
-      {/* swept pectoral fin */}
-      <path d="M64 44 C64 56 70 66 78 68 C74 58 72 50 72 44 C69 44 66 44 64 44 Z" />
-    </svg>
+    />
   );
 }
 
-// Full lockup: mark + bold "Marlin" wordmark. Used in the app header.
-export function MarlinLogo({ size = 22, markColor = "#16325c", textColor = "#16325c" }) {
+// Full lockup: fish mark + bold "Marlin" wordmark. Used in the app header.
+export function MarlinLogo({ height = 30, textColor = "#16325c" }) {
   return (
     <span className="inline-flex items-center gap-2">
-      <MarlinMark size={size} color={markColor} />
-      <span style={{ fontSize: size * 0.92, color: textColor, fontWeight: 800, letterSpacing: "-0.02em" }}>
+      <MarlinMark height={height} />
+      <span style={{ fontSize: height * 0.66, color: textColor, fontWeight: 800, letterSpacing: "-0.02em" }}>
         Marlin
       </span>
     </span>

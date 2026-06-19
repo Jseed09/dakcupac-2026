@@ -41,7 +41,7 @@ try {
     platform: "node",
     format: "cjs",
     jsx: "automatic",
-    loader: { ".jsx": "jsx" },
+    loader: { ".jsx": "jsx", ".jpeg": "dataurl", ".jpg": "dataurl", ".png": "dataurl", ".svg": "dataurl" },
     write: false,
     logLevel: "warning",
   });
@@ -60,8 +60,8 @@ const missingViews = views.filter((s) => !html.includes(s));
 if (missingViews.length) fail("missing view markers: " + missingViews.join(", "));
 
 // SLDS theme contract: navy header, blue accent, teal boating accent.
-const tokens = { "navy header (#16325c)": "16325c", "SLDS blue accent (#0176d3)": "0176d3", "marlin brand teal (#3ec6e0)": "3ec6e0" };
-const missingTokens = Object.entries(tokens).filter(([, hex]) => !html.includes(hex)).map(([name]) => name);
+const tokens = { "navy header (#16325c)": "16325c", "SLDS blue accent (#0176d3)": "0176d3", "marlin logo image": "data:image/jpeg" };
+const missingTokens = Object.entries(tokens).filter(([, needle]) => !html.includes(needle)).map(([name]) => name);
 if (missingTokens.length) fail("missing theme tokens: " + missingTokens.join(", "));
 
 console.log("SMOKE PASS: app rendered " + html.length + " bytes; all views + SLDS theme tokens present.");
