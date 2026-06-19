@@ -16,6 +16,7 @@ import ScreenPop from "./components/ScreenPop.jsx";
 import DraftModal from "./components/DraftModal.jsx";
 import IntakeModal from "./components/IntakeModal.jsx";
 import DispatchModal from "./components/DispatchModal.jsx";
+import { MarlinLogo } from "./components/Logo.jsx";
 
 const NAV = [
   ["home", "Home", Grid],
@@ -94,9 +95,8 @@ export default function App() {
       <header className="bg-[#16325c] text-white">
         <div className="flex items-center gap-3 px-4 h-14">
           <button className="p-1.5 rounded hover:bg-white/10" title="App launcher" aria-label="App launcher"><Grid size={18} /></button>
-          <div className="flex items-center gap-2 pr-3 mr-1 border-r border-white/15">
-            <span className="inline-flex items-center justify-center w-7 h-7 rounded-md bg-[#1aa0c4]"><Anchor size={16} /></span>
-            <span className="font-bold tracking-tight text-[15px]">Marlin</span>
+          <div className="flex items-center pr-3 mr-1 border-r border-white/15">
+            <MarlinLogo size={22} markColor="#3ec6e0" textColor="#ffffff" />
           </div>
           <button className="flex items-center gap-1 text-[15px] font-bold hover:bg-white/10 rounded px-1.5 h-8">
             Service Console <ChevronDown size={15} className="text-white/70" />
