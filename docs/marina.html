@@ -123,7 +123,7 @@ function start(e){down=true;moved=false;const p=pt(e);sx0=p.x;sy0=p.y;px0=panX;p
 function move(e){if(!down)return;const p=pt(e);const dx=p.x-sx0,dy=p.y-sy0;if(Math.abs(dx)+Math.abs(dy)>6)moved=true;panX=px0+dx;panY=py0+dy;applyCam();}
 function end(e){down=false;stage.classList.remove("grabbing");
   if(!moved){const b=e.target.closest(".building");if(b&&b.dataset.title)showPop(b,e);else hidePop();}}
-function pt(e){const t=e.touches?e.touches[0]:e;return{x:t.clientX,y:t.clientY};}
+function pt(e){const t=(e.touches&&e.touches[0])||(e.changedTouches&&e.changedTouches[0])||e;return{x:t.clientX,y:t.clientY};}
 stage.addEventListener("mousedown",start);window.addEventListener("mousemove",move);window.addEventListener("mouseup",end);
 stage.addEventListener("touchstart",start,{passive:true});window.addEventListener("touchmove",move,{passive:true});window.addEventListener("touchend",end);
 // hover lift + hover popup (desktop)
