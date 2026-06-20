@@ -70,12 +70,11 @@ export default function MarinaScene() {
 
     // boats enter from open foreground water and motor UP to a dock, then disappear; one goes for fuel
     const APPROACHES = [
-      [[150,985],[300,950],[430,895],[520,815],[565,735],[585,690]],
-      [[430,988],[470,930],[480,858],[470,795],[458,742]],
-      [[700,990],[742,922],[795,848],[825,775],[845,715]],
-      [[1040,988],[1010,915],[986,845],[975,775],[968,715]],
+      [[150,992],[320,958],[470,910],[560,850],[600,800]],
+      [[700,995],[758,935],[808,872],[835,812]],
+      [[1030,992],[1000,922],[980,862],[972,808]],
     ];
-    const FUEL = [[1180,990],[1258,952],[1316,906],[1340,862],[1349,828]];
+    const FUEL = [[1190,992],[1265,952],[1320,906],[1345,862],[1352,832]];
     const makeBoat = (w) => { const e = document.createElement("img"); e.src = "/boat.png"; e.style.cssText = `position:absolute;left:0;top:0;width:${w}px;height:auto;will-change:transform;pointer-events:none;filter:drop-shadow(0 4px 5px rgba(0,0,0,.2))`; return e; };
     const boats = [];
     const launch = (fuel) => { if (boats.length >= 4) return; const path = fuel ? FUEL : APPROACHES[(Math.random() * APPROACHES.length) | 0]; const el = makeBoat(R(92, 116)); fx.appendChild(el); boats.push({ el, path, t: 0, sp: R(0.05, 0.075), fuel, gas: 0 }); };
@@ -86,17 +85,14 @@ export default function MarinaScene() {
     // waves — only on water cells
     for (let i = 0; i < 11; i++) { const p = randWater(); const w = R(22, 46); const d = document.createElement("div"); d.style.cssText = `position:absolute;left:${p[0]}px;top:${p[1]}px;width:${w}px;height:0;border-top:3px solid rgba(255,255,255,.5);border-radius:50%;animation:mwave ${R(2.6,4.4)}s ease-in-out ${R(0,3)}s infinite`; fx.appendChild(d); }
 
-    const angDelta = (a, b) => { let d = a - b; while (d > 180) d -= 360; while (d < -180) d += 360; return d; };
     const tick = (ts) => { if (cancelled) return; const dt = Math.min(0.05, (ts - lastTs) / 1000 || 0); lastTs = ts;
       for (let i = boats.length - 1; i >= 0; i--) { const b = boats[i];
         if (b.fuel && b.t >= 0.86 && b.gas < 2.6) { b.gas += dt; } else { b.t += b.sp * dt; }
         if (b.t >= 1) { b.el.remove(); boats.splice(i, 1); continue; }
         const p = interpolatePath(b.path, b.t); const a = interpolatePath(b.path, Math.min(1, b.t + 0.03));
-        const H = Math.atan2(a[1] - p[1], a[0] - p[0]) * 180 / Math.PI;
-        const flip = Math.cos(H * Math.PI / 180) >= 0 ? -1 : 1;        // face travel direction
-        const rot = Math.max(-34, Math.min(34, angDelta(H, flip < 0 ? 25 : 155) * 0.55)); // bank into turns
+        const flip = (a[0] - p[0]) >= 0 ? -1 : 1;   // face travel direction; keep the art's upright look (no tilt)
         b.el.style.opacity = b.t < 0.08 ? b.t / 0.08 : b.t > 0.92 ? Math.max(0, (1 - b.t) / 0.08) : 1;
-        b.el.style.transform = `translate3d(${p[0]}px,${p[1]}px,0) translate(-50%,-50%) scaleX(${flip}) rotate(${rot}deg)`;
+        b.el.style.transform = `translate3d(${p[0]}px,${p[1]}px,0) translate(-50%,-50%) scaleX(${flip})`;
       }
       raf = requestAnimationFrame(tick); };
     raf = requestAnimationFrame(tick);
