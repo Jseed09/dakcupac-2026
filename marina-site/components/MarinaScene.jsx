@@ -121,8 +121,9 @@ export default function MarinaScene() {
     ];
     const active = new Set(); let lastVig = null;
     const spawnVig = (v) => { active.add(v.id); const p = v.z(); if (v.run) v.run(p); else spawnAt(v.e, v.s, p, v.m, v.d); lastVig = v.id; timers.push(setTimeout(() => active.delete(v.id), (v.d || 8) * 1000 + 400)); };
-    const tickVig = () => { if (cancelled) return; if (active.size < 5) { const c = VIG.filter(v => !active.has(v.id) && v.id !== lastVig); if (c.length) spawnVig(c[(Math.random() * c.length) | 0]); } timers.push(setTimeout(tickVig, R(1600, 3200))); };
-    timers.push(setTimeout(tickVig, 2500));
+    // rare, one-at-a-time happenings — a new thing every ~30-45s
+    const tickVig = () => { if (cancelled) return; if (active.size < 1) { const c = VIG.filter(v => !active.has(v.id) && v.id !== lastVig); if (c.length) spawnVig(c[(Math.random() * c.length) | 0]); } timers.push(setTimeout(tickVig, R(30000, 45000))); };
+    timers.push(setTimeout(tickVig, 14000));
 
     const onVis = () => { if (document.hidden) cancelAnimationFrame(raf); else { lastTs = 0; raf = requestAnimationFrame(tick); } };
     document.addEventListener("visibilitychange", onVis);
