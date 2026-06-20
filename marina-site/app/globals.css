@@ -1,0 +1,5 @@
+:root { --teal:#36c5e0; --navy:#0c2942; --gold:#e9c893; }
+* { margin: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; overflow: hidden; background: #1a86b8;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif; }
+button { font-family: inherit; }
