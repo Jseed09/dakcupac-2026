@@ -68,18 +68,21 @@ export default function MarinaScene() {
     const timers = [], styles = [], movers = [];
     const kf = (frames) => { const n = "z" + (uid++); const s = document.createElement("style"); s.textContent = "@keyframes " + n + "{" + frames + "}"; document.head.appendChild(s); styles.push(s); return n; };
 
-    // real boat sprites cut from the artwork — translate (drift) along water lanes, flip for direction
-    const makeBoat = (w) => { const e = document.createElement("img"); e.src = "/boat.png"; e.style.cssText = `position:absolute;left:0;top:0;width:${w}px;height:auto;will-change:transform;pointer-events:none;filter:drop-shadow(0 4px 4px rgba(0,0,0,.18))`; return e; };
-    const laneList = [MARINA_MAP.lanes.front, MARINA_MAP.lanes.left, MARINA_MAP.lanes.right, MARINA_MAP.lanes.front];
-    laneList.forEach((lane, i) => { const el = makeBoat(R(96, 124)); fx.appendChild(el); movers.push({ el, path: lane, t: Math.random(), dir: Math.random() < .5 ? 1 : -1, sp: R(0.015, 0.03) }); });
+    // forward cruising route around the open water (left edge -> across the front -> up the right edge)
+    const ROUTE = [[100,470],[95,650],[100,840],[150,930],[430,965],[820,972],[1180,962],[1280,905],[1294,760],[1296,600],[1292,520]];
+    const makeBoat = (w) => { const e = document.createElement("img"); e.src = "/boat.png"; e.style.cssText = `position:absolute;left:0;top:0;width:${w}px;height:auto;will-change:transform;pointer-events:none;filter:drop-shadow(0 4px 5px rgba(0,0,0,.2))`; return e; };
+    const boats = [];
+    for (let i = 0; i < 3; i++) { const el = makeBoat(R(96, 122)); fx.appendChild(el); boats.push({ el, t: i / 3, sp: R(0.018, 0.03) }); }
 
     // waves — only on water cells
     for (let i = 0; i < 11; i++) { const p = randWater(); const w = R(22, 46); const d = document.createElement("div"); d.style.cssText = `position:absolute;left:${p[0]}px;top:${p[1]}px;width:${w}px;height:0;border-top:3px solid rgba(255,255,255,.5);border-radius:50%;animation:mwave ${R(2.6,4.4)}s ease-in-out ${R(0,3)}s infinite`; fx.appendChild(d); }
 
-    const setT = (el, x, y, extra) => { el.style.transform = `translate3d(${x}px,${y}px,0) translate(-50%,-50%) ${extra || ""}`; };
     const tick = (ts) => { if (cancelled) return; const dt = Math.min(0.05, (ts - lastTs) / 1000 || 0); lastTs = ts;
-      for (const m of movers) { m.t += m.dir * m.sp * dt; if (m.t > 1) { m.t = 1; m.dir = -1; } if (m.t < 0) { m.t = 0; m.dir = 1; }
-        const p = interpolatePath(m.path, m.t); setT(m.el, p[0], p[1], `scaleX(${m.dir >= 0 ? 1 : -1})`); }
+      for (const b of boats) { b.t += b.sp * dt; if (b.t >= 1) b.t = 0;
+        const p = interpolatePath(ROUTE, b.t); const a = interpolatePath(ROUTE, Math.min(1, b.t + 0.012));
+        const hx = a[0] - p[0], hy = a[1] - p[1]; const flip = hx < 0 ? 1 : -1; const tilt = Math.max(-16, Math.min(16, hy * 0.5));
+        b.el.style.opacity = b.t < 0.05 ? b.t / 0.05 : b.t > 0.95 ? (1 - b.t) / 0.05 : 1;
+        b.el.style.transform = `translate3d(${p[0]}px,${p[1]}px,0) translate(-50%,-50%) scaleX(${flip}) rotate(${tilt}deg)`; }
       raf = requestAnimationFrame(tick); };
     raf = requestAnimationFrame(tick);
 
@@ -102,7 +105,8 @@ export default function MarinaScene() {
     const active = new Set(); let lastVig = null;
     const spawnVig = (v) => { active.add(v.id); const p = v.z(); if (v.run) v.run(p); else spawnAt(v.e, v.s, p, v.m, v.d); lastVig = v.id; timers.push(setTimeout(() => active.delete(v.id), (v.d || 8) * 1000 + 400)); };
     const tickVig = () => { if (cancelled) return; if (active.size < 1) { const c = VIG.filter(v => !active.has(v.id) && v.id !== lastVig); if (c.length) spawnVig(c[(Math.random() * c.length) | 0]); } timers.push(setTimeout(tickVig, R(30000, 45000))); };
-    timers.push(setTimeout(tickVig, 16000));
+    // emoji wildlife events disabled — they clashed with the art style (plane, etc.).
+    void [emoji, spawnVig, tickVig];
 
     const onVis = () => { if (document.hidden) cancelAnimationFrame(raf); else { lastTs = 0; raf = requestAnimationFrame(tick); } };
     document.addEventListener("visibilitychange", onVis);
